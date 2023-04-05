@@ -12,10 +12,16 @@ if ( NOT TARGET lib_slam_utility )
     add_subdirectory( ${SLAM_UTILITY_PATH}/src ${PROJECT_SOURCE_DIR}/build/lib_slam_utility )
 endif()
 
+# Add camera model.
+if ( NOT TARGET lib_camera_model )
+	add_subdirectory( src/camera ${PROJECT_SOURCE_DIR}/build/lib_camera_model )
+endif()
+
 add_executable( test_camera_model
-	test/test_camera_model.cpp
+    test/test_camera_model.cpp
 )
 
 target_link_libraries( test_camera_model
-	lib_slam_utility
+    lib_slam_utility
+    lib_camera_model
 )
