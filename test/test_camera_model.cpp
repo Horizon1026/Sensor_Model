@@ -76,6 +76,10 @@ void TestPinholeCameraModel() {
         cv::circle(show_undistorted, undistort_features[i], 2, cv::Scalar(255, 255, 0), 3);
     }
     cv::imshow("Pinhole undistorted image with detected features", show_undistorted);
+
+    // Draw undistortion result with extra size.
+    camera.CorrectDistortedImage(raw_image, corr_image, 1.4f);
+    cv::imshow("Pinhole undistorted image", cv_corr_image);
     cv::waitKey();
 }
 

@@ -2,7 +2,6 @@
 #define _SENSOR_MODEL_PINHOLE_CAMERA_MODEL_H_
 
 #include "camera_basic.h"
-#include "datatype_image.h"
 
 namespace SensorModel {
 
@@ -30,16 +29,14 @@ public:
 	virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) override;
 
     void SetDistortionParameter(const float k1, const float k2, const float k3, const float p1, const float p2);
-
     const float &k1() const { return k_[0]; }
     const float &k2() const { return k_[1]; }
     const float &k3() const { return k_[2]; }
     const float &p1() const { return p_[0]; }
     const float &p2() const { return p_[1]; }
 
-    bool CorrectDistortedImage(const Image &raw_image, Image &corrected_image);
-
 private:
+    // Different method to do undistortion.
     bool UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_xy);
     bool UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy);
 

@@ -41,6 +41,41 @@ bool CameraBasic::UndistortOnImagePlane(const Vec2 distort_uv, Vec2 &undistort_u
     return true;
 }
 
+// Undistort image.
+bool CameraBasic::CorrectDistortedImage(const Image &raw_image, Image &corrected_image, float scale) {
+    if (raw_image.data() == nullptr || corrected_image.data() == nullptr) {
+        return false;
+    }
+
+    if (raw_image.cols() != corrected_image.cols() || raw_image.rows() != corrected_image.rows()) {
+        return false;
+    }
+
+    const int32_t rows = corrected_image.rows();
+    const int32_t cols = corrected_image.cols();
+    scale = std::max(1e0f, scale);
+
+    Vec2 distort_uv = Vec2::Zero();
+    for (int32_t u = 0; u < cols; ++u) {
+        for (int32_t v = 0; v < rows; ++v) {
+            Vec2 undistort_uv = Vec2(u, v);
+            const Vec2 mid_uv = Vec2(cx_, cy_);
+            undistort_uv = scale * (undistort_uv - mid_uv) + mid_uv;
+
+            DistortOnImagePlane(undistort_uv, distort_uv);
+
+            float pixel_value = 0.0f;
+            if (raw_image.GetPixelValue(distort_uv.y(), distort_uv.x(), &pixel_value)) {
+                corrected_image.SetPixelValue(v, u, static_cast<uint8_t>(pixel_value));
+            } else {
+                corrected_image.SetPixelValue(v, u, 0);
+            }
+        }
+    }
+
+    return true;
+}
+
 void CameraBasic::SetMatrixK(float fx, float fy, float cx, float cy) {
 	fx_ = fx;
     fy_ = fy;

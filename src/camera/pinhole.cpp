@@ -55,33 +55,6 @@ void Pinhole::SetDistortionParameter(const float k1, const float k2, const float
     p_[1] = p2;
 }
 
-bool Pinhole::CorrectDistortedImage(const Image &raw_image, Image &corrected_image) {
-    if (raw_image.data() == nullptr || corrected_image.data() == nullptr) {
-        return false;
-    }
-
-    if (raw_image.cols() != corrected_image.cols() || raw_image.rows() != corrected_image.rows()) {
-        return false;
-    }
-
-    const int32_t rows = corrected_image.rows();
-    const int32_t cols = corrected_image.cols();
-
-    Vec2 distort = Vec2::Zero();
-    for (int32_t u = 0; u < cols; ++u) {
-        for (int32_t v = 0; v < rows; ++v) {
-            DistortOnImagePlane(Vec2(u, v), distort);
-
-            float pixel_value = 0.0f;
-            if (raw_image.GetPixelValue(distort.y(), distort.x(), &pixel_value)) {
-                corrected_image.SetPixelValue(v, u, static_cast<uint8_t>(pixel_value));
-            }
-        }
-    }
-
-    return true;
-}
-
 bool Pinhole::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_xy) {
     // Set initial value.
     undistort_xy = distort_xy;
