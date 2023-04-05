@@ -76,7 +76,7 @@ void Pinhole::SetDistortionParameter(const float k1, const float k2, const float
 }
 
 bool Pinhole::CorrectDistortedImage(const Image &raw_image, Image &corrected_image) {
-    if (raw_image.image_data() == nullptr || corrected_image.image_data() == nullptr) {
+    if (raw_image.data() == nullptr || corrected_image.data() == nullptr) {
         return false;
     }
 
