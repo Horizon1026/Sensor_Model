@@ -12,7 +12,7 @@ enum class UndistortMethod : uint8_t {
 };
 
 struct CameraModelOptions {
-    UndistortMethod kUndistortMethod = UndistortMethod::kGradientDesent;
+    UndistortMethod kUndistortMethod = UndistortMethod::kFixePointIteration;
     uint32_t kMaxIterationForUndistortion = 10;
     float kMaxIterateStepLengthForUndistortion = 1e-6f;
 
