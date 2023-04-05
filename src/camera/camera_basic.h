@@ -29,11 +29,20 @@ public:
     // Lift 3d point in camera frame on normalized plane.
     virtual void LiftToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) = 0;
 
+    // Lift 3d point in camera frame on normalized plane, and do undistortion.
+    virtual bool LiftToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy) = 0;
+
     // Lift 2d point in normalized plane on image plane.
-    inline void LiftToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv);
+    void LiftToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv);
 
     // Lift 2d point in image plane back on normalized plane.
-    inline void LiftBackToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy);
+    void LiftBackToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy);
+
+    virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) = 0;
+	virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) = 0;
+
+    bool DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv);
+	bool UndistortOnImagePlane(const Vec2 distort_uv, Vec2 &undistort_uv);
 
 	void SetMatrixK(float fx, float fy, float cx, float cy);
 

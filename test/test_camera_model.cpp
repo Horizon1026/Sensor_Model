@@ -13,7 +13,7 @@ void DetectFeaturesInRawImage(const cv::Mat &cv_raw_image, std::vector<cv::Point
         cv::circle(show_distorted, distort_features[i], 2, cv::Scalar(255, 255, 0), 3);
     }
 
-    cv::imshow("distorted image with detected features", show_distorted);
+    cv::imshow("Pinhole distorted image with detected features", show_distorted);
 }
 
 void TestPinholeCameraModel() {
@@ -75,7 +75,7 @@ void TestPinholeCameraModel() {
     for (unsigned long i = 0; i < undistort_features.size(); i++) {
         cv::circle(show_undistorted, undistort_features[i], 2, cv::Scalar(255, 255, 0), 3);
     }
-    cv::imshow("undistorted image with detected features", show_undistorted);
+    cv::imshow("Pinhole undistorted image with detected features", show_undistorted);
     cv::waitKey();
 }
 

@@ -1,6 +1,5 @@
 #include "pinhole.h"
 #include "math_kinematics.h"
-#include "slam_operations.h"
 
 namespace SensorModel {
 
@@ -14,30 +13,11 @@ void Pinhole::LiftToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) {
     }
 }
 
-bool Pinhole::DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv) {
-    Vec2 undistort_xy = Vec2((undistort_uv(0) - cx()) / fx(),
-                             (undistort_uv(1) - cy()) / fy());
-
+// Lift 3d point in camera frame on normalized plane, and do undistortion.
+bool Pinhole::LiftToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy) {
     Vec2 distort_xy;
-    RETURN_FALSE_IF_FALSE(DistortOnNormalizedPlane(undistort_xy, distort_xy));
-
-    distort_uv(0) = distort_xy(0) * fx() + cx();
-    distort_uv(1) = distort_xy(1) * fy() + cy();
-
-    return true;
-}
-
-bool Pinhole::UndistortOnImagePlane(const Vec2 distort_uv, Vec2 &undistort_uv) {
-    Vec2 distort_xy = Vec2((distort_uv(0) - cx()) / fx(),
-                           (distort_uv(1) - cy()) / fy());
-
-    Vec2 undistort_xy;
-    RETURN_FALSE_IF_FALSE(UndistortOnNormalizedPlane(distort_xy, undistort_xy));
-
-    undistort_uv(0) = undistort_xy(0) * fx() + cx();
-    undistort_uv(1) = undistort_xy(1) * fy() + cy();
-
-    return true;
+    LiftBackToNormalizedPlane(pixel_uv, distort_xy);
+    return UndistortOnNormalizedPlane(distort_xy, undistort_xy);
 }
 
 bool Pinhole::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
