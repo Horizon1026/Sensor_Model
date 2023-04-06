@@ -4,13 +4,12 @@
 
 #include "opencv2/opencv.hpp"
 
-
 void DetectFeaturesInRawImage(const cv::Mat &cv_raw_image, std::vector<cv::Point2f> &distort_features) {
     cv::goodFeaturesToTrack(cv_raw_image, distort_features, 200, 0.01, 20);
 
     cv::Mat show_distorted(cv_raw_image.rows, cv_raw_image.cols, CV_8UC3);
     cv::cvtColor(cv_raw_image, show_distorted, cv::COLOR_GRAY2BGR);
-    for (unsigned long i = 0; i < distort_features.size(); i++) {
+    for (uint32_t i = 0; i < distort_features.size(); ++i) {
         cv::circle(show_distorted, distort_features[i], 2, cv::Scalar(255, 255, 0), 3);
     }
 
@@ -73,7 +72,7 @@ void TestPinholeCameraModel() {
     // Show undistortion image.
     cv::Mat show_undistorted(cv_corr_image.rows, cv_corr_image.cols, CV_8UC3);
     cv::cvtColor(cv_corr_image, show_undistorted, cv::COLOR_GRAY2BGR);
-    for (unsigned long i = 0; i < undistort_features.size(); i++) {
+    for (uint32_t i = 0; i < undistort_features.size(); ++i) {
         cv::circle(show_undistorted, undistort_features[i], 2, cv::Scalar(255, 255, 0), 3);
     }
     cv::imshow("Pinhole undistorted image with detected features", show_undistorted);
@@ -140,7 +139,7 @@ void TestFisheyeCameraModel() {
     // Show undistortion image.
     cv::Mat show_undistorted(cv_corr_image.rows, cv_corr_image.cols, CV_8UC3);
     cv::cvtColor(cv_corr_image, show_undistorted, cv::COLOR_GRAY2BGR);
-    for (unsigned long i = 0; i < undistort_features.size(); i++) {
+    for (uint32_t i = 0; i < undistort_features.size(); ++i) {
         cv::circle(show_undistorted, undistort_features[i], 2, cv::Scalar(255, 255, 0), 3);
     }
     cv::imshow("Fisheye undistorted image with detected features", show_undistorted);
