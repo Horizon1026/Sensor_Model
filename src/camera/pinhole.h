@@ -14,9 +14,6 @@ public:
     Pinhole(const Pinhole &pinhole) = delete;
 
 public:
-    // Lift 3d point in camera frame on normalized plane.
-    virtual void LiftToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) override;
-
     // Lift 3d point in camera frame on normalized plane, and do undistortion.
     virtual bool LiftToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy) override;
 
@@ -42,11 +39,11 @@ private:
 
 private:
     // Distortion model parameters.
-	std::array<float, 3> k_ = {0, 0, 0};
-    std::array<float, 2> p_ = {0, 0};
+	std::array<float, 3> k_ = {};
+    std::array<float, 2> p_ = {};
 
 };
 
 }
 
-#endif
+#endif // end of _SENSOR_MODEL_PINHOLE_CAMERA_MODEL_H_

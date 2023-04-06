@@ -1,7 +1,18 @@
 #include "camera_basic.h"
 #include "slam_operations.h"
+#include "math_kinematics.h"
 
 namespace SensorModel {
+
+// Lift 3d point in camera frame on normalized plane.
+void CameraBasic::LiftToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) {
+    if (p_c.z() < kZero) {
+        norm_xy.setZero();
+    } else {
+        norm_xy.x() = p_c.x() / p_c.z();
+        norm_xy.y() = p_c.y() / p_c.z();
+    }
+}
 
 // Lift 2d point in normalized plane on image plane.
 void CameraBasic::LiftToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv) {
@@ -76,7 +87,7 @@ bool CameraBasic::CorrectDistortedImage(const Image &raw_image, Image &corrected
     return true;
 }
 
-void CameraBasic::SetMatrixK(float fx, float fy, float cx, float cy) {
+void CameraBasic::SetIntrinsicParameter(float fx, float fy, float cx, float cy) {
 	fx_ = fx;
     fy_ = fy;
     cx_ = cx;

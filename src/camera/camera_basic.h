@@ -9,13 +9,14 @@ namespace SensorModel {
 enum class UndistortMethod : uint8_t {
     kGradientDesent = 0,
     kFixePointIteration = 1,
+    kBisection = 2,
+    kNewtonIteration = 3,
 };
 
 struct CameraModelOptions {
-    UndistortMethod kUndistortMethod = UndistortMethod::kFixePointIteration;
+    UndistortMethod kUndistortMethod = UndistortMethod::kGradientDesent;
     uint32_t kMaxIterationForUndistortion = 10;
     float kMaxIterateStepLengthForUndistortion = 1e-6f;
-
 };
 
 class CameraBasic {
@@ -28,7 +29,7 @@ public:
 
 public:
     // Lift 3d point in camera frame on normalized plane.
-    virtual void LiftToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) = 0;
+    void LiftToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy);
 
     // Lift 3d point in camera frame on normalized plane, and do undistortion.
     virtual bool LiftToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy) = 0;
@@ -50,7 +51,7 @@ public:
     // Undistort image.
     bool CorrectDistortedImage(const Image &raw_image, Image &corrected_image, float scale = 1.0f);
 
-	void SetMatrixK(float fx, float fy, float cx, float cy);
+	void SetIntrinsicParameter(float fx, float fy, float cx, float cy);
     const float &fx() const { return fx_; }
     const float &fy() const { return fy_; }
     const float &cx() const { return cx_; }

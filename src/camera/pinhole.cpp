@@ -3,16 +3,6 @@
 
 namespace SensorModel {
 
-// Lift 3d point in camera frame on normalized plane.
-void Pinhole::LiftToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) {
-    if (p_c.z() < kZero) {
-        norm_xy.setZero();
-    } else {
-        norm_xy.x() = p_c.x() / p_c.z();
-        norm_xy.y() = p_c.y() / p_c.z();
-    }
-}
-
 // Lift 3d point in camera frame on normalized plane, and do undistortion.
 bool Pinhole::LiftToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy) {
     Vec2 distort_xy;
@@ -41,9 +31,8 @@ bool Pinhole::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_
         case UndistortMethod::kGradientDesent:
             return UndistortByGradienDesent(distort_xy, undistort_xy);
         case UndistortMethod::kFixePointIteration:
-            return UndistortByFixePointIteration(distort_xy, undistort_xy);
         default:
-            return false;
+            return UndistortByFixePointIteration(distort_xy, undistort_xy);
     }
 }
 
@@ -151,6 +140,5 @@ bool Pinhole::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undist
 
     return true;
 }
-
 
 }

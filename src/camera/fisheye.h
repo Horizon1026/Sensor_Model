@@ -14,16 +14,11 @@ public:
     Fisheye(const Fisheye &fisheye) = delete;
 
 public:
-    // Lift 3d point in camera frame on normalized plane.
-    virtual void LiftToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) override;
-
     // Lift 3d point in camera frame on normalized plane, and do undistortion.
     virtual bool LiftToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy) override;
 
-    /*
-        Distortion model:
-        r(theta) = k0 * theta + k1 * theta3 + k2 * theta5 + k3 * theta7 + k4 * theta9 + ...
-    */
+    /*  Kannala-Brandt model.
+        r(theta) = k0 * theta + k1 * theta3 + k2 * theta5 + k3 * theta7 + k4 * theta9 + ... */
 	virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) override;
 	virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) override;
 
@@ -36,12 +31,11 @@ public:
 
 private:
     // Different method to do undistortion.
-    bool UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_xy);
     bool UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy);
 
 private:
     // Distortion model parameters.
-	std::array<float, 5> k_ = {0, 0, 0, 0, 0};
+	std::array<float, 5> k_ = {};
 
 };
 

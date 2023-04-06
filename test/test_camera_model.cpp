@@ -40,7 +40,7 @@ void TestPinholeCameraModel() {
 
     // Initialize pinhole camera.
     SensorModel::Pinhole camera;
-    camera.SetMatrixK(fx, fy, cx, cy);
+    camera.SetIntrinsicParameter(fx, fy, cx, cy);
     camera.SetDistortionParameter(k1, k2, k3, p1, p2);
 
     // Undistort the whole image.
@@ -107,7 +107,7 @@ void TestFisheyeCameraModel() {
 
     // Initialize fisheye camera.
     SensorModel::Fisheye camera;
-    camera.SetMatrixK(fx, fy, cx, cy);
+    camera.SetIntrinsicParameter(fx, fy, cx, cy);
     camera.SetDistortionParameter(k1, k2, k3, k4, k5);
 
     // Undistort the whole image.
