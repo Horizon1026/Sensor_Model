@@ -3,13 +3,6 @@
 
 namespace SensorModel {
 
-// Lift 3d point in camera frame on normalized plane, and do undistortion.
-bool Pinhole::LiftToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy) {
-    Vec2 distort_xy;
-    LiftBackToNormalizedPlane(pixel_uv, distort_xy);
-    return UndistortOnNormalizedPlane(distort_xy, undistort_xy);
-}
-
 bool Pinhole::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
     const float x = undistort_xy(0);
     const float y = undistort_xy(1);

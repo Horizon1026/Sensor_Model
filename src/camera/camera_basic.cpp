@@ -26,6 +26,13 @@ void CameraBasic::LiftBackToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) 
     norm_xy(1) = (pixel_uv(1) - cy_) / fy_;
 }
 
+// Lift 3d point in camera frame on normalized plane, and do undistortion.
+bool CameraBasic::LiftToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy) {
+    Vec2 distort_xy;
+    LiftBackToNormalizedPlane(pixel_uv, distort_xy);
+    return UndistortOnNormalizedPlane(distort_xy, undistort_xy);
+}
+
 bool CameraBasic::DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv) {
     Vec2 undistort_xy = Vec2((undistort_uv(0) - cx()) / fx(),
                              (undistort_uv(1) - cy()) / fy());

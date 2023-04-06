@@ -3,13 +3,6 @@
 
 namespace SensorModel {
 
-// Lift 3d point in camera frame on normalized plane, and do undistortion.
-bool Fisheye::LiftToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy) {
-    Vec2 distort_xy;
-    LiftBackToNormalizedPlane(pixel_uv, distort_xy);
-    return UndistortOnNormalizedPlane(distort_xy, undistort_xy);
-}
-
 bool Fisheye::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
     const float r = undistort_xy.norm();
     const float theta = std::atan(r);
@@ -31,6 +24,20 @@ bool Fisheye::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_
         default:
             return UndistortByFixePointIteration(distort_xy, undistort_xy);
     }
+}
+
+// Lift 2d point in normalized plane on image plane.
+void Fisheye::LiftToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv) {
+    // TODO: consider alpha.
+	pixel_uv(0) = fx() * norm_xy(0) + cx();
+    pixel_uv(1) = fy() * norm_xy(1) + cy();
+}
+
+// Lift 2d point in image plane back on normalized plane.
+void Fisheye::LiftBackToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) {
+    // TODO: consider alpha.
+	norm_xy(0) = (pixel_uv(0) - cx()) / fx();
+    norm_xy(1) = (pixel_uv(1) - cy()) / fy();
 }
 
 void Fisheye::SetDistortionParameter(float k1, float k2, float k3, float k4, float k5) {
