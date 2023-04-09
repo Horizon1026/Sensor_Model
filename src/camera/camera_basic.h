@@ -4,7 +4,7 @@
 #include "datatype_basic.h"
 #include "datatype_image.h"
 
-namespace SensorModel {
+namespace SENSOR_MODEL {
 
 enum class UndistortMethod : uint8_t {
     kGradientDesent = 0,
@@ -52,6 +52,7 @@ public:
     bool CorrectDistortedImage(const Image &raw_image, Image &corrected_image, float scale = 1.0f);
 
 	void SetIntrinsicParameter(float fx, float fy, float cx, float cy);
+    virtual void SetDistortionParameter(const Vec &params) = 0;
     const float &fx() const { return fx_; }
     const float &fy() const { return fy_; }
     const float &cx() const { return cx_; }

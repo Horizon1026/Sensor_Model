@@ -3,7 +3,7 @@
 
 #include "camera_basic.h"
 
-namespace SensorModel {
+namespace SENSOR_MODEL {
 
 class Pinhole : public CameraBasic {
 
@@ -20,7 +20,7 @@ public:
 	virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) override;
 	virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) override;
 
-    void SetDistortionParameter(const float k1, const float k2, const float k3, const float p1, const float p2);
+    virtual void SetDistortionParameter(const Vec &params) override;
     const float &k1() const { return k_[0]; }
     const float &k2() const { return k_[1]; }
     const float &k3() const { return k_[2]; }

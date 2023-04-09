@@ -1,7 +1,7 @@
 #include "pinhole.h"
 #include "math_kinematics.h"
 
-namespace SensorModel {
+namespace SENSOR_MODEL {
 
 bool Pinhole::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
     const float x = undistort_xy(0);
@@ -29,12 +29,12 @@ bool Pinhole::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_
     }
 }
 
-void Pinhole::SetDistortionParameter(const float k1, const float k2, const float k3, const float p1, const float p2) {
-    k_[0] = k1;
-    k_[1] = k2;
-    k_[2] = k3;
-    p_[0] = p1;
-    p_[1] = p2;
+void Pinhole::SetDistortionParameter(const Vec &params) {
+    k_[0] = params(0);
+    k_[1] = params(1);
+    k_[2] = params(2);
+    p_[0] = params(3);
+    p_[1] = params(4);
 }
 
 bool Pinhole::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_xy) {

@@ -39,9 +39,9 @@ void TestPinholeCameraModel() {
     undistort_features.reserve(distort_features.size());
 
     // Initialize pinhole camera.
-    SensorModel::Pinhole camera;
+    SENSOR_MODEL::Pinhole camera;
     camera.SetIntrinsicParameter(fx, fy, cx, cy);
-    camera.SetDistortionParameter(k1, k2, k3, p1, p2);
+    camera.SetDistortionParameter(Vec5(k1, k2, k3, p1, p2));
 
     // Undistort the whole image.
     Image raw_image, corr_image;
@@ -106,9 +106,9 @@ void TestFisheyeCameraModel() {
     undistort_features.reserve(distort_features.size());
 
     // Initialize fisheye camera.
-    SensorModel::Fisheye camera;
+    SENSOR_MODEL::Fisheye camera;
     camera.SetIntrinsicParameter(fx, fy, cx, cy);
-    camera.SetDistortionParameter(k1, k2, k3, k4, k5);
+    camera.SetDistortionParameter(Vec5(k1, k2, k3, k4, k5));
 
     // Undistort the whole image.
     Image raw_image, corr_image;

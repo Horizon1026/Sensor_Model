@@ -3,7 +3,7 @@
 
 #include "camera_basic.h"
 
-namespace SensorModel {
+namespace SENSOR_MODEL {
 
 class Fisheye : public CameraBasic {
 
@@ -25,7 +25,7 @@ public:
     // Lift 2d point in image plane back on normalized plane.
     virtual void LiftBackToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) override;
 
-    void SetDistortionParameter(float k1, float k2, float k3, float k4, float k5);
+    virtual void SetDistortionParameter(const Vec &params) override;
     const float &k1() const { return k_[0]; }
     const float &k2() const { return k_[1]; }
     const float &k3() const { return k_[2]; }

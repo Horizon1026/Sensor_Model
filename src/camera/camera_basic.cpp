@@ -2,7 +2,7 @@
 #include "slam_operations.h"
 #include "math_kinematics.h"
 
-namespace SensorModel {
+namespace SENSOR_MODEL {
 
 // Lift 3d point in camera frame on normalized plane.
 void CameraBasic::LiftToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) {

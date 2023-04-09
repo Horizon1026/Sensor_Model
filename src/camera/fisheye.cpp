@@ -1,7 +1,7 @@
 #include "fisheye.h"
 #include "math_kinematics.h"
 
-namespace SensorModel {
+namespace SENSOR_MODEL {
 
 bool Fisheye::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
     const float r = undistort_xy.norm();
@@ -40,12 +40,10 @@ void Fisheye::LiftBackToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) {
     norm_xy(1) = (pixel_uv(1) - cy()) / fy();
 }
 
-void Fisheye::SetDistortionParameter(float k1, float k2, float k3, float k4, float k5) {
-    k_[0] = k1;
-    k_[1] = k2;
-    k_[2] = k3;
-    k_[3] = k4;
-    k_[4] = k5;
+void Fisheye::SetDistortionParameter(const Vec &params) {
+    for (uint32_t i = 0; i < 5; ++i) {
+        k_[i] = params(i);
+    }
 }
 
 bool Fisheye::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) {
