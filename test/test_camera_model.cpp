@@ -150,7 +150,7 @@ void TestFisheyeCameraModel() {
     cv::waitKey();
 }
 
-int main() {
+int main(int argc, char **argv) {
     LogInfo(YELLOW ">> Test camera model." RESET_COLOR);
 
 	TestPinholeCameraModel();
