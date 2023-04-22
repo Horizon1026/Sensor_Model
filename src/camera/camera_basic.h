@@ -41,8 +41,8 @@ public:
     bool LiftToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy);
 
     // Do distortion and undistortion on normalized plane.
-    virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) = 0;
-	virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) = 0;
+    virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) { return false; }
+	virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) { return false; }
 
     // Do distortion and undistortion on image plane.
     bool DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv);
@@ -52,7 +52,7 @@ public:
     bool CorrectDistortedImage(const Image &raw_image, Image &corrected_image, float scale = 1.0f);
 
 	void SetIntrinsicParameter(float fx, float fy, float cx, float cy);
-    virtual void SetDistortionParameter(const Vec &params) = 0;
+    virtual void SetDistortionParameter(const Vec &params) {};
     const float &fx() const { return fx_; }
     const float &fy() const { return fy_; }
     const float &cx() const { return cx_; }
