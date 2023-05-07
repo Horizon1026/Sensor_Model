@@ -20,12 +20,26 @@ if ( NOT TARGET lib_camera_model )
 	add_subdirectory( src/camera ${PROJECT_SOURCE_DIR}/build/lib_camera_model )
 endif()
 
+# Add imu model.
+if ( NOT TARGET lib_imu_model )
+	add_subdirectory( src/imu ${PROJECT_SOURCE_DIR}/build/lib_imu_model )
+endif()
+
+# Create executable target to test camera model.
 add_executable( test_camera_model
     test/test_camera_model.cpp
 )
-
 target_link_libraries( test_camera_model
     ${OpenCV_LIBS}
     lib_slam_utility
     lib_camera_model
+)
+
+# Create executable target to test imu model.
+add_executable( test_imu_model
+    test/test_imu_model.cpp
+)
+target_link_libraries( test_imu_model
+    lib_slam_utility
+    lib_imu_model
 )
