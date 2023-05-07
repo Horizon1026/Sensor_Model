@@ -28,9 +28,15 @@ public:
     Imu() = default;
     virtual ~Imu() = default;
 
-    void PropagateNominalState(const ImuMeasurement &measurement);
+    template <typename ImuState>
+    void PropagateNominalState(const ImuMeasurement &measurement,
+                               const ImuState &state_i,
+                               ImuState &state_j);
 
-    void PropagateNominalStateCovariance(const ImuMeasurement &measurement);
+    template <typename CovType>
+    void PropagateNominalStateCovariance(const ImuMeasurement &measurement,
+                                         const CovType &covariance_i,
+                                         CovType &covariance_j);
 
     void PropagateResidualStateCovariance(const ImuMeasurement &measurement);
 

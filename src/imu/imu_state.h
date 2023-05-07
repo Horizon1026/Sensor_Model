@@ -7,11 +7,11 @@
 namespace SENSOR_MODEL {
 
 /* Imu state with size 15. */
-class ImuState {
+class ImuState15 {
 
 public:
-    ImuState() = default;
-    virtual ~ImuState() = default;
+    ImuState15() = default;
+    virtual ~ImuState15() = default;
 
 public:
     Vec3 p_wi = Vec3::Zero();
@@ -19,15 +19,16 @@ public:
     Vec3 v_wi = Vec3::Zero();
     Vec3 ba = Vec3::Zero();
     Vec3 bg = Vec3::Zero();
+    float time_stamp = 0.0f;
 
 };
 
 /* Imu state with size 18. */
-class ImuExState : public ImuState {
+class ImuState18 : public ImuState15 {
 
 public:
-    ImuExState() : ImuState() {}
-    virtual ~ImuExState() = default;
+    ImuState18() : ImuState15() {}
+    virtual ~ImuState18() = default;
 
 public:
     Vec3 g_w = Vec3(0, 0, 9.8f);
