@@ -6,12 +6,29 @@
 
 namespace SENSOR_MODEL {
 
-/* Imu state with size 15. */
-class ImuState15 {
+/* Measurement of imu. */
+struct ImuMeasurement {
+    Vec3 accel = Vec3::Zero();
+    Vec3 gyro = Vec3::Zero();
+    float time_stamp = 0.0f;
+};
+
+/* Indice of imu state. */
+enum ImuStateIndex : uint8_t {
+    kPosition = 0,
+    kVelocity = 3,
+    kRotation = 6,
+    kBiasAccel = 9,
+    kBiasGyro = 12,
+    kGravity = 15,
+};
+
+/* Imu state with size 15 or 18. */
+class ImuState {
 
 public:
-    ImuState15() = default;
-    virtual ~ImuState15() = default;
+    ImuState() = default;
+    virtual ~ImuState() = default;
 
 public:
     Vec3 p_wi = Vec3::Zero();
@@ -19,36 +36,12 @@ public:
     Vec3 v_wi = Vec3::Zero();
     Vec3 ba = Vec3::Zero();
     Vec3 bg = Vec3::Zero();
-    float time_stamp = 0.0f;
-
-};
-
-/* Imu state with size 18. */
-class ImuState18 : public ImuState15 {
-
-public:
-    ImuState18() : ImuState15() {}
-    virtual ~ImuState18() = default;
-
-public:
     Vec3 g_w = Vec3(0, 0, 9.8f);
 
-};
-
-/* Imu preintegrate block. */
-class ImuPreintegrateBlock {
-
-public:
-    ImuPreintegrateBlock() = default;
-    virtual ~ImuPreintegrateBlock() = default;
-
-public:
-    Vec3 p_ij = Vec3::Zero();
-    Quat q_ij = Quat::Identity();
-    Vec3 v_ij = Vec3::Zero();
+    float time_stamp = 0.0f;
 
 };
 
 }
 
-#endif
+#endif // end of _SENSOR_MODEL_IMU_STATE_H_

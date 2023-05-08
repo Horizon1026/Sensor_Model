@@ -4,55 +4,42 @@
 #include "datatype_basic.h"
 #include "math_kinematics.h"
 #include "imu_state.h"
+#include "imu_preintegrate.h"
 
 namespace SENSOR_MODEL {
 
-struct ImuMeasurement {
-    Vec3 accel = Vec3::Zero();
-    Vec3 gyro = Vec3::Zero();
-    float time_stamp = 0.0f;
+struct ImuModelOptions {
+    float kAccelNoise = 1e-6f;
+    float kGyroNoise = 1e-6f;
+    float kAccelRandomWalk = 1e-6f;
+    float kGyroRandomWalk = 1e-6f;
+    int32_t kImuStateSize = 15;
 };
 
-enum ImuStateIndex : uint8_t {
-    kPosition = 0,
-    kVelocity = 3,
-    kRotation = 6,
-    kBiasAccel = 9,
-    kBiasGyro = 12,
-    kGravity = 15,
-};
-
+/* Class IMU model Declaration. */
 class Imu {
 
 public:
     Imu() = default;
     virtual ~Imu() = default;
 
-    template <typename ImuState>
-    void PropagateNominalState(const ImuMeasurement &measurement,
+    bool PropagateNominalState(const ImuMeasurement &measurement,
                                const ImuState &state_i,
                                ImuState &state_j);
 
-    template <typename CovType>
-    void PropagateNominalStateCovariance(const ImuMeasurement &measurement,
-                                         const CovType &covariance_i,
-                                         CovType &covariance_j);
+    bool PropagateNominalStateCovariance(const ImuMeasurement &measurement,
+                                         const Mat &covariance_i,
+                                         Mat &covariance_j);
 
-    void PropagateResidualStateCovariance(const ImuMeasurement &measurement);
+    bool PropagateResidualStateCovariance(const ImuMeasurement &measurement);
 
-    void PropagetePreintegrationBlock(const ImuMeasurement &measurement);
+    bool PropagetePreintegrationBlock(const ImuMeasurement &measurement);
 
     // Reference for member variables.
-    float &noise_accel() { return noise_accel_; }
-    float &noise_gyro() { return noise_gyro_; }
-    float &random_walk_accel() { return random_walk_accel_; }
-    float &random_walk_gyro() { return random_walk_gyro_; }
+    ImuModelOptions &options() { return options_; }
 
 private:
-    float noise_accel_ = 0.0f;
-    float noise_gyro_ = 0.0f;
-    float random_walk_accel_ = 0.0f;
-    float random_walk_gyro_ = 0.0f;
+    ImuModelOptions options_;
 
 };
 

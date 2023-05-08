@@ -2,32 +2,18 @@
 
 namespace SENSOR_MODEL {
 
-template <>
-void Imu::PropagateNominalState<ImuState15>(const ImuMeasurement &measurement,
-                                            const ImuState15 &state_i,
-                                            ImuState15 &state_j) {
+bool Imu::PropagateNominalState(const ImuMeasurement &measurement,
+                                const ImuState &state_i,
+                                ImuState &state_j) {
 
+    return true;
 }
 
-template <>
-void Imu::PropagateNominalState<ImuState18>(const ImuMeasurement &measurement,
-                                            const ImuState18 &state_i,
-                                            ImuState18 &state_j) {
+bool Imu::PropagateNominalStateCovariance(const ImuMeasurement &measurement,
+                                          const Mat &covariance_i,
+                                          Mat &covariance_j) {
 
-}
-
-template <>
-void Imu::PropagateNominalStateCovariance<Mat15>(const ImuMeasurement &measurement,
-                                                 const Mat15 &covariance_i,
-                                                 Mat15 &covariance_j) {
-
-}
-
-template <>
-void Imu::PropagateNominalStateCovariance<Mat18>(const ImuMeasurement &measurement,
-                                                 const Mat18 &covariance_i,
-                                                 Mat18 &covariance_j) {
-
+    return true;
 }
 
 }
