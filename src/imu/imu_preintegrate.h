@@ -36,11 +36,11 @@ public:
 
     float &integrate_time_s() { return integrate_time_s_; }
 
-    Mat3 dr_dbg() { return jacobian_.block<3, 3>(ImuStateIndex::kRotation, ImuStateIndex::kBiasGyro); }
-    Mat3 dv_dba() { return jacobian_.block<3, 3>(ImuStateIndex::kVelocity, ImuStateIndex::kBiasAccel); }
-    Mat3 dv_dbg() { return jacobian_.block<3, 3>(ImuStateIndex::kVelocity, ImuStateIndex::kBiasGyro); }
-    Mat3 dp_dba() { return jacobian_.block<3, 3>(ImuStateIndex::kPosition, ImuStateIndex::kBiasAccel); }
-    Mat3 dp_dbg() { return jacobian_.block<3, 3>(ImuStateIndex::kPosition, ImuStateIndex::kBiasGyro); }
+    inline Mat3 dr_dbg() { return jacobian_.block<3, 3>(ImuStateIndex::kRotation, ImuStateIndex::kBiasGyro); }
+    inline Mat3 dv_dba() { return jacobian_.block<3, 3>(ImuStateIndex::kVelocity, ImuStateIndex::kBiasAccel); }
+    inline Mat3 dv_dbg() { return jacobian_.block<3, 3>(ImuStateIndex::kVelocity, ImuStateIndex::kBiasGyro); }
+    inline Mat3 dp_dba() { return jacobian_.block<3, 3>(ImuStateIndex::kPosition, ImuStateIndex::kBiasAccel); }
+    inline Mat3 dp_dbg() { return jacobian_.block<3, 3>(ImuStateIndex::kPosition, ImuStateIndex::kBiasGyro); }
 
 private:
     Vec3 p_ij_ = Vec3::Zero();
