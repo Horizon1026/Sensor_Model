@@ -15,13 +15,20 @@ public:
     virtual ~ImuPreintegrateBlock() = default;
 
     // Propagate integrate block.
-    void Propagate(const ImuMeasurement &measurement);
+    bool Propagate(const ImuMeasurement &measure_i,
+                   const ImuMeasurement &measure_j);
 
     // Repropagate integrate block with all imu measurements.
-    void Repropagate(const std::vector<ImuMeasurement *> &measurements);
+    bool Repropagate(const std::vector<ImuMeasurement *> &measurements,
+                     const Vec3 &bias_accel,
+                     const Vec3 &bias_gyro);
 
-    // Correct integrate block with delta bias_a and bias_g.
-    void Correct(const Vec3 &delta_ba, const Vec3 &delta_bg);
+    // Correct integrate block with new bias_a and bias_g.
+    void Correct(const Vec3 &new_ba,
+                 const Vec3 &new_bg,
+                 Vec3 &corr_p_ij,
+                 Quat &corr_q_ij,
+                 Vec3 &corr_v_ij);
 
     // Reference for member variables.
     Vec3 &p_ij() { return p_ij_; }
