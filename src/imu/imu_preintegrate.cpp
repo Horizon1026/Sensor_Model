@@ -50,33 +50,30 @@ bool ImuPreintegrateBlock::Propagate(const ImuMeasurement &measure_i,
     F.block<3, 3>(ImuStateIndex::kBiasGyro, ImuStateIndex::kBiasGyro) = I3;
 
     Mat15x18 V = Mat15x18::Zero();
-    V.block<3, 3>(0, 0)   = 0.25f * Ri * dt2;
-    V.block<3, 3>(0, 3)   = - 0.25f * Rj * Raj  * dt2 * half_dt;
-    V.block<3, 3>(0, 6)   = 0.25f * Rj * dt2;
-    V.block<3, 3>(0, 9)   = V.block<3, 3>(0, 3);
-    V.block<3, 3>(3, 3)   = 0.5f * dt_I3;
-    V.block<3, 3>(3, 9)   = 0.5f * dt_I3;
-    V.block<3, 3>(6, 0)   = Ri * half_dt;
-    V.block<3, 3>(6, 3)   = - Rj * Raj * half_dt * half_dt;
-    V.block<3, 3>(6, 6)   = Rj * half_dt;
-    V.block<3, 3>(6, 9)   = V.block<3, 3>(6, 3);
-    V.block<3, 3>(9, 12)  = dt_I3;
-    V.block<3, 3>(12, 15) = dt_I3;
+    V.block<3, 3>(ImuStateIndex::kPosition, 0) = 0.25f * Ri * dt2;
+    V.block<3, 3>(ImuStateIndex::kPosition, 3) = - 0.25f * Rj * Raj * dt2 * half_dt;
+    V.block<3, 3>(ImuStateIndex::kPosition, 6) = 0.25f * Rj * dt2;
+    V.block<3, 3>(ImuStateIndex::kPosition, 9) = V.block<3, 3>(ImuStateIndex::kPosition, 3);
+    V.block<3, 3>(ImuStateIndex::kVelocity, 3) = 0.5f * dt_I3;
+    V.block<3, 3>(ImuStateIndex::kVelocity, 9) = 0.5f * dt_I3;
+    V.block<3, 3>(ImuStateIndex::kRotation, 0) = Ri * half_dt;
+    V.block<3, 3>(ImuStateIndex::kRotation, 3) = - Rj * Raj * half_dt * half_dt;
+    V.block<3, 3>(ImuStateIndex::kRotation, 6) = Rj * half_dt;
+    V.block<3, 3>(ImuStateIndex::kRotation, 9) = V.block<3, 3>(ImuStateIndex::kRotation, 3);
+    V.block<3, 3>(ImuStateIndex::kBiasAccel, 12) = dt_I3;
+    V.block<3, 3>(ImuStateIndex::kBiasGyro, 15) = dt_I3;
+
+    // In order to compute V * Q * V.t, decompose Q as sqrt(Q), and compute V * sqrt(Q) with noise model.
+    for (uint32_t i = 0; i < 18; ++i) {
+        V.col(i) *= noise_sigma_(i);
+    }
 
     // Update jacobian, covariance and preintegration results.
     jacobian_ = F * jacobian_;
-    covariance_ = F * covariance_ * F.transpose();  // + V * Q * V.t
+    covariance_ = F * covariance_ * F.transpose() + V * V.transpose();
     p_ij_ = new_p_ij;
     q_ij_ = new_q_ij;
     v_ij_ = new_v_ij;
-
-    return true;
-}
-
-// Repropagate integrate block with all imu measurements.
-bool ImuPreintegrateBlock::Repropagate(const std::vector<ImuMeasurement *> &measurements,
-                                       const Vec3 &bias_accel,
-                                       const Vec3 &bias_gyro) {
 
     return true;
 }
@@ -96,6 +93,19 @@ void ImuPreintegrateBlock::Correct(const Vec3 &new_ba,
     const Vec3 temp = dr_dbg() * delta_bg;
     corr_q_ij = q_ij_ * Utility::Exponent(temp).normalized();
     corr_q_ij.normalize();
+}
+
+// Set noise sigma vector.
+void ImuPreintegrateBlock::SetImuNoiseSigma(const float accel_noise,
+                                            const float gyro_noise,
+                                            const float accel_random_walk,
+                                            const float gyro_random_walk) {
+    noise_sigma_ << accel_noise, accel_noise, accel_noise,
+                    gyro_noise, gyro_noise, gyro_noise,
+                    accel_noise, accel_noise, accel_noise,
+                    gyro_noise, gyro_noise, gyro_noise,
+                    accel_random_walk, accel_random_walk, accel_random_walk,
+                    gyro_random_walk, gyro_random_walk, gyro_random_walk;
 }
 
 }

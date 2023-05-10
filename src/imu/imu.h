@@ -23,17 +23,31 @@ public:
     Imu() = default;
     virtual ~Imu() = default;
 
-    bool PropagateNominalState(const ImuMeasurement &measurement,
+    bool PropagateNominalState(const ImuMeasurement &meas_i,
+                               const ImuMeasurement &meas_j,
                                const ImuState &state_i,
                                ImuState &state_j);
 
-    bool PropagateNominalStateCovariance(const ImuMeasurement &measurement,
-                                         const Mat &covariance_i,
-                                         Mat &covariance_j);
+    bool PropagateNominalState(const ImuMeasurement &meas_i,
+                               const ImuMeasurement &meas_j,
+                               const ImuState &state_i,
+                               ImuState &state_j,
+                               Vec3 &mid_accel,
+                               Vec3 &mid_gyro);
 
-    bool PropagateResidualStateCovariance(const ImuMeasurement &measurement);
+    bool PropagateNominalStateCovariance(const ImuMeasurement &meas_i,
+                                         const ImuMeasurement &meas_j,
+                                         const Mat &cov_i,
+                                         Mat &cov_j);
 
-    bool PropagetePreintegrationBlock(const ImuMeasurement &measurement);
+    bool PropagateResidualStateCovariance(const ImuMeasurement &meas_i,
+                                          const ImuMeasurement &meas_j,
+                                          const Mat &cov_i,
+                                          Mat &cov_j);
+
+    bool PropagetePreintegrationBlock(const ImuMeasurement &meas_i,
+                                      const ImuMeasurement &meas_j,
+                                      ImuPreintegrateBlock &block);
 
     // Reference for member variables.
     ImuModelOptions &options() { return options_; }

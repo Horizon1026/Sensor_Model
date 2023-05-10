@@ -18,17 +18,18 @@ public:
     bool Propagate(const ImuMeasurement &measure_i,
                    const ImuMeasurement &measure_j);
 
-    // Repropagate integrate block with all imu measurements.
-    bool Repropagate(const std::vector<ImuMeasurement *> &measurements,
-                     const Vec3 &bias_accel,
-                     const Vec3 &bias_gyro);
-
     // Correct integrate block with new bias_a and bias_g.
     void Correct(const Vec3 &new_ba,
                  const Vec3 &new_bg,
                  Vec3 &corr_p_ij,
                  Quat &corr_q_ij,
                  Vec3 &corr_v_ij);
+
+    // Set noise sigma vector.
+    void SetImuNoiseSigma(const float accel_noise,
+                          const float gyro_noise,
+                          const float accel_random_walk,
+                          const float gyro_random_walk);
 
     // Reference for member variables.
     Vec3 &p_ij() { return p_ij_; }
@@ -40,6 +41,8 @@ public:
 
     Mat15 &jacobian() { return jacobian_; }
     Mat15 &covariance() { return covariance_; }
+
+    Vec18 &noise_sigma() { return noise_sigma_; }
 
     float &integrate_time_s() { return integrate_time_s_; }
 
@@ -59,6 +62,8 @@ private:
 
     Mat15 jacobian_ = Mat15::Identity();
     Mat15 covariance_ = Mat15::Zero();
+
+    Vec18 noise_sigma_ = Vec18::Ones() * 1e-6f;
 
     float integrate_time_s_ = 0.0f;
 
