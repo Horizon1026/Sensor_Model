@@ -10,8 +10,6 @@ bool Imu::PropagateNominalState(const ImuMeasurement &meas_i,
         return false;
     }
 
-    const float dt = meas_j.time_stamp - meas_i.time_stamp;
-
     // Propagate nominal state.
     Vec3 mid_accel = Vec3::Zero();
     Vec3 mid_gyro = Vec3::Zero();
@@ -50,6 +48,10 @@ bool Imu::PropagateNominalState(const ImuMeasurement &meas_i,
 
 bool Imu::PropagateNominalStateCovariance(const ImuMeasurement &meas_i,
                                           const ImuMeasurement &meas_j,
+                                          const Vec3 &mid_accel,
+                                          const Vec3 &mid_gyro,
+                                          const ImuState &state_i,
+                                          const ImuState &state_j,
                                           const Mat &cov_i,
                                           Mat &cov_j) {
 
@@ -58,15 +60,48 @@ bool Imu::PropagateNominalStateCovariance(const ImuMeasurement &meas_i,
 
 bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_i,
                                            const ImuMeasurement &meas_j,
+                                           const Vec3 &mid_accel,
+                                           const Vec3 &mid_gyro,
+                                           const ImuState &state_i,
+                                           const ImuState &state_j,
                                            const Mat &cov_i,
                                            Mat &cov_j) {
 
-    return true;
-}
+    if (meas_j.time_stamp - meas_i.time_stamp < 0) {
+        return false;
+    }
 
-bool Imu::PropagetePreintegrationBlock(const ImuMeasurement &meas_i,
-                                       const ImuMeasurement &meas_j,
-                                       ImuPreintegrateBlock &block) {
+    const float dt = meas_j.time_stamp - meas_i.time_stamp;
+    const float sqrt_dt = std::sqrt(dt);
+    const Mat3 dt_I3 = dt * Mat3::Identity();
+    const Mat3 sqrt_dt_I3 = sqrt_dt * Mat3::Identity();
+    const Mat3 R_wi_i = state_i.q_wi.matrix();
+
+    Mat15 F = Mat15::Zero();
+    F.block<3, 3>(ImuIndex::kPosition, ImuIndex::kVelocity) = dt_I3;
+    F.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kRotation) = - dt * R_wi_i * Utility::SkewSymmetricMatrix(mid_accel);
+    F.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasAccel) = - dt * R_wi_i;
+    F.block<3, 3>(ImuIndex::kRotation, ImuIndex::kRotation) = Mat3::Identity() - dt * Utility::SkewSymmetricMatrix(mid_gyro);
+    F.block<3, 3>(ImuIndex::kRotation, ImuIndex::kBiasGyro) = - dt_I3;
+
+    Mat15x12 G = Mat15x12::Zero();
+    G.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kNoiseAccel) = dt * R_wi_i;
+    G.block<3, 3>(ImuIndex::kRotation, ImuIndex::kNoiseGyro) = dt_I3;
+    G.block<3, 3>(ImuIndex::kBiasAccel, ImuIndex::kRandomWalkAccel) = sqrt_dt_I3;
+    G.block<3, 3>(ImuIndex::kBiasGyro, ImuIndex::kRandomWalkGyro) = sqrt_dt_I3;
+
+    if (noise_sigma_(0) != options_.kAccelNoise) {
+        noise_sigma_.segment<3>(ImuIndex::kNoiseAccel).array() = options_.kAccelNoise;
+        noise_sigma_.segment<3>(ImuIndex::kNoiseGyro).array() = options_.kGyroNoise;
+        noise_sigma_.segment<3>(ImuIndex::kRandomWalkAccel).array() = options_.kAccelRandomWalk;
+        noise_sigma_.segment<3>(ImuIndex::kRandomWalkGyro).array() = options_.kGyroRandomWalk;
+    }
+
+    // In order to compute G * Q * G.t, decompose Q as sqrt(Q), and compute G * sqrt(Q) with noise model.
+    for (uint32_t i = 0; i < 12; ++i) {
+        G.col(i) *= noise_sigma_(i);
+    }
+    cov_j = F * cov_i * F.transpose() + G * G.transpose();
 
     return true;
 }

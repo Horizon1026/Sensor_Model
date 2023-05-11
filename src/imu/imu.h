@@ -13,7 +13,6 @@ struct ImuModelOptions {
     float kGyroNoise = 1e-6f;
     float kAccelRandomWalk = 1e-6f;
     float kGyroRandomWalk = 1e-6f;
-    int32_t kImuStateSize = 15;
 };
 
 /* Class IMU model Declaration. */
@@ -37,23 +36,30 @@ public:
 
     bool PropagateNominalStateCovariance(const ImuMeasurement &meas_i,
                                          const ImuMeasurement &meas_j,
+                                         const Vec3 &mid_accel,
+                                         const Vec3 &mid_gyro,
+                                         const ImuState &state_i,
+                                         const ImuState &state_j,
                                          const Mat &cov_i,
                                          Mat &cov_j);
 
     bool PropagateResidualStateCovariance(const ImuMeasurement &meas_i,
                                           const ImuMeasurement &meas_j,
+                                          const Vec3 &mid_accel,
+                                          const Vec3 &mid_gyro,
+                                          const ImuState &state_i,
+                                          const ImuState &state_j,
                                           const Mat &cov_i,
                                           Mat &cov_j);
-
-    bool PropagetePreintegrationBlock(const ImuMeasurement &meas_i,
-                                      const ImuMeasurement &meas_j,
-                                      ImuPreintegrateBlock &block);
 
     // Reference for member variables.
     ImuModelOptions &options() { return options_; }
 
 private:
     ImuModelOptions options_;
+
+    // Sequence is na, ng, nwa, nwg
+    Vec12 noise_sigma_ = Vec12::Ones() * 1e-6f;
 
 };
 

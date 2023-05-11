@@ -14,13 +14,25 @@ struct ImuMeasurement {
 };
 
 /* Indice of imu state. */
-enum ImuStateIndex : uint8_t {
+enum ImuIndex : uint8_t {
     kPosition = 0,
     kVelocity = 3,
     kRotation = 6,
     kBiasAccel = 9,
     kBiasGyro = 12,
     kGravity = 15,
+
+    kNoiseAccel = 0,
+    kNoiseGyro = 3,
+    kRandomWalkAccel = 6,
+    kRandomWalkGyro = 9,
+
+    kMidValueNoiseAccel0 = 0,
+    kMidValueNoiseGyro0 = 3,
+    kMidValueNoiseAccel1 = 6,
+    kMidValueNoiseGyro1 = 9,
+    kMidValueRandomWalkAccel = 12,
+    kMidValueRandomWalkGyro = 15,
 };
 
 /* Imu state with size 15 or 18. */
