@@ -69,8 +69,11 @@ bool ImuPreintegrateBlock::Propagate(const ImuMeasurement &measure_i,
     }
 
     // Update jacobian, covariance and preintegration results.
-    jacobian_ = F * jacobian_;
-    covariance_ = F * covariance_ * F.transpose() + V * V.transpose();
+    const Mat15 jacobian = F * jacobian_;
+    const Mat15 covariance = F * covariance_ * F.transpose() + V * V.transpose();
+
+    jacobian_ = jacobian;
+    covariance_ = covariance;
     p_ij_ = new_p_ij;
     q_ij_ = new_q_ij;
     v_ij_ = new_v_ij;

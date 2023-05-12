@@ -73,7 +73,7 @@ void TestImuPreintegration(std::vector<ImuMeasurement> &measurements,
 
     // Preintegrate all imu measurements.
     ImuPreintegrateBlock block;
-    block.SetImuNoiseSigma(0.5f, 0.5f, 0.5f, 0.5f);
+    block.SetImuNoiseSigma(1e-2f, 1e-2f, 1e-2f, 1e-2f);
     for (int32_t i = start_index + 1; i < end_index + 1; ++i) {
         block.Propagate(measurements[i - 1], measurements[i]);
     }
@@ -119,10 +119,10 @@ void TestImuIntegration(std::vector<ImuMeasurement> &measurements,
 
     // Integrate state and covariance.
     Imu imu_model;
-    imu_model.options().kAccelNoise = 0.5f;
-    imu_model.options().kGyroNoise = 0.5f;
-    imu_model.options().kAccelRandomWalk = 0.5f;
-    imu_model.options().kGyroRandomWalk = 0.5f;
+    imu_model.options().kAccelNoise = 1e-2f;
+    imu_model.options().kGyroNoise = 1e-2f;
+    imu_model.options().kAccelRandomWalk = 1e-2f;
+    imu_model.options().kGyroRandomWalk = 1e-2f;
     for (int32_t i = start_index + 1; i < end_index + 1; ++i) {
         imu_model.PropagateNominalState(measurements[i - 1], measurements[i], state_i, state_j, mid_accel, mid_gyro);
         imu_model.PropagateResidualStateCovariance(measurements[i - 1], measurements[i], mid_accel, mid_gyro, state_i, state_j, cov_i, cov_j);
