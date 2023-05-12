@@ -158,7 +158,6 @@ int main(int argc, char **argv) {
 
     TestImuIntegration(measurements, position, rotation);
 
-    measurements.resize(20);
     TestImuPreintegration(measurements, position, rotation);
 
     return 0;
