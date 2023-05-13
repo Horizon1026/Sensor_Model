@@ -1,4 +1,5 @@
 #include "imu.h"
+#include "log_api.h"
 
 namespace SENSOR_MODEL {
 
@@ -52,8 +53,8 @@ bool Imu::PropagateNominalStateCovariance(const ImuMeasurement &meas_i,
                                           const Vec3 &mid_gyro,
                                           const ImuState &state_i,
                                           const ImuState &state_j,
-                                          const Mat &cov_i,
-                                          Mat &cov_j) {
+                                          const Mat15 &cov_i,
+                                          Mat15 &cov_j) {
 
     return true;
 }
@@ -64,8 +65,8 @@ bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_i,
                                            const Vec3 &mid_gyro,
                                            const ImuState &state_i,
                                            const ImuState &state_j,
-                                           const Mat &cov_i,
-                                           Mat &cov_j) {
+                                           const Mat15 &cov_i,
+                                           Mat15 &cov_j) {
 
     if (meas_j.time_stamp - meas_i.time_stamp < 0) {
         return false;
@@ -99,7 +100,7 @@ bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_i,
 
     // In order to compute G * Q * G.t, decompose Q as sqrt(Q), and compute G * sqrt(Q) with noise model.
     for (uint32_t i = 0; i < 12; ++i) {
-        G.col(i) *= noise_sigma_(i);
+        G.col(i).noalias() = G.col(i) * noise_sigma_(i);
     }
     cov_j = F * cov_i * F.transpose() + G * G.transpose();
 

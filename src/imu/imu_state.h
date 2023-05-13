@@ -40,6 +40,8 @@ class ImuState {
 
 public:
     ImuState() = default;
+    ImuState(const Vec3 &p_wi, const Quat &q_wi, const Vec3 &v_wi, const Vec3 &ba, const Vec3 &bg, const Vec3 &g_w, const float t) :
+        p_wi(p_wi), q_wi(q_wi), v_wi(v_wi), ba(ba), bg(bg), g_w(g_w), time_stamp(t) {}
     virtual ~ImuState() = default;
 
 public:

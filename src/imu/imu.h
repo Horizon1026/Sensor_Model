@@ -40,8 +40,8 @@ public:
                                          const Vec3 &mid_gyro,
                                          const ImuState &state_i,
                                          const ImuState &state_j,
-                                         const Mat &cov_i,
-                                         Mat &cov_j);
+                                         const Mat15 &cov_i,
+                                         Mat15 &cov_j);
 
     bool PropagateResidualStateCovariance(const ImuMeasurement &meas_i,
                                           const ImuMeasurement &meas_j,
@@ -49,8 +49,8 @@ public:
                                           const Vec3 &mid_gyro,
                                           const ImuState &state_i,
                                           const ImuState &state_j,
-                                          const Mat &cov_i,
-                                          Mat &cov_j);
+                                          const Mat15 &cov_i,
+                                          Mat15 &cov_j);
 
     // Reference for member variables.
     ImuModelOptions &options() { return options_; }
