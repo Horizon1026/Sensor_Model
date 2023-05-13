@@ -57,19 +57,20 @@ void TestImuPreintegration(std::vector<ImuMeasurement> &measurements,
                            std::vector<Quat> &rotation) {
     // Preintegrate all imu measurements.
     ImuPreintegrateBlock block;
-    for (uint32_t i = 1; i < measurements.size(); ++i) {
+    const int32_t meas_size = measurements.size();
+    for (int32_t i = 2; i < meas_size - 1; ++i) {
         block.Propagate(measurements[i - 1], measurements[i]);
     }
 
     // Compute residual.
-    const float dt = measurements.back().time_stamp - measurements.front().time_stamp;
-    const Mat3 R_wi_i = rotation.front().matrix();
-    const Quat q_wi_i = rotation.front();
-    const Quat q_wi_j = rotation.back();
-    const Vec3 p_wi_i = position.front();
-    const Vec3 p_wi_j = position.back();
-    const Vec3 v_wi_i = (p_wi_j - p_wi_i) / dt;
-    const Vec3 v_wi_j = v_wi_i;
+    const float dt = measurements[meas_size - 2].time_stamp - measurements[1].time_stamp;
+    const Mat3 R_wi_i = rotation[1].matrix();
+    const Quat q_wi_i = rotation[1];
+    const Quat q_wi_j = rotation[meas_size - 2];
+    const Vec3 p_wi_i = position[1];
+    const Vec3 p_wi_j = position[meas_size - 2];
+    const Vec3 v_wi_i = (position[2] - position[0]) / (measurements[2].time_stamp - measurements[0].time_stamp);
+    const Vec3 v_wi_j = (position[meas_size - 1] - position[meas_size - 3]) / (measurements[meas_size - 1].time_stamp - measurements[meas_size - 3].time_stamp);
     const Vec3 g_w = Vec3(0, 0, 9.8);
 
     Vec9 residual = Vec9::Zero();
