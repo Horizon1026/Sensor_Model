@@ -19,6 +19,11 @@ if ( NOT TARGET lib_imu_model )
 	add_subdirectory( src/imu ${PROJECT_SOURCE_DIR}/build/lib_imu_model )
 endif()
 
+# Add covisible graph.
+if ( NOT TARGET lib_covisible_graph )
+    add_subdirectory( src/covisible_graph ${PROJECT_SOURCE_DIR}/build/lib_covisible_graph )
+endif()
+
 # Create executable target to test camera model.
 add_executable( test_camera_model
     test/test_camera_model.cpp
@@ -34,4 +39,12 @@ add_executable( test_imu_model
 )
 target_link_libraries( test_imu_model
     lib_imu_model
+)
+
+# Create executable target to test covisible graph.
+add_executable( test_covisible_graph
+    test/test_covisible_graph.cpp
+)
+target_link_libraries( test_covisible_graph
+    lib_covisible_graph
 )
