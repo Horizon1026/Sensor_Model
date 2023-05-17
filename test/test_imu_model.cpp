@@ -1,4 +1,4 @@
-#include "log_api.h"
+#include "log_report.h"
 #include "imu_state.h"
 #include "imu.h"
 #include "imu_preintegrate.h"
@@ -11,7 +11,7 @@ bool LoadImuMeasurements(const std::string &imu_file,
                          std::vector<ImuMeasurement> &measurements,
                          std::vector<Vec3> &position,
                          std::vector<Quat> &rotation) {
-    LogInfo(">> Load imu data from " << imu_file);
+    ReportInfo(">> Load imu data from " << imu_file);
 
     measurements.clear();
     position.clear();
@@ -45,14 +45,14 @@ bool LoadImuMeasurements(const std::string &imu_file,
         ++cnt;
     }
 
-    LogInfo(GREEN << cnt << RESET_COLOR " imu raw data loaded.");
+    ReportInfo(GREEN << cnt << RESET_COLOR " imu raw data loaded.");
     return true;
 }
 
 void TestImuPreintegration(std::vector<ImuMeasurement> &measurements,
                            std::vector<Vec3> &position,
                            std::vector<Quat> &rotation) {
-    LogInfo(YELLOW ">> Test imu preintegration." RESET_COLOR);
+    ReportInfo(YELLOW ">> Test imu preintegration." RESET_COLOR);
 
     // Define range.
     const int32_t start_index = 1;
@@ -84,15 +84,15 @@ void TestImuPreintegration(std::vector<ImuMeasurement> &measurements,
     residual.segment<3>(ImuIndex::kVelocity) = R_wi_i.transpose() * (v_wi_j - v_wi_i + g_w * dt) - block.v_ij();
     residual.segment<3>(ImuIndex::kRotation) = 2.0f * (block.q_ij().inverse() * (q_wi_i.inverse() * q_wi_j)).vec();
 
-    LogInfo("Residual of imu preintegration is " << LogVec(residual));
-    LogInfo("Covariance of imu preintegration is\n" << block.covariance());
+    ReportInfo("Residual of imu preintegration is " << LogVec(residual));
+    ReportInfo("Covariance of imu preintegration is\n" << block.covariance());
 
 }
 
 void TestImuIntegration(std::vector<ImuMeasurement> &measurements,
                         std::vector<Vec3> &position,
                         std::vector<Quat> &rotation) {
-    LogInfo(YELLOW ">> Test imu integration." RESET_COLOR);
+    ReportInfo(YELLOW ">> Test imu integration." RESET_COLOR);
 
     // Define range.
     const int32_t start_index = 1;
@@ -136,8 +136,8 @@ void TestImuIntegration(std::vector<ImuMeasurement> &measurements,
     residual.segment<3>(ImuIndex::kVelocity) = v_wi_j - state_j.v_wi;
     residual.segment<3>(ImuIndex::kRotation) = 2.0f * (state_j.q_wi.inverse() * q_wi_j).vec();
 
-    LogInfo("Residual of imu integration is " << LogVec(residual));
-    LogInfo("Covariance of imu integration is\n" << cov_j);
+    ReportInfo("Residual of imu integration is " << LogVec(residual));
+    ReportInfo("Covariance of imu integration is\n" << cov_j);
 }
 
 int main(int argc, char **argv) {
@@ -146,7 +146,7 @@ int main(int argc, char **argv) {
         imu_file = argv[1];
     }
 
-    LogInfo(YELLOW ">> Test imu model." RESET_COLOR);
+    ReportInfo(YELLOW ">> Test imu model." RESET_COLOR);
     LogFixPercision(5);
 
     std::vector<ImuMeasurement> measurements;

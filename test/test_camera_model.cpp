@@ -1,4 +1,4 @@
-#include "log_api.h"
+#include "log_report.h"
 #include "pinhole.h"
 #include "fisheye.h"
 
@@ -17,7 +17,7 @@ void DetectFeaturesInRawImage(const cv::Mat &cv_raw_image, std::vector<cv::Point
 }
 
 void TestPinholeCameraModel() {
-	LogInfo(YELLOW ">> Test pinhole camera model undistortion." RESET_COLOR);
+	ReportInfo(YELLOW ">> Test pinhole camera model undistortion." RESET_COLOR);
 
     // Load parameters for pinhole camera.
     const std::string image_filepath = "../examples/pinhole_distorted.png";
@@ -63,11 +63,11 @@ void TestPinholeCameraModel() {
             average_residual += (raw_distort - distort).norm();
             undistort_features.emplace_back(cv::Point2f(undistort.x(), undistort.y()));
         } else {
-            LogError("camera.UndistortOnImagePlane(raw_distort, undistort) failed.");
+            ReportError("camera.UndistortOnImagePlane(raw_distort, undistort) failed.");
         }
     }
     average_residual /= static_cast<float>(distort_features.size());
-    LogInfo("   Undistortion average residual is " << average_residual);
+    ReportInfo("   Undistortion average residual is " << average_residual);
 
     // Show undistortion image.
     cv::Mat show_undistorted(cv_corr_image.rows, cv_corr_image.cols, CV_8UC3);
@@ -84,7 +84,7 @@ void TestPinholeCameraModel() {
 }
 
 void TestFisheyeCameraModel() {
-	LogInfo(YELLOW ">> Test fisheye camera model undistortion." RESET_COLOR);
+	ReportInfo(YELLOW ">> Test fisheye camera model undistortion." RESET_COLOR);
 
     // Load parameters for fisheye camera.
     const std::string image_filepath = "../examples/fisheye_distorted.png";
@@ -130,11 +130,11 @@ void TestFisheyeCameraModel() {
             average_residual += (raw_distort - distort).norm();
             undistort_features.emplace_back(cv::Point2f(undistort.x(), undistort.y()));
         } else {
-            LogError("camera.UndistortOnImagePlane(raw_distort, undistort) failed.");
+            ReportError("camera.UndistortOnImagePlane(raw_distort, undistort) failed.");
         }
     }
     average_residual /= static_cast<float>(distort_features.size());
-    LogInfo("   Undistortion average residual is " << average_residual);
+    ReportInfo("   Undistortion average residual is " << average_residual);
 
     // Show undistortion image.
     cv::Mat show_undistorted(cv_corr_image.rows, cv_corr_image.cols, CV_8UC3);
@@ -151,7 +151,7 @@ void TestFisheyeCameraModel() {
 }
 
 int main(int argc, char **argv) {
-    LogInfo(YELLOW ">> Test camera model." RESET_COLOR);
+    ReportInfo(YELLOW ">> Test camera model." RESET_COLOR);
 
 	TestPinholeCameraModel();
     TestFisheyeCameraModel();
