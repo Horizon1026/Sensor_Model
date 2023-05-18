@@ -31,4 +31,4 @@ private:
 
 }
 
-#endif
+#endif // end of _SENSOR_MODEL_VISUAL_FRAME_H_

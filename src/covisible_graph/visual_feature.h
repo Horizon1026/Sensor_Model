@@ -39,4 +39,4 @@ private:
 
 }
 
-#endif
+#endif // end of _SENSOR_MODEL_VISUAL_FEATURE_H_
