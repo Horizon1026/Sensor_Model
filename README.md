@@ -3,7 +3,7 @@ The model of sensors for slam, for example, imu, camera, and so on.
 
 # Components
 - [x] Camera model
-- [ ] Imu model
+- [x] Imu model
 - [ ] Lidar model
 
 # Dependence
