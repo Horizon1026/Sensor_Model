@@ -8,7 +8,7 @@ namespace SENSOR_MODEL {
 
 /* Measurement of camera. */
 struct CameraMeasurement {
-    Eigen::Matrix<uint8_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> image = TMat1<uint8_t>();
+    MatImg image = MatImg::Zero(1, 1);
     float time_stamp_s = 0.0f;
 };
 
