@@ -11,12 +11,12 @@ find_package( OpenCV REQUIRED )
 
 # Add camera model.
 if ( NOT TARGET lib_camera_model )
-	add_subdirectory( src/camera ${PROJECT_SOURCE_DIR}/build/lib_camera_model )
+    add_subdirectory( src/camera ${PROJECT_SOURCE_DIR}/build/lib_camera_model )
 endif()
 
 # Add imu model.
 if ( NOT TARGET lib_imu_model )
-	add_subdirectory( src/imu ${PROJECT_SOURCE_DIR}/build/lib_imu_model )
+    add_subdirectory( src/imu ${PROJECT_SOURCE_DIR}/build/lib_imu_model )
 endif()
 
 # Create executable target to test camera model.

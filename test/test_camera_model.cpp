@@ -17,7 +17,7 @@ void DetectFeaturesInRawImage(const cv::Mat &cv_raw_image, std::vector<cv::Point
 }
 
 void TestPinholeCameraModel() {
-	ReportInfo(YELLOW ">> Test pinhole camera model undistortion." RESET_COLOR);
+    ReportInfo(YELLOW ">> Test pinhole camera model undistortion." RESET_COLOR);
 
     // Load parameters for pinhole camera.
     const std::string image_filepath = "../examples/pinhole_distorted.png";
@@ -84,7 +84,7 @@ void TestPinholeCameraModel() {
 }
 
 void TestFisheyeCameraModel() {
-	ReportInfo(YELLOW ">> Test fisheye camera model undistortion." RESET_COLOR);
+    ReportInfo(YELLOW ">> Test fisheye camera model undistortion." RESET_COLOR);
 
     // Load parameters for fisheye camera.
     const std::string image_filepath = "../examples/fisheye_distorted.png";
@@ -153,7 +153,7 @@ void TestFisheyeCameraModel() {
 int main(int argc, char **argv) {
     ReportInfo(YELLOW ">> Test camera model." RESET_COLOR);
 
-	TestPinholeCameraModel();
+    TestPinholeCameraModel();
     TestFisheyeCameraModel();
     return 0;
 }

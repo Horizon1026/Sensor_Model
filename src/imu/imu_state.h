@@ -10,7 +10,7 @@ namespace SENSOR_MODEL {
 struct ImuMeasurement {
     Vec3 accel = Vec3::Zero();
     Vec3 gyro = Vec3::Zero();
-    float time_stamp = 0.0f;
+    float time_stamp_s = 0.0f;
 };
 
 /* Indice of imu state. */
@@ -41,7 +41,7 @@ class ImuState {
 public:
     ImuState() = default;
     ImuState(const Vec3 &p_wi, const Quat &q_wi, const Vec3 &v_wi, const Vec3 &ba, const Vec3 &bg, const Vec3 &g_w, const float t) :
-        p_wi(p_wi), q_wi(q_wi), v_wi(v_wi), ba(ba), bg(bg), g_w(g_w), time_stamp(t) {}
+        p_wi(p_wi), q_wi(q_wi), v_wi(v_wi), ba(ba), bg(bg), g_w(g_w), time_stamp_s(t) {}
     virtual ~ImuState() = default;
 
 public:
@@ -52,7 +52,7 @@ public:
     Vec3 bg = Vec3::Zero();
     Vec3 g_w = Vec3(0, 0, 9.8f);
 
-    float time_stamp = 0.0f;
+    float time_stamp_s = 0.0f;
 
 };
 

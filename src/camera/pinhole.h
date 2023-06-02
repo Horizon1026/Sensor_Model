@@ -8,7 +8,7 @@ namespace SENSOR_MODEL {
 class Pinhole : public CameraBasic {
 
 public:
-	Pinhole() : CameraBasic() {}
+    Pinhole() : CameraBasic() {}
     Pinhole(float fx, float fy, float cx, float cy) : CameraBasic(fx, fy, cx, cy) {}
     virtual ~Pinhole() = default;
     Pinhole(const Pinhole &pinhole) = delete;
@@ -17,8 +17,8 @@ public:
     /*  Distortion model:
         x_distort = (1 + k1 * r2 + k2 * r4 + k3 * r6) * x + 2 * p1 * x * y + p2 * (r2 + 2 * x * x)
         y_distort = (1 + k1 * r2 + k2 * r4 + k3 * r6) * y + p1 * (r2 + 2 * y * y) + 2 * p2 * x * y */
-	virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) override;
-	virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) override;
+    virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) override;
+    virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) override;
 
     virtual void SetDistortionParameter(const Vec &params) override;
     const float &k1() const { return k_[0]; }
@@ -34,7 +34,7 @@ private:
 
 private:
     // Distortion model parameters.
-	std::array<float, 3> k_ = {};
+    std::array<float, 3> k_ = {};
     std::array<float, 2> p_ = {};
 
 };

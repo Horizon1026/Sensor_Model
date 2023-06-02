@@ -25,19 +25,19 @@ bool LoadImuMeasurements(const std::string &imu_file,
     }
 
     std::string oneLine;
-    double time_stamp;
+    double time_stamp_s;
     TVec3<double> acc, gyr, pos;
     TQuat<double> q;
     uint32_t cnt = 0;
     while (std::getline(fsIMU, oneLine) && !oneLine.empty()) {
         std::istringstream imuData(oneLine);
-        imuData >> time_stamp >> q.w() >> q.x() >> q.y() >> q.z() >> pos.x() >> pos.y() >> pos.z()
-			>> gyr.x() >> gyr.y() >> gyr.z() >> acc.x() >> acc.y() >> acc.z();
+        imuData >> time_stamp_s >> q.w() >> q.x() >> q.y() >> q.z() >> pos.x() >> pos.y() >> pos.z()
+            >> gyr.x() >> gyr.y() >> gyr.z() >> acc.x() >> acc.y() >> acc.z();
 
         ImuMeasurement meas;
         meas.accel = acc.cast<float>();
         meas.gyro = gyr.cast<float>();
-        meas.time_stamp = time_stamp;
+        meas.time_stamp_s = time_stamp_s;
         measurements.emplace_back(meas);
         position.emplace_back(pos.cast<float>());
         rotation.emplace_back(q.cast<float>());
@@ -59,16 +59,16 @@ void TestImuPreintegration(std::vector<ImuMeasurement> &measurements,
     const int32_t end_index = measurements.size() - 2;
 
     // Compute state in selected range.
-    const float dt = measurements[end_index].time_stamp - measurements[start_index].time_stamp;
+    const float dt = measurements[end_index].time_stamp_s - measurements[start_index].time_stamp_s;
     const Mat3 R_wi_i = rotation[start_index].matrix();
     const Quat q_wi_i = rotation[start_index];
     const Quat q_wi_j = rotation[end_index];
     const Vec3 p_wi_i = position[start_index];
     const Vec3 p_wi_j = position[end_index];
     const Vec3 v_wi_i = (position[start_index + 1] - position[start_index - 1])
-        / (measurements[start_index + 1].time_stamp - measurements[start_index - 1].time_stamp);
+        / (measurements[start_index + 1].time_stamp_s - measurements[start_index - 1].time_stamp_s);
     const Vec3 v_wi_j = (position[end_index + 1] - position[end_index - 1])
-        / (measurements[end_index + 1].time_stamp - measurements[end_index - 1].time_stamp);
+        / (measurements[end_index + 1].time_stamp_s - measurements[end_index - 1].time_stamp_s);
     const Vec3 g_w = Vec3(0, 0, 9.81);
 
     // Preintegrate all imu measurements.
@@ -104,13 +104,13 @@ void TestImuIntegration(std::vector<ImuMeasurement> &measurements,
     const Vec3 p_wi_i = position[start_index];
     const Vec3 p_wi_j = position[end_index];
     const Vec3 v_wi_i = (position[start_index + 1] - position[start_index - 1])
-        / (measurements[start_index + 1].time_stamp - measurements[start_index - 1].time_stamp);
+        / (measurements[start_index + 1].time_stamp_s - measurements[start_index - 1].time_stamp_s);
     const Vec3 v_wi_j = (position[end_index + 1] - position[end_index - 1])
-        / (measurements[end_index + 1].time_stamp - measurements[end_index - 1].time_stamp);
+        / (measurements[end_index + 1].time_stamp_s - measurements[end_index - 1].time_stamp_s);
     const Vec3 g_w = Vec3(0, 0, 9.81);
 
     // Prepare for integration.
-    ImuState state_i(p_wi_i, q_wi_i, v_wi_i, Vec3::Zero(), Vec3::Zero(), g_w, measurements[start_index].time_stamp);
+    ImuState state_i(p_wi_i, q_wi_i, v_wi_i, Vec3::Zero(), Vec3::Zero(), g_w, measurements[start_index].time_stamp_s);
     ImuState state_j = state_i;
     Mat15 cov_i = Mat15::Zero();
     Mat15 cov_j = cov_i;

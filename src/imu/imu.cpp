@@ -7,7 +7,7 @@ bool Imu::PropagateNominalState(const ImuMeasurement &meas_i,
                                 const ImuMeasurement &meas_j,
                                 const ImuState &state_i,
                                 ImuState &state_j) {
-    if (meas_i.time_stamp > meas_j.time_stamp) {
+    if (meas_i.time_stamp_s > meas_j.time_stamp_s) {
         return false;
     }
 
@@ -23,11 +23,11 @@ bool Imu::PropagateNominalState(const ImuMeasurement &meas_i,
                                 ImuState &state_j,
                                 Vec3 &mid_accel,
                                 Vec3 &mid_gyro) {
-    if (meas_i.time_stamp > meas_j.time_stamp) {
+    if (meas_i.time_stamp_s > meas_j.time_stamp_s) {
         return false;
     }
 
-    const float dt = meas_j.time_stamp - meas_i.time_stamp;
+    const float dt = meas_j.time_stamp_s - meas_i.time_stamp_s;
     const Vec3 &bias_a = state_i.ba;
     const Vec3 &bias_g = state_i.bg;
     const Vec3 &gravity = state_i.g_w;
@@ -68,11 +68,11 @@ bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_i,
                                            const Mat15 &cov_i,
                                            Mat15 &cov_j) {
 
-    if (meas_j.time_stamp - meas_i.time_stamp < 0) {
+    if (meas_j.time_stamp_s - meas_i.time_stamp_s < 0) {
         return false;
     }
 
-    const float dt = meas_j.time_stamp - meas_i.time_stamp;
+    const float dt = meas_j.time_stamp_s - meas_i.time_stamp_s;
     const float sqrt_dt = std::sqrt(dt);
     const Mat3 dt_I3 = dt * Mat3::Identity();
     const Mat3 sqrt_dt_I3 = sqrt_dt * Mat3::Identity();

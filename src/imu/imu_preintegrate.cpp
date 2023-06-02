@@ -6,7 +6,7 @@ namespace SENSOR_MODEL {
 bool ImuPreintegrateBlock::Propagate(const ImuMeasurement &measure_i,
                                      const ImuMeasurement &measure_j) {
     // Check integrate time.
-    const float dt = measure_j.time_stamp - measure_i.time_stamp;
+    const float dt = measure_j.time_stamp_s - measure_i.time_stamp_s;
     if (dt < 0) {
         return false;
     }

@@ -6,6 +6,12 @@
 
 namespace SENSOR_MODEL {
 
+/* Measurement of camera. */
+struct CameraMeasurement {
+    Eigen::Matrix<uint8_t, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> image = TMat1<uint8_t>();
+    float time_stamp_s = 0.0f;
+};
+
 enum class UndistortMethod : uint8_t {
     kGradientDesent = 0,
     kFixePointIteration = 1,
@@ -42,27 +48,27 @@ public:
 
     // Do distortion and undistortion on normalized plane.
     virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) { return false; }
-	virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) { return false; }
+    virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) { return false; }
 
     // Do distortion and undistortion on image plane.
     bool DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv);
-	bool UndistortOnImagePlane(const Vec2 distort_uv, Vec2 &undistort_uv);
+    bool UndistortOnImagePlane(const Vec2 distort_uv, Vec2 &undistort_uv);
 
     // Undistort image.
     bool CorrectDistortedImage(const Image &raw_image, Image &corrected_image, float scale = 1.0f);
 
-	void SetIntrinsicParameter(float fx, float fy, float cx, float cy);
+    void SetIntrinsicParameter(float fx, float fy, float cx, float cy);
     virtual void SetDistortionParameter(const Vec &params) {};
-    const float &fx() const { return fx_; }
-    const float &fy() const { return fy_; }
-    const float &cx() const { return cx_; }
-    const float &cy() const { return cy_; }
 
     // Reference for member variables.
     CameraModelOptions &options() { return options_; }
 
     // Const reference for member variables.
     const CameraModelOptions &options() const { return options_; }
+    const float &fx() const { return fx_; }
+    const float &fy() const { return fy_; }
+    const float &cx() const { return cx_; }
+    const float &cy() const { return cy_; }
 
 private:
     float fx_ = 0.0f;
