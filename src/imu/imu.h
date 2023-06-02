@@ -54,6 +54,11 @@ public:
 
     // Reference for member variables.
     ImuModelOptions &options() { return options_; }
+    Vec12 &noise_sigma() { return noise_sigma_; }
+
+    // Const reference for member variables.
+    const ImuModelOptions &options() const { return options_; }
+    const Vec12 &noise_sigma() const { return noise_sigma_; }
 
 private:
     ImuModelOptions options_;

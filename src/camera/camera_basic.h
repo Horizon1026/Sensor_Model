@@ -58,7 +58,11 @@ public:
     const float &cx() const { return cx_; }
     const float &cy() const { return cy_; }
 
+    // Reference for member variables.
     CameraModelOptions &options() { return options_; }
+
+    // Const reference for member variables.
+    const CameraModelOptions &options() const { return options_; }
 
 private:
     float fx_ = 0.0f;
