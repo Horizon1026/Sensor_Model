@@ -1,6 +1,7 @@
 #include "log_report.h"
-#include "imu_state.h"
 #include "imu.h"
+#include "imu_state.h"
+#include "imu_measurement.h"
 #include "imu_preintegrate.h"
 
 #include <fstream>

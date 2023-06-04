@@ -3,6 +3,7 @@
 
 #include "datatype_basic.h"
 #include "math_kinematics.h"
+#include "imu_measurement.h"
 #include "imu_state.h"
 #include "imu_preintegrate.h"
 
