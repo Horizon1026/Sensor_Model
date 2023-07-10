@@ -44,7 +44,7 @@ void TestPinholeCameraModel() {
     camera.SetDistortionParameter(Vec5(k1, k2, k3, p1, p2));
 
     // Undistort the whole image.
-    Image raw_image, corr_image;
+    GrayImage raw_image, corr_image;
     raw_image.SetImage(cv_raw_image.data, cv_raw_image.rows, cv_raw_image.cols);
     corr_image.SetImage(cv_corr_image.data, cv_corr_image.rows, cv_corr_image.cols);
     camera.CorrectDistortedImage(raw_image, corr_image);
@@ -111,7 +111,7 @@ void TestFisheyeCameraModel() {
     camera.SetDistortionParameter(Vec5(k1, k2, k3, k4, k5));
 
     // Undistort the whole image.
-    Image raw_image, corr_image;
+    GrayImage raw_image, corr_image;
     raw_image.SetImage(cv_raw_image.data, cv_raw_image.rows, cv_raw_image.cols);
     corr_image.SetImage(cv_corr_image.data, cv_corr_image.rows, cv_corr_image.cols);
     camera.CorrectDistortedImage(raw_image, corr_image);

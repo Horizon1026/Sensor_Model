@@ -49,7 +49,7 @@ public:
     bool UndistortOnImagePlane(const Vec2 distort_uv, Vec2 &undistort_uv);
 
     // Undistort image.
-    bool CorrectDistortedImage(const Image &raw_image, Image &corrected_image, float scale = 1.0f);
+    bool CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, float scale = 1.0f);
 
     void SetIntrinsicParameter(float fx, float fy, float cx, float cy);
     virtual void SetDistortionParameter(const Vec &params) {};

@@ -60,7 +60,7 @@ bool CameraBasic::UndistortOnImagePlane(const Vec2 distort_uv, Vec2 &undistort_u
 }
 
 // Undistort image.
-bool CameraBasic::CorrectDistortedImage(const Image &raw_image, Image &corrected_image, float scale) {
+bool CameraBasic::CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, float scale) {
     if (raw_image.data() == nullptr || corrected_image.data() == nullptr) {
         return false;
     }
