@@ -27,22 +27,22 @@ bool Fisheye::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_
 }
 
 // Lift 2d point in normalized plane on image plane.
-void Fisheye::LiftToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv) {
+void Fisheye::LiftFromNormalizedPlaneToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv) {
     // TODO: consider alpha.
     pixel_uv(0) = fx() * norm_xy(0) + cx();
     pixel_uv(1) = fy() * norm_xy(1) + cy();
 }
 
 // Lift 2d point in image plane back on normalized plane.
-void Fisheye::LiftBackToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) {
+void Fisheye::LiftFromImagePlaneToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) {
     // TODO: consider alpha.
     norm_xy(0) = (pixel_uv(0) - cx()) / fx();
     norm_xy(1) = (pixel_uv(1) - cy()) / fy();
 }
 
-void Fisheye::SetDistortionParameter(const Vec &params) {
+void Fisheye::SetDistortionParameter(const std::vector<float> &params) {
     for (uint32_t i = 0; i < 5; ++i) {
-        k_[i] = params(i);
+        k_[i] = params[i];
     }
 }
 

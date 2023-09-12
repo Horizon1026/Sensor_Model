@@ -29,12 +29,12 @@ bool Pinhole::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_
     }
 }
 
-void Pinhole::SetDistortionParameter(const Vec &params) {
-    k_[0] = params(0);
-    k_[1] = params(1);
-    k_[2] = params(2);
-    p_[0] = params(3);
-    p_[1] = params(4);
+void Pinhole::SetDistortionParameter(const std::vector<float> &params) {
+    k_[0] = params[0];
+    k_[1] = params[1];
+    k_[2] = params[2];
+    p_[0] = params[3];
+    p_[1] = params[4];
 }
 
 bool Pinhole::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_xy) {

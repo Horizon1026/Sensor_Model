@@ -28,17 +28,20 @@ public:
     CameraBasic(const CameraBasic &camera_basic) = delete;
 
 public:
-    // Lift 3d point in camera frame on normalized plane.
-    void LiftToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy);
+    // Lift 2d point in normalized plane on unit sphere.
+    void LiftFromNormalizedPlaneToUnitSphere(const Vec2 norm_xy, Vec3 &sphere_xyz);
+    // Lift 3d point in unit sphere on normalized plane.
+    void LiftFromNormalizedPlaneToUnitSphere(const Vec3 sphere_xyz, Vec2 &norm_xy);
 
     // Lift 2d point in normalized plane on image plane.
-    virtual void LiftToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv);
-
+    virtual void LiftFromNormalizedPlaneToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv);
     // Lift 2d point in image plane back on normalized plane.
-    virtual void LiftBackToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy);
+    virtual void LiftFromImagePlaneToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy);
 
+    // Lift 3d point in camera frame on normalized plane.
+    void LiftFromCameraFrameToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy);
     // Lift 3d point in camera frame on normalized plane, and do undistortion.
-    bool LiftToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy);
+    bool LiftFromCameraFrameToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy);
 
     // Do distortion and undistortion on normalized plane.
     virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) { return false; }
@@ -51,8 +54,9 @@ public:
     // Undistort image.
     bool CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, float scale = 1.0f);
 
+    // Set intrinsic and distortion parameters.
     void SetIntrinsicParameter(float fx, float fy, float cx, float cy);
-    virtual void SetDistortionParameter(const Vec &params) {};
+    virtual void SetDistortionParameter(const std::vector<float> &params) {};
 
     // Reference for member variables.
     CameraModelOptions &options() { return options_; }

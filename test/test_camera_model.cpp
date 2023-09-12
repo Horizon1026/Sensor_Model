@@ -41,7 +41,7 @@ void TestPinholeCameraModel() {
     // Initialize pinhole camera.
     SENSOR_MODEL::Pinhole camera;
     camera.SetIntrinsicParameter(fx, fy, cx, cy);
-    camera.SetDistortionParameter(Vec5(k1, k2, k3, p1, p2));
+    camera.SetDistortionParameter(std::vector<float>{k1, k2, k3, p1, p2});
 
     // Undistort the whole image.
     GrayImage raw_image, corr_image;
@@ -108,7 +108,7 @@ void TestFisheyeCameraModel() {
     // Initialize fisheye camera.
     SENSOR_MODEL::Fisheye camera;
     camera.SetIntrinsicParameter(fx, fy, cx, cy);
-    camera.SetDistortionParameter(Vec5(k1, k2, k3, k4, k5));
+    camera.SetDistortionParameter(std::vector<float>{k1, k2, k3, k4, k5});
 
     // Undistort the whole image.
     GrayImage raw_image, corr_image;

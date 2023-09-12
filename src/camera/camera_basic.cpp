@@ -4,8 +4,21 @@
 
 namespace SENSOR_MODEL {
 
+// Lift 2d point in normalized plane on unit sphere.
+void CameraBasic::LiftFromNormalizedPlaneToUnitSphere(const Vec2 norm_xy, Vec3 &sphere_xyz) {
+    const float yita = 2.0f / (1.0f + norm_xy.squaredNorm());
+    sphere_xyz.head<2>() = norm_xy * yita;
+    sphere_xyz.z() = yita - 1.0f;
+}
+
+// Lift 3d point in unit sphere on normalized plane.
+void CameraBasic::LiftFromNormalizedPlaneToUnitSphere(const Vec3 sphere_xyz, Vec2 &norm_xy) {
+    const float yita = sphere_xyz.z() + 1.0f;
+    norm_xy = sphere_xyz.head<2>() / yita;
+}
+
 // Lift 3d point in camera frame on normalized plane.
-void CameraBasic::LiftToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) {
+void CameraBasic::LiftFromCameraFrameToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) {
     if (p_c.z() < kZero) {
         norm_xy.setZero();
     } else {
@@ -15,21 +28,21 @@ void CameraBasic::LiftToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) {
 }
 
 // Lift 2d point in normalized plane on image plane.
-void CameraBasic::LiftToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv) {
+void CameraBasic::LiftFromNormalizedPlaneToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv) {
     pixel_uv(0) = fx_ * norm_xy(0) + cx_;
     pixel_uv(1) = fy_ * norm_xy(1) + cy_;
 }
 
 // Lift 2d point in image plane back on normalized plane.
-void CameraBasic::LiftBackToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) {
+void CameraBasic::LiftFromImagePlaneToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) {
     norm_xy(0) = (pixel_uv(0) - cx_) / fx_;
     norm_xy(1) = (pixel_uv(1) - cy_) / fy_;
 }
 
 // Lift 3d point in camera frame on normalized plane, and do undistortion.
-bool CameraBasic::LiftToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy) {
+bool CameraBasic::LiftFromCameraFrameToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy) {
     Vec2 distort_xy;
-    LiftBackToNormalizedPlane(pixel_uv, distort_xy);
+    LiftFromImagePlaneToNormalizedPlane(pixel_uv, distort_xy);
     return UndistortOnNormalizedPlane(distort_xy, undistort_xy);
 }
 

@@ -20,12 +20,12 @@ public:
     virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) override;
 
     // Lift 2d point in normalized plane on image plane.
-    virtual void LiftToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv) override;
+    virtual void LiftFromNormalizedPlaneToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv) override;
 
     // Lift 2d point in image plane back on normalized plane.
-    virtual void LiftBackToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) override;
+    virtual void LiftFromImagePlaneToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) override;
 
-    virtual void SetDistortionParameter(const Vec &params) override;
+    virtual void SetDistortionParameter(const std::vector<float> &params) override;
     const float &k1() const { return k_[0]; }
     const float &k2() const { return k_[1]; }
     const float &k3() const { return k_[2]; }
