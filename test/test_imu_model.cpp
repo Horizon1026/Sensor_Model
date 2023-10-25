@@ -87,6 +87,7 @@ void TestImuPreintegration(std::vector<ImuMeasurement> &measurements,
 
     ReportInfo("Residual of imu preintegration is " << LogVec(residual));
     ReportInfo("Covariance of imu preintegration is\n" << block.covariance());
+    block.Information();
 
 }
 
