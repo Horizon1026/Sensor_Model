@@ -1,6 +1,39 @@
 #include "imu_preintegrate.h"
+#include "log_report.h"
 
 namespace SENSOR_MODEL {
+
+// Reset all states.
+void ImuPreintegrateBlock::Reset() {
+    p_ij_ = Vec3::Zero();
+    v_ij_ = Vec3::Zero();
+    q_ij_ = Quat::Identity();
+
+    bias_accel_ = Vec3::Zero();
+    bias_gyro_ = Vec3::Zero();
+
+    jacobian_ = Mat15::Identity();
+    covariance_ = Mat15::Zero();
+
+    // Sequence is na_i, ng_i, na_j, ng_j, nwa, nwg
+    noise_sigma_ = Vec18::Ones() * 1e-6f;
+
+    integrate_time_s_ = 0.0f;
+}
+
+// Print all states.
+void ImuPreintegrateBlock::Information() {
+    ReportInfo("[Imu Preintegrate Block] Information:");
+    ReportInfo(" - p_ij is " << LogVec(p_ij_));
+    ReportInfo(" - v_ij is " << LogVec(v_ij_));
+    ReportInfo(" - q_ij is " << LogQuat(q_ij_));
+    ReportInfo(" - bias_accel is " << LogVec(bias_accel_));
+    ReportInfo(" - bias_gyro is " << LogVec(bias_gyro_));
+    ReportInfo(" - integrate_time is " << integrate_time_s_ << "s");
+    ReportInfo(" - noise_sigma is " << LogVec(noise_sigma_));
+    ReportInfo(" - jacobian is\n" << jacobian_);
+    ReportInfo(" - covariance is\n" << covariance_);
+}
 
 // Propagate integrate block.
 bool ImuPreintegrateBlock::Propagate(const ImuMeasurement &measure_i,

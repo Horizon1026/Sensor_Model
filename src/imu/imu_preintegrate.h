@@ -15,6 +15,12 @@ public:
     ImuPreintegrateBlock() = default;
     virtual ~ImuPreintegrateBlock() = default;
 
+    // Reset all states.
+    void Reset();
+
+    // Print all states.
+    void Information();
+
     // Propagate integrate block.
     bool Propagate(const ImuMeasurement &measure_i,
                    const ImuMeasurement &measure_j);
