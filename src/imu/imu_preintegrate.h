@@ -15,8 +15,9 @@ public:
     ImuPreintegrateBlock() = default;
     virtual ~ImuPreintegrateBlock() = default;
 
-    // Reset all states.
+    // Reset all or integrated states.
     void Reset();
+    void ResetIntegratedStates();
 
     // Print all states.
     void Information();

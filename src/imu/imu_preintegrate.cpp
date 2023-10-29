@@ -21,6 +21,18 @@ void ImuPreintegrateBlock::Reset() {
     integrate_time_s_ = 0.0f;
 }
 
+// Reset some states.
+void ResetIntegratedStates() {
+    p_ij_ = Vec3::Zero();
+    v_ij_ = Vec3::Zero();
+    q_ij_ = Quat::Identity();
+
+    jacobian_ = Mat15::Identity();
+    covariance_ = Mat15::Zero();
+
+    integrate_time_s_ = 0.0f;
+}
+
 // Print all states.
 void ImuPreintegrateBlock::Information() {
     ReportInfo("[Imu Preintegrate Block] Information:");
