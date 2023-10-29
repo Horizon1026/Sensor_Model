@@ -22,7 +22,7 @@ void ImuPreintegrateBlock::Reset() {
 }
 
 // Reset some states.
-void ResetIntegratedStates() {
+void ImuPreintegrateBlock::ResetIntegratedStates() {
     p_ij_ = Vec3::Zero();
     v_ij_ = Vec3::Zero();
     q_ij_ = Quat::Identity();
