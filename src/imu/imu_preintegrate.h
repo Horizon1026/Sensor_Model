@@ -20,6 +20,7 @@ public:
 
     // Print all states.
     void Information();
+    void SimpleInformation();
 
     // Propagate integrate block.
     bool Propagate(const ImuMeasurement &measure_i,

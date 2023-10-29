@@ -34,6 +34,16 @@ void ImuPreintegrateBlock::Information() {
     ReportInfo(" - jacobian is\n" << jacobian_);
     ReportInfo(" - covariance is\n" << covariance_);
 }
+void ImuPreintegrateBlock::SimpleInformation() {
+    ReportInfo("[Imu Preintegrate Block] Information:");
+    ReportInfo(" - p_ij is " << LogVec(p_ij_));
+    ReportInfo(" - v_ij is " << LogVec(v_ij_));
+    ReportInfo(" - q_ij is " << LogQuat(q_ij_));
+    ReportInfo(" - bias_accel is " << LogVec(bias_accel_));
+    ReportInfo(" - bias_gyro is " << LogVec(bias_gyro_));
+    ReportInfo(" - integrate_time is " << integrate_time_s_ << "s");
+    ReportInfo(" - noise_sigma is " << LogVec(noise_sigma_));
+}
 
 // Propagate integrate block.
 bool ImuPreintegrateBlock::Propagate(const ImuMeasurement &measure_i,
