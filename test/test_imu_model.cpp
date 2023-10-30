@@ -86,9 +86,8 @@ void TestImuPreintegration(std::vector<ImuMeasurement> &measurements,
     residual.segment<3>(ImuIndex::kRotation) = 2.0f * (block.q_ij().inverse() * (q_wi_i.inverse() * q_wi_j)).vec();
 
     ReportInfo("Residual of imu preintegration is " << LogVec(residual));
-    ReportInfo("Covariance of imu preintegration is\n" << block.covariance());
     block.Information();
-
+    ReportInfo("dr_dbg is\n" << block.dr_dbg());
 }
 
 void TestImuIntegration(std::vector<ImuMeasurement> &measurements,

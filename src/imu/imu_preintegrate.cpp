@@ -91,16 +91,16 @@ bool ImuPreintegrateBlock::Propagate(const ImuMeasurement &measure_i,
 
     Mat15 F = Mat15::Zero();
     F.block<3, 3>(ImuIndex::kPosition, ImuIndex::kPosition) = I3;
-    F.block<3, 3>(ImuIndex::kPosition, ImuIndex::kVelocity) = - 0.25f * Ri * Rai * dt2 - 0.25f * Rj * Raj * (I3 - Rw * dt) * dt2;
-    F.block<3, 3>(ImuIndex::kPosition, ImuIndex::kRotation) = dt_I3;
+    F.block<3, 3>(ImuIndex::kPosition, ImuIndex::kRotation) = - 0.25f * Ri * Rai * dt2 - 0.25f * Rj * Raj * (I3 - Rw * dt) * dt2;
+    F.block<3, 3>(ImuIndex::kPosition, ImuIndex::kVelocity) = dt_I3;
     F.block<3, 3>(ImuIndex::kPosition, ImuIndex::kBiasAccel) = - 0.25f * (Ri + Rj) * dt2;
     F.block<3, 3>(ImuIndex::kPosition, ImuIndex::kBiasGyro) = 0.25f * Rj * Raj * dt2 * dt;
-    F.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kVelocity) = I3 - Rw * dt;
-    F.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasGyro) = - dt_I3;
-    F.block<3, 3>(ImuIndex::kRotation, ImuIndex::kVelocity) = - Ri * Rai * half_dt - Rj * Raj * (I3 - Rw * dt) * half_dt;
-    F.block<3, 3>(ImuIndex::kRotation, ImuIndex::kRotation) = I3;
-    F.block<3, 3>(ImuIndex::kRotation, ImuIndex::kBiasAccel) = - (Ri + Rj) * half_dt;
-    F.block<3, 3>(ImuIndex::kRotation, ImuIndex::kBiasGyro) = 0.5f * Rj * Raj * dt2;
+    F.block<3, 3>(ImuIndex::kRotation, ImuIndex::kRotation) = I3 - Rw * dt;
+    F.block<3, 3>(ImuIndex::kRotation, ImuIndex::kBiasGyro) = - dt_I3;
+    F.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kRotation) = - Ri * Rai * half_dt - Rj * Raj * (I3 - Rw * dt) * half_dt;
+    F.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kVelocity) = I3;
+    F.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasAccel) = - (Ri + Rj) * half_dt;
+    F.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasGyro) = 0.5f * Rj * Raj * dt2;
     F.block<3, 3>(ImuIndex::kBiasAccel, ImuIndex::kBiasAccel) = I3;
     F.block<3, 3>(ImuIndex::kBiasGyro, ImuIndex::kBiasGyro) = I3;
 
@@ -109,12 +109,12 @@ bool ImuPreintegrateBlock::Propagate(const ImuMeasurement &measure_i,
     V.block<3, 3>(ImuIndex::kPosition, ImuIndex::kMidValueNoiseGyro0) = - 0.25f * Rj * Raj * dt2 * half_dt;
     V.block<3, 3>(ImuIndex::kPosition, ImuIndex::kMidValueNoiseAccel1) = 0.25f * Rj * dt2;
     V.block<3, 3>(ImuIndex::kPosition, ImuIndex::kMidValueNoiseGyro1) = V.block<3, 3>(ImuIndex::kPosition, ImuIndex::kMidValueNoiseGyro0);
-    V.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kMidValueNoiseGyro0) = 0.5f * dt_I3;
-    V.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kMidValueNoiseGyro1) = 0.5f * dt_I3;
-    V.block<3, 3>(ImuIndex::kRotation, ImuIndex::kMidValueNoiseAccel0) = Ri * half_dt;
-    V.block<3, 3>(ImuIndex::kRotation, ImuIndex::kMidValueNoiseGyro0) = - Rj * Raj * half_dt * half_dt;
-    V.block<3, 3>(ImuIndex::kRotation, ImuIndex::kMidValueNoiseAccel1) = Rj * half_dt;
-    V.block<3, 3>(ImuIndex::kRotation, ImuIndex::kMidValueNoiseGyro1) = V.block<3, 3>(ImuIndex::kRotation, ImuIndex::kMidValueNoiseGyro0);
+    V.block<3, 3>(ImuIndex::kRotation, ImuIndex::kMidValueNoiseGyro0) = 0.5f * dt_I3;
+    V.block<3, 3>(ImuIndex::kRotation, ImuIndex::kMidValueNoiseGyro1) = 0.5f * dt_I3;
+    V.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kMidValueNoiseAccel0) = Ri * half_dt;
+    V.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kMidValueNoiseGyro0) = - Rj * Raj * half_dt * half_dt;
+    V.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kMidValueNoiseAccel1) = Rj * half_dt;
+    V.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kMidValueNoiseGyro1) = V.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kMidValueNoiseGyro0);
     V.block<3, 3>(ImuIndex::kBiasAccel, ImuIndex::kMidValueRandomWalkAccel) = dt_I3;
     V.block<3, 3>(ImuIndex::kBiasGyro, ImuIndex::kMidValueRandomWalkGyro) = dt_I3;
 

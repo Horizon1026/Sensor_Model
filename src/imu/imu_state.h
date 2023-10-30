@@ -9,8 +9,8 @@ namespace SENSOR_MODEL {
 /* Indice of imu state. */
 enum ImuIndex : uint8_t {
     kPosition = 0,
-    kVelocity = 3,
-    kRotation = 6,
+    kRotation = 3,
+    kVelocity = 6,
     kBiasAccel = 9,
     kBiasGyro = 12,
     kGravity = 15,
