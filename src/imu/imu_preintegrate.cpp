@@ -34,7 +34,7 @@ void ImuPreintegrateBlock::ResetIntegratedStates() {
 }
 
 // Print all states.
-void ImuPreintegrateBlock::Information() {
+void ImuPreintegrateBlock::Information() const {
     ReportInfo("[Imu Preintegrate Block] Information:");
     ReportInfo(" - p_ij is " << LogVec(p_ij_));
     ReportInfo(" - v_ij is " << LogVec(v_ij_));
@@ -46,7 +46,7 @@ void ImuPreintegrateBlock::Information() {
     ReportInfo(" - jacobian is\n" << jacobian_);
     ReportInfo(" - covariance is\n" << covariance_);
 }
-void ImuPreintegrateBlock::SimpleInformation() {
+void ImuPreintegrateBlock::SimpleInformation() const {
     ReportInfo("[Imu Preintegrate Block] Information:");
     ReportInfo(" - p_ij is " << LogVec(p_ij_));
     ReportInfo(" - v_ij is " << LogVec(v_ij_));

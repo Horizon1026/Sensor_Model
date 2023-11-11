@@ -20,8 +20,8 @@ public:
     void ResetIntegratedStates();
 
     // Print all states.
-    void Information();
-    void SimpleInformation();
+    void Information() const;
+    void SimpleInformation() const;
 
     // Propagate integrate block.
     bool Propagate(const ImuMeasurement &measure_i,
