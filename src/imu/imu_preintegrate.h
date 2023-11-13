@@ -44,16 +44,23 @@ public:
     Vec3 &p_ij() { return p_ij_; }
     Quat &q_ij() { return q_ij_; }
     Vec3 &v_ij() { return v_ij_; }
-
     Vec3 &bias_accel() { return bias_accel_; }
     Vec3 &bias_gyro() { return bias_gyro_; }
-
     Mat15 &jacobian() { return jacobian_; }
     Mat15 &covariance() { return covariance_; }
-
     Vec18 &noise_sigma() { return noise_sigma_; }
-
     float &integrate_time_s() { return integrate_time_s_; }
+
+    // Const reference for member variables.
+    const Vec3 &p_ij() const { return p_ij_; }
+    const Quat &q_ij() const { return q_ij_; }
+    const Vec3 &v_ij() const { return v_ij_; }
+    const Vec3 &bias_accel() const { return bias_accel_; }
+    const Vec3 &bias_gyro() const { return bias_gyro_; }
+    const Mat15 &jacobian() const { return jacobian_; }
+    const Mat15 &covariance() const { return covariance_; }
+    const Vec18 &noise_sigma() const { return noise_sigma_; }
+    const float &integrate_time_s() const { return integrate_time_s_; }
 
     inline Mat3 dr_dbg() { return jacobian_.block<3, 3>(ImuIndex::kRotation, ImuIndex::kBiasGyro); }
     inline Mat3 dv_dba() { return jacobian_.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasAccel); }
