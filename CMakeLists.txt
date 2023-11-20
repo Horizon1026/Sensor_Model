@@ -31,7 +31,9 @@ target_link_libraries( test_camera_model
 # Create executable target to test imu model.
 add_executable( test_imu_model
     test/test_imu_model.cpp
+    test/imu_preintegration.cpp
 )
+include_directories(test)
 target_link_libraries( test_imu_model
     lib_imu_model
 )

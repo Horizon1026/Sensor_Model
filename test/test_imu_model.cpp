@@ -4,6 +4,8 @@
 #include "imu_measurement.h"
 #include "imu_preintegrate.h"
 
+#include "imu_preintegration.hpp"
+
 #include <fstream>
 
 using namespace SENSOR_MODEL;
@@ -79,15 +81,39 @@ void TestImuPreintegration(std::vector<ImuMeasurement> &measurements,
         block.Propagate(measurements[i - 1], measurements[i]);
     }
 
-    // Compute preintegration residual.
-    Vec9 residual = Vec9::Zero();
-    residual.segment<3>(ImuIndex::kPosition) = R_wi_i.transpose() * (p_wi_j - p_wi_i - v_wi_i * dt + 0.5f * g_w * dt * dt) - block.p_ij();
-    residual.segment<3>(ImuIndex::kVelocity) = R_wi_i.transpose() * (v_wi_j - v_wi_i + g_w * dt) - block.v_ij();
-    residual.segment<3>(ImuIndex::kRotation) = 2.0f * (block.q_ij().inverse() * (q_wi_i.inverse() * q_wi_j)).vec();
-
-    ReportInfo("Residual of imu preintegration is " << LogVec(residual));
     block.Information();
-    ReportInfo("dr_dbg is\n" << block.dr_dbg());
+}
+
+void TestOldImuPreintegration(std::vector<ImuMeasurement> &measurements,
+                              std::vector<Vec3> &position,
+                              std::vector<Quat> &rotation) {
+    ReportInfo(YELLOW ">> Test old imu preintegration." RESET_COLOR);
+
+    // Define range.
+    const int32_t start_index = 1;
+    const int32_t end_index = measurements.size() - 2;
+
+    // Compute state in selected range.
+    const float dt = measurements[end_index].time_stamp_s - measurements[start_index].time_stamp_s;
+    const Mat3 R_wi_i = rotation[start_index].matrix();
+    const Quat q_wi_i = rotation[start_index];
+    const Quat q_wi_j = rotation[end_index];
+    const Vec3 p_wi_i = position[start_index];
+    const Vec3 p_wi_j = position[end_index];
+    const Vec3 v_wi_i = (position[start_index + 1] - position[start_index - 1])
+        / (measurements[start_index + 1].time_stamp_s - measurements[start_index - 1].time_stamp_s);
+    const Vec3 v_wi_j = (position[end_index + 1] - position[end_index - 1])
+        / (measurements[end_index + 1].time_stamp_s - measurements[end_index - 1].time_stamp_s);
+    const Vec3 g_w = Vec3(0, 0, 9.81);
+
+    // Preintegrate all imu measurements.
+    IMUPreintegration block(Vec3::Zero(), Vec3::Zero());
+    IMUPreintegration::Q = Eigen::Matrix<float, 18, 18>::Identity() * 1e-4f;
+    for (int32_t i = start_index; i < end_index + 1; ++i) {
+        block.Propagate(measurements[i].time_stamp_s, measurements[i].accel, measurements[i].gyro);
+    }
+
+    block.PrintContent();
 }
 
 void TestImuIntegration(std::vector<ImuMeasurement> &measurements,
@@ -160,6 +186,8 @@ int main(int argc, char **argv) {
     TestImuIntegration(measurements, position, rotation);
 
     TestImuPreintegration(measurements, position, rotation);
+
+    TestOldImuPreintegration(measurements, position, rotation);
 
     return 0;
 }
