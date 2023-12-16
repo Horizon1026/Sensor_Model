@@ -62,11 +62,11 @@ public:
     const Vec18 &noise_sigma() const { return noise_sigma_; }
     const float &integrate_time_s() const { return integrate_time_s_; }
 
-    inline Mat3 dr_dbg() { return jacobian_.block<3, 3>(ImuIndex::kRotation, ImuIndex::kBiasGyro); }
-    inline Mat3 dv_dba() { return jacobian_.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasAccel); }
-    inline Mat3 dv_dbg() { return jacobian_.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasGyro); }
-    inline Mat3 dp_dba() { return jacobian_.block<3, 3>(ImuIndex::kPosition, ImuIndex::kBiasAccel); }
-    inline Mat3 dp_dbg() { return jacobian_.block<3, 3>(ImuIndex::kPosition, ImuIndex::kBiasGyro); }
+    inline Mat3 dr_dbg() const { return jacobian_.block<3, 3>(ImuIndex::kRotation, ImuIndex::kBiasGyro); }
+    inline Mat3 dv_dba() const { return jacobian_.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasAccel); }
+    inline Mat3 dv_dbg() const { return jacobian_.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasGyro); }
+    inline Mat3 dp_dba() const { return jacobian_.block<3, 3>(ImuIndex::kPosition, ImuIndex::kBiasAccel); }
+    inline Mat3 dp_dbg() const { return jacobian_.block<3, 3>(ImuIndex::kPosition, ImuIndex::kBiasGyro); }
 
 private:
     Vec3 p_ij_ = Vec3::Zero();
