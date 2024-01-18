@@ -147,7 +147,9 @@ void ImuPreintegrateBlock::Correct(const Vec3 &new_ba,
 
     corr_p_ij = p_ij_ + dp_dba() * delta_ba + dp_dbg() * delta_bg;
     corr_v_ij = v_ij_ + dv_dba() * delta_ba + dv_dbg() * delta_bg;
-    corr_q_ij = q_ij_ * Utility::DeltaQ(dr_dbg() * delta_bg);
+
+    const Vec3 omega = dr_dbg() * delta_bg;
+    corr_q_ij = q_ij_ * Utility::Exponent(omega);
     corr_q_ij.normalize();
 }
 
