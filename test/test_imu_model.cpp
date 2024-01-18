@@ -82,6 +82,11 @@ void TestImuPreintegration(std::vector<ImuMeasurement> &measurements,
     }
 
     block.Information();
+    ReportInfo("dr_dbg\n" << block.dr_dbg());
+    ReportInfo("dv_dba\n" << block.dv_dba());
+    ReportInfo("dv_dbg\n" << block.dv_dbg());
+    ReportInfo("dp_dba\n" << block.dp_dba());
+    ReportInfo("dp_dbg\n" << block.dp_dbg());
 }
 
 void TestOldImuPreintegration(std::vector<ImuMeasurement> &measurements,
@@ -114,6 +119,11 @@ void TestOldImuPreintegration(std::vector<ImuMeasurement> &measurements,
     }
 
     block.PrintContent();
+    ReportInfo("dr_dbg\n" << block.GetDrDbg());
+    ReportInfo("dv_dba\n" << block.GetDvDba());
+    ReportInfo("dv_dbg\n" << block.GetDvDbg());
+    ReportInfo("dp_dba\n" << block.GetDpDba());
+    ReportInfo("dp_dbg\n" << block.GetDpDbg());
 }
 
 void TestImuIntegration(std::vector<ImuMeasurement> &measurements,
