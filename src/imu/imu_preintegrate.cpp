@@ -128,7 +128,7 @@ bool ImuPreintegrateBlock<Scalar>::Propagate(const ImuMeasurement &measure_i,
     V.template block<3, 3>(ImuIndex::kBiasGyro, ImuIndex::kMidValueRandomWalkGyro) = dt_I3;
 
     // In order to compute V * Q * V.t, decompose Q as sqrt(Q), and compute V * sqrt(Q) with noise model.
-    for (uint32_t i = 0; i < 18; ++i) {
+    for (uint32_t i = 0; i < V.cols(); ++i) {
         V.col(i) *= noise_sigma_(i);
     }
 
