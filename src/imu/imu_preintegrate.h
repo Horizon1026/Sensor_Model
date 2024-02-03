@@ -9,6 +9,7 @@
 namespace SENSOR_MODEL {
 
 /* Imu preintegrate block. */
+template <typename Scalar = float>
 class ImuPreintegrateBlock {
 
 public:
@@ -28,61 +29,61 @@ public:
                    const ImuMeasurement &measure_j);
 
     // Correct integrate block with new bias_a and bias_g.
-    void Correct(const Vec3 &new_ba,
-                 const Vec3 &new_bg,
-                 Vec3 &corr_p_ij,
-                 Quat &corr_q_ij,
-                 Vec3 &corr_v_ij);
+    void Correct(const TVec3<Scalar> &new_ba,
+                 const TVec3<Scalar> &new_bg,
+                 TVec3<Scalar> &corr_p_ij,
+                 TQuat<Scalar> &corr_q_ij,
+                 TVec3<Scalar> &corr_v_ij);
 
     // Set noise sigma vector.
-    void SetImuNoiseSigma(const float accel_noise,
-                          const float gyro_noise,
-                          const float accel_random_walk,
-                          const float gyro_random_walk);
+    void SetImuNoiseSigma(const Scalar accel_noise,
+                          const Scalar gyro_noise,
+                          const Scalar accel_random_walk,
+                          const Scalar gyro_random_walk);
 
     // Reference for member variables.
-    Vec3 &p_ij() { return p_ij_; }
-    Quat &q_ij() { return q_ij_; }
-    Vec3 &v_ij() { return v_ij_; }
-    Vec3 &bias_accel() { return bias_accel_; }
-    Vec3 &bias_gyro() { return bias_gyro_; }
-    Mat15 &jacobian() { return jacobian_; }
-    Mat15 &covariance() { return covariance_; }
-    Vec18 &noise_sigma() { return noise_sigma_; }
-    float &integrate_time_s() { return integrate_time_s_; }
+    TVec3<Scalar> &p_ij() { return p_ij_; }
+    TQuat<Scalar> &q_ij() { return q_ij_; }
+    TVec3<Scalar> &v_ij() { return v_ij_; }
+    TVec3<Scalar> &bias_accel() { return bias_accel_; }
+    TVec3<Scalar> &bias_gyro() { return bias_gyro_; }
+    TMat15<Scalar> &jacobian() { return jacobian_; }
+    TMat15<Scalar> &covariance() { return covariance_; }
+    TVec18<Scalar> &noise_sigma() { return noise_sigma_; }
+    Scalar &integrate_time_s() { return integrate_time_s_; }
 
     // Const reference for member variables.
-    const Vec3 &p_ij() const { return p_ij_; }
-    const Quat &q_ij() const { return q_ij_; }
-    const Vec3 &v_ij() const { return v_ij_; }
-    const Vec3 &bias_accel() const { return bias_accel_; }
-    const Vec3 &bias_gyro() const { return bias_gyro_; }
-    const Mat15 &jacobian() const { return jacobian_; }
-    const Mat15 &covariance() const { return covariance_; }
-    const Vec18 &noise_sigma() const { return noise_sigma_; }
-    const float &integrate_time_s() const { return integrate_time_s_; }
+    const TVec3<Scalar> &p_ij() const { return p_ij_; }
+    const TQuat<Scalar> &q_ij() const { return q_ij_; }
+    const TVec3<Scalar> &v_ij() const { return v_ij_; }
+    const TVec3<Scalar> &bias_accel() const { return bias_accel_; }
+    const TVec3<Scalar> &bias_gyro() const { return bias_gyro_; }
+    const TMat15<Scalar> &jacobian() const { return jacobian_; }
+    const TMat15<Scalar> &covariance() const { return covariance_; }
+    const TVec18<Scalar> &noise_sigma() const { return noise_sigma_; }
+    const Scalar &integrate_time_s() const { return integrate_time_s_; }
 
-    inline Mat3 dr_dbg() const { return jacobian_.block<3, 3>(ImuIndex::kRotation, ImuIndex::kBiasGyro); }
-    inline Mat3 dv_dba() const { return jacobian_.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasAccel); }
-    inline Mat3 dv_dbg() const { return jacobian_.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasGyro); }
-    inline Mat3 dp_dba() const { return jacobian_.block<3, 3>(ImuIndex::kPosition, ImuIndex::kBiasAccel); }
-    inline Mat3 dp_dbg() const { return jacobian_.block<3, 3>(ImuIndex::kPosition, ImuIndex::kBiasGyro); }
+    inline TMat3<Scalar> dr_dbg() const { return jacobian_.template block<3, 3>(ImuIndex::kRotation, ImuIndex::kBiasGyro); }
+    inline TMat3<Scalar> dv_dba() const { return jacobian_.template block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasAccel); }
+    inline TMat3<Scalar> dv_dbg() const { return jacobian_.template block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasGyro); }
+    inline TMat3<Scalar> dp_dba() const { return jacobian_.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kBiasAccel); }
+    inline TMat3<Scalar> dp_dbg() const { return jacobian_.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kBiasGyro); }
 
 private:
-    Vec3 p_ij_ = Vec3::Zero();
-    Quat q_ij_ = Quat::Identity();
-    Vec3 v_ij_ = Vec3::Zero();
+    TVec3<Scalar> p_ij_ = TVec3<Scalar>::Zero();
+    TQuat<Scalar> q_ij_ = TQuat<Scalar>::Identity();
+    TVec3<Scalar> v_ij_ = TVec3<Scalar>::Zero();
 
-    Vec3 bias_accel_ = Vec3::Zero();
-    Vec3 bias_gyro_ = Vec3::Zero();
+    TVec3<Scalar> bias_accel_ = TVec3<Scalar>::Zero();
+    TVec3<Scalar> bias_gyro_ = TVec3<Scalar>::Zero();
 
-    Mat15 jacobian_ = Mat15::Identity();
-    Mat15 covariance_ = Mat15::Zero();
+    TMat15<Scalar> jacobian_ = TMat15<Scalar>::Identity();
+    TMat15<Scalar> covariance_ = TMat15<Scalar>::Zero();
 
-    // Sequence is na_i, ng_i, na_j, ng_j, nwa, nwg
-    Vec18 noise_sigma_ = Vec18::Ones() * 1e-6f;
+    // Sequence is na_i, ng_i, na_j, ng_j, nwa, nwg.
+    TVec18<Scalar> noise_sigma_ = TVec18<Scalar>::Ones() * static_cast<Scalar>(1e-6);
 
-    float integrate_time_s_ = 0.0f;
+    Scalar integrate_time_s_ = static_cast<Scalar>(0);
 
 };
 
