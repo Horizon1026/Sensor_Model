@@ -75,7 +75,7 @@ void TestImuPreintegration(std::vector<ImuMeasurement> &measurements,
     const Vec3 g_w = Vec3(0, 0, 9.81);
 
     // Preintegrate all imu measurements.
-    ImuPreintegrateBlock<> block;
+    ImuPreintegrateBlock<DorF> block;
     block.SetImuNoiseSigma(1e-2f, 1e-2f, 1e-2f, 1e-2f);
     for (int32_t i = start_index + 1; i < end_index + 1; ++i) {
         block.Propagate(measurements[i - 1], measurements[i]);
