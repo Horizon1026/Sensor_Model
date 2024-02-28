@@ -4,8 +4,6 @@
 #include "imu_measurement.h"
 #include "imu_preintegrate.h"
 
-#include "imu_preintegration.hpp"
-
 #include <fstream>
 
 using namespace SENSOR_MODEL;
@@ -61,19 +59,6 @@ void TestImuPreintegration(std::vector<ImuMeasurement> &measurements,
     const int32_t start_index = 1;
     const int32_t end_index = measurements.size() - 2;
 
-    // Compute state in selected range.
-    const float dt = measurements[end_index].time_stamp_s - measurements[start_index].time_stamp_s;
-    const Mat3 R_wi_i = rotation[start_index].matrix();
-    const Quat q_wi_i = rotation[start_index];
-    const Quat q_wi_j = rotation[end_index];
-    const Vec3 p_wi_i = position[start_index];
-    const Vec3 p_wi_j = position[end_index];
-    const Vec3 v_wi_i = (position[start_index + 1] - position[start_index - 1])
-        / (measurements[start_index + 1].time_stamp_s - measurements[start_index - 1].time_stamp_s);
-    const Vec3 v_wi_j = (position[end_index + 1] - position[end_index - 1])
-        / (measurements[end_index + 1].time_stamp_s - measurements[end_index - 1].time_stamp_s);
-    const Vec3 g_w = Vec3(0, 0, 9.81);
-
     // Preintegrate all imu measurements.
     ImuPreintegrateBlock<> block;
     block.SetImuNoiseSigma(1e-2f, 1e-2f, 1e-2f, 1e-2f);
@@ -87,43 +72,6 @@ void TestImuPreintegration(std::vector<ImuMeasurement> &measurements,
     ReportInfo("dv_dbg\n" << block.dv_dbg());
     ReportInfo("dp_dba\n" << block.dp_dba());
     ReportInfo("dp_dbg\n" << block.dp_dbg());
-}
-
-void TestOldImuPreintegration(std::vector<ImuMeasurement> &measurements,
-                              std::vector<Vec3> &position,
-                              std::vector<Quat> &rotation) {
-    ReportInfo(YELLOW ">> Test old imu preintegration." RESET_COLOR);
-
-    // Define range.
-    const int32_t start_index = 1;
-    const int32_t end_index = measurements.size() - 2;
-
-    // Compute state in selected range.
-    const float dt = measurements[end_index].time_stamp_s - measurements[start_index].time_stamp_s;
-    const Mat3 R_wi_i = rotation[start_index].matrix();
-    const Quat q_wi_i = rotation[start_index];
-    const Quat q_wi_j = rotation[end_index];
-    const Vec3 p_wi_i = position[start_index];
-    const Vec3 p_wi_j = position[end_index];
-    const Vec3 v_wi_i = (position[start_index + 1] - position[start_index - 1])
-        / (measurements[start_index + 1].time_stamp_s - measurements[start_index - 1].time_stamp_s);
-    const Vec3 v_wi_j = (position[end_index + 1] - position[end_index - 1])
-        / (measurements[end_index + 1].time_stamp_s - measurements[end_index - 1].time_stamp_s);
-    const Vec3 g_w = Vec3(0, 0, 9.81);
-
-    // Preintegrate all imu measurements.
-    IMUPreintegration block(Vec3::Zero(), Vec3::Zero());
-    IMUPreintegration::Q = Eigen::Matrix<float, 18, 18>::Identity() * 1e-4f;
-    for (int32_t i = start_index; i < end_index + 1; ++i) {
-        block.Propagate(measurements[i].time_stamp_s, measurements[i].accel, measurements[i].gyro);
-    }
-
-    block.PrintContent();
-    ReportInfo("dr_dbg\n" << block.GetDrDbg());
-    ReportInfo("dv_dba\n" << block.GetDvDba());
-    ReportInfo("dv_dbg\n" << block.GetDvDbg());
-    ReportInfo("dp_dba\n" << block.GetDpDba());
-    ReportInfo("dp_dbg\n" << block.GetDpDbg());
 }
 
 void TestImuIntegration(std::vector<ImuMeasurement> &measurements,
@@ -196,8 +144,6 @@ int main(int argc, char **argv) {
     TestImuIntegration(measurements, position, rotation);
 
     TestImuPreintegration(measurements, position, rotation);
-
-    TestOldImuPreintegration(measurements, position, rotation);
 
     return 0;
 }

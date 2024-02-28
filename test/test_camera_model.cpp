@@ -1,19 +1,24 @@
+#include "datatype_basic.h"
 #include "log_report.h"
+
 #include "pinhole.h"
 #include "fisheye.h"
 
-#include "opencv2/opencv.hpp"
+#include "visualizor.h"
 
-void DetectFeaturesInRawImage(const cv::Mat &cv_raw_image, std::vector<cv::Point2f> &distort_features) {
-    cv::goodFeaturesToTrack(cv_raw_image, distort_features, 200, 0.01, 20);
+#include "feature_point_detector.h"
+#include "feature_harris.h"
 
-    cv::Mat show_distorted(cv_raw_image.rows, cv_raw_image.cols, CV_8UC3);
-    cv::cvtColor(cv_raw_image, show_distorted, cv::COLOR_GRAY2BGR);
-    for (uint32_t i = 0; i < distort_features.size(); ++i) {
-        cv::circle(show_distorted, distort_features[i], 2, cv::Scalar(255, 255, 0), 3);
-    }
+using namespace SLAM_VISUALIZOR;
+using namespace FEATURE_DETECTOR;
 
-    cv::imshow("Distorted image with detected features", show_distorted);
+void DetectFeaturesInRawImage(const GrayImage &image, std::vector<Vec2> &pixel_uv) {
+    // Detect features.
+    FeaturePointDetector<HarrisFeature> detector;
+    detector.options().kMinFeatureDistance = 25;
+    detector.feature().options().kHalfPatchSize = 1;
+    detector.feature().options().kMinValidResponse = 40.0f;
+    detector.DetectGoodFeatures(image, 20, pixel_uv);
 }
 
 void TestPinholeCameraModel() {
@@ -32,10 +37,12 @@ void TestPinholeCameraModel() {
     const float p2 = 1.76187114e-05f;
 
     // Load image, allocate memory.
-    cv::Mat cv_raw_image = cv::imread(image_filepath, 0);
-    cv::Mat cv_corr_image = cv::imread(image_filepath, 0);
-    std::vector<cv::Point2f> distort_features, undistort_features;
-    DetectFeaturesInRawImage(cv_raw_image, distort_features);
+    GrayImage raw_image;
+    GrayImage corr_image;
+    Visualizor::LoadImage(image_filepath, raw_image);
+    Visualizor::LoadImage(image_filepath, corr_image);
+    std::vector<Vec2> distort_features, undistort_features;
+    DetectFeaturesInRawImage(raw_image, distort_features);
     undistort_features.reserve(distort_features.size());
 
     // Initialize pinhole camera.
@@ -44,9 +51,6 @@ void TestPinholeCameraModel() {
     camera.SetDistortionParameter(std::vector<float>{k1, k2, k3, p1, p2});
 
     // Undistort the whole image.
-    GrayImage raw_image, corr_image;
-    raw_image.SetImage(cv_raw_image.data, cv_raw_image.rows, cv_raw_image.cols);
-    corr_image.SetImage(cv_corr_image.data, cv_corr_image.rows, cv_corr_image.cols);
     camera.CorrectDistortedImage(raw_image, corr_image);
 
     // Step 1: use raw image to detect distorted features.
@@ -56,12 +60,12 @@ void TestPinholeCameraModel() {
     Vec2 undistort = Vec2::Zero();
     Vec2 distort = Vec2::Zero();
     for (uint32_t i = 0; i < distort_features.size(); ++i) {
-        Vec2 raw_distort = Vec2(distort_features[i].x, distort_features[i].y);
+        const Vec2 &raw_distort = distort_features[i];
 
         if (camera.UndistortOnImagePlane(raw_distort, undistort)) {
             camera.DistortOnImagePlane(undistort, distort);
             average_residual += (raw_distort - distort).norm();
-            undistort_features.emplace_back(cv::Point2f(undistort.x(), undistort.y()));
+            undistort_features.emplace_back(undistort);
         } else {
             ReportError("camera.UndistortOnImagePlane(raw_distort, undistort) failed.");
         }
@@ -70,24 +74,18 @@ void TestPinholeCameraModel() {
     ReportInfo("   Undistortion average residual is " << average_residual);
 
     // Show undistortion image.
-    cv::Mat show_undistorted(cv_corr_image.rows, cv_corr_image.cols, CV_8UC3);
-    cv::cvtColor(cv_corr_image, show_undistorted, cv::COLOR_GRAY2BGR);
-    for (uint32_t i = 0; i < undistort_features.size(); ++i) {
-        cv::circle(show_undistorted, undistort_features[i], 2, cv::Scalar(255, 255, 0), 3);
-    }
-    cv::imshow("Pinhole undistorted image with detected features", show_undistorted);
-
-    // Draw undistortion result with extra size.
-    camera.CorrectDistortedImage(raw_image, corr_image, 1.4f);
-    cv::imshow("Pinhole undistorted image", cv_corr_image);
-    cv::waitKey();
+    Visualizor::ShowImageWithDetectedFeatures("Pinhole distorted image with detected features",
+        raw_image, distort_features);
+    Visualizor::ShowImageWithDetectedFeatures("Pinhole undistorted image with detected features",
+        corr_image, undistort_features);
+    Visualizor::WaitKey(1);
 }
 
 void TestFisheyeCameraModel() {
     ReportInfo(YELLOW ">> Test fisheye camera model undistortion." RESET_COLOR);
 
     // Load parameters for fisheye camera.
-    const std::string image_filepath = "../examples/fisheye_distorted.png";
+    const std::string image_filepath = "../examples/fisheye_distorted.bmp";
     const float fx = 348.52f;
     const float fy = 348.52f;
     const float cx = 640.19f;
@@ -99,10 +97,12 @@ void TestFisheyeCameraModel() {
     const float k5 = 0.0f;
 
     // Load image, allocate memory.
-    cv::Mat cv_raw_image = cv::imread(image_filepath, 0);
-    cv::Mat cv_corr_image = cv::imread(image_filepath, 0);
-    std::vector<cv::Point2f> distort_features, undistort_features;
-    DetectFeaturesInRawImage(cv_raw_image, distort_features);
+    GrayImage raw_image;
+    GrayImage corr_image;
+    Visualizor::LoadImage(image_filepath, raw_image);
+    Visualizor::LoadImage(image_filepath, corr_image);
+    std::vector<Vec2> distort_features, undistort_features;
+    DetectFeaturesInRawImage(raw_image, distort_features);
     undistort_features.reserve(distort_features.size());
 
     // Initialize fisheye camera.
@@ -111,9 +111,6 @@ void TestFisheyeCameraModel() {
     camera.SetDistortionParameter(std::vector<float>{k1, k2, k3, k4, k5});
 
     // Undistort the whole image.
-    GrayImage raw_image, corr_image;
-    raw_image.SetImage(cv_raw_image.data, cv_raw_image.rows, cv_raw_image.cols);
-    corr_image.SetImage(cv_corr_image.data, cv_corr_image.rows, cv_corr_image.cols);
     camera.CorrectDistortedImage(raw_image, corr_image);
 
     // Step 1: use raw image to detect distorted features.
@@ -123,12 +120,12 @@ void TestFisheyeCameraModel() {
     Vec2 undistort = Vec2::Zero();
     Vec2 distort = Vec2::Zero();
     for (uint32_t i = 0; i < distort_features.size(); ++i) {
-        Vec2 raw_distort = Vec2(distort_features[i].x, distort_features[i].y);
+        const Vec2 &raw_distort = distort_features[i];
 
         if (camera.UndistortOnImagePlane(raw_distort, undistort)) {
             camera.DistortOnImagePlane(undistort, distort);
             average_residual += (raw_distort - distort).norm();
-            undistort_features.emplace_back(cv::Point2f(undistort.x(), undistort.y()));
+            undistort_features.emplace_back(undistort);
         } else {
             ReportError("camera.UndistortOnImagePlane(raw_distort, undistort) failed.");
         }
@@ -137,17 +134,11 @@ void TestFisheyeCameraModel() {
     ReportInfo("   Undistortion average residual is " << average_residual);
 
     // Show undistortion image.
-    cv::Mat show_undistorted(cv_corr_image.rows, cv_corr_image.cols, CV_8UC3);
-    cv::cvtColor(cv_corr_image, show_undistorted, cv::COLOR_GRAY2BGR);
-    for (uint32_t i = 0; i < undistort_features.size(); ++i) {
-        cv::circle(show_undistorted, undistort_features[i], 2, cv::Scalar(255, 255, 0), 3);
-    }
-    cv::imshow("Fisheye undistorted image with detected features", show_undistorted);
-
-    // Draw undistortion result with extra size.
-    camera.CorrectDistortedImage(raw_image, corr_image, 3.0f);
-    cv::imshow("Fisheye undistorted image", cv_corr_image);
-    cv::waitKey();
+    Visualizor::ShowImageWithDetectedFeatures("Fisheye distorted image with detected features",
+        raw_image, distort_features);
+    Visualizor::ShowImageWithDetectedFeatures("Fisheye undistorted image with detected features",
+        corr_image, undistort_features);
+    Visualizor::WaitKey(1);
 }
 
 int main(int argc, char **argv) {
@@ -155,5 +146,8 @@ int main(int argc, char **argv) {
 
     TestPinholeCameraModel();
     TestFisheyeCameraModel();
+
+    Visualizor::WaitKey(0);
+
     return 0;
 }
