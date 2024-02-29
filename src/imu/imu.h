@@ -40,7 +40,6 @@ public:
                                          const Vec3 &mid_accel,
                                          const Vec3 &mid_gyro,
                                          const ImuState &state_i,
-                                         const ImuState &state_j,
                                          const Mat15 &cov_i,
                                          Mat15 &cov_j);
 
@@ -49,7 +48,6 @@ public:
                                           const Vec3 &mid_accel,
                                           const Vec3 &mid_gyro,
                                           const ImuState &state_i,
-                                          const ImuState &state_j,
                                           const Mat15 &cov_i,
                                           Mat15 &cov_j);
 

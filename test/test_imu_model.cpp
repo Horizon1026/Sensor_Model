@@ -110,16 +110,16 @@ void TestImuIntegration(std::vector<ImuMeasurement> &measurements,
     imu_model.options().kGyroRandomWalk = 1e-2f;
     for (int32_t i = start_index + 1; i < end_index + 1; ++i) {
         imu_model.PropagateNominalState(measurements[i - 1], measurements[i], state_i, state_j, mid_accel, mid_gyro);
-        imu_model.PropagateResidualStateCovariance(measurements[i - 1], measurements[i], mid_accel, mid_gyro, state_i, state_j, cov_i, cov_j);
+        imu_model.PropagateResidualStateCovariance(measurements[i - 1], measurements[i], mid_accel, mid_gyro, state_i, cov_i, cov_j);
         state_i = state_j;
         cov_i = cov_j;
     }
 
     // Compute integration residual.
     Vec9 residual = Vec9::Zero();
-    residual.segment<3>(ImuIndex::kPosition) = p_wi_j - state_j.p_wi;
-    residual.segment<3>(ImuIndex::kVelocity) = v_wi_j - state_j.v_wi;
-    residual.segment<3>(ImuIndex::kRotation) = 2.0f * (state_j.q_wi.inverse() * q_wi_j).vec();
+    residual.segment<3>(ImuIndex::kPosition) = p_wi_j - state_j.p_wi();
+    residual.segment<3>(ImuIndex::kVelocity) = v_wi_j - state_j.v_wi();
+    residual.segment<3>(ImuIndex::kRotation) = 2.0f * (state_j.q_wi().inverse() * q_wi_j).vec();
 
     ReportInfo("Residual of imu integration is " << LogVec(residual));
     ReportInfo("Covariance of imu integration is\n" << cov_j);

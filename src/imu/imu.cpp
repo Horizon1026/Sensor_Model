@@ -28,21 +28,21 @@ bool Imu::PropagateNominalState(const ImuMeasurement &meas_i,
     }
 
     const float dt = meas_j.time_stamp_s - meas_i.time_stamp_s;
-    const Vec3 &bias_a = state_i.ba;
-    const Vec3 &bias_g = state_i.bg;
-    const Vec3 &gravity = state_i.g_w;
+    const Vec3 &bias_a = state_i.ba();
+    const Vec3 &bias_g = state_i.bg();
+    const Vec3 &gravity = state_i.g_w();
 
     // Propagate nominal attitude.
     mid_gyro = 0.5f * (meas_i.gyro + meas_j.gyro) - bias_g;
     Quat dq = Utility::DeltaQ(mid_gyro * dt);
-    state_j.q_wi = (state_i.q_wi * dq).normalized();
+    state_j.q_wi() = (state_i.q_wi() * dq).normalized();
 
     // Propagate nominal velocity.
-    mid_accel = 0.5f * (state_i.q_wi * (meas_i.accel - bias_a) + state_j.q_wi * (meas_j.accel - bias_a));
-    state_j.v_wi = state_i.v_wi + (mid_accel - gravity) * dt;
+    mid_accel = 0.5f * (state_i.q_wi() * (meas_i.accel - bias_a) + state_j.q_wi() * (meas_j.accel - bias_a));
+    state_j.v_wi() = state_i.v_wi() + (mid_accel - gravity) * dt;
 
     // Propagate nominal position.
-    state_j.p_wi = state_i.p_wi + 0.5f * (state_i.v_wi + state_j.v_wi) * dt;
+    state_j.p_wi() = state_i.p_wi() + 0.5f * (state_i.v_wi() + state_j.v_wi()) * dt;
 
     return true;
 }
@@ -52,11 +52,9 @@ bool Imu::PropagateNominalStateCovariance(const ImuMeasurement &meas_i,
                                           const Vec3 &mid_accel,
                                           const Vec3 &mid_gyro,
                                           const ImuState &state_i,
-                                          const ImuState &state_j,
                                           const Mat15 &cov_i,
                                           Mat15 &cov_j) {
-    // TODO:
-    return PropagateResidualStateCovariance(meas_i, meas_j, mid_accel, mid_gyro, state_i, state_j, cov_i, cov_j);
+    return PropagateResidualStateCovariance(meas_i, meas_j, mid_accel, mid_gyro, state_i, cov_i, cov_j);
 }
 
 bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_i,
@@ -64,7 +62,6 @@ bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_i,
                                            const Vec3 &mid_accel,
                                            const Vec3 &mid_gyro,
                                            const ImuState &state_i,
-                                           const ImuState &state_j,
                                            const Mat15 &cov_i,
                                            Mat15 &cov_j) {
 
@@ -76,7 +73,7 @@ bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_i,
     const float sqrt_dt = std::sqrt(dt);
     const Mat3 dt_I3 = dt * Mat3::Identity();
     const Mat3 sqrt_dt_I3 = sqrt_dt * Mat3::Identity();
-    const Mat3 R_wi_i = state_i.q_wi.matrix();
+    const Mat3 R_wi_i = state_i.q_wi().matrix();
 
     Mat15 F = Mat15::Identity();
     F.block<3, 3>(ImuIndex::kPosition, ImuIndex::kVelocity) = dt_I3;

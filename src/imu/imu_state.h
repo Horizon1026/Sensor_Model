@@ -2,7 +2,6 @@
 #define _SENSOR_MODEL_IMU_STATE_H_
 
 #include "datatype_basic.h"
-#include "math_kinematics.h"
 
 namespace SENSOR_MODEL {
 
@@ -28,24 +27,46 @@ enum ImuIndex : uint8_t {
     kMidValueRandomWalkGyro = 15,
 };
 
-/* Imu state with size 15 or 18. */
+/* Imu state with size of 15 or 18. */
 class ImuState {
 
 public:
     ImuState() = default;
     ImuState(const Vec3 &p_wi, const Quat &q_wi, const Vec3 &v_wi, const Vec3 &ba, const Vec3 &bg, const Vec3 &g_w, const float t) :
-        p_wi(p_wi), q_wi(q_wi), v_wi(v_wi), ba(ba), bg(bg), g_w(g_w), time_stamp_s(t) {}
+        p_wi_(p_wi), q_wi_(q_wi), v_wi_(v_wi), ba_(ba), bg_(bg), g_w_(g_w), time_stamp_s_(t) {}
     virtual ~ImuState() = default;
 
-public:
-    Vec3 p_wi = Vec3::Zero();
-    Quat q_wi = Quat::Identity();
-    Vec3 v_wi = Vec3::Zero();
-    Vec3 ba = Vec3::Zero();
-    Vec3 bg = Vec3::Zero();
-    Vec3 g_w = Vec3(0, 0, 9.8f);
+    // Reference for Member Variables.
+    Vec3 &p_wi() { return p_wi_; }
+    Quat &q_wi() { return q_wi_; }
+    Vec3 &v_wi() { return v_wi_; }
+    Vec3 &ba() { return ba_; }
+    Vec3 &bg() { return bg_; }
+    Vec3 &g_w() { return g_w_; }
+    float &time_stamp_s() { return time_stamp_s_; }
+    Mat18 &covariance() { return covariance_; }
 
-    float time_stamp_s = 0.0f;
+    // Const Reference for Member Variables.
+    const Vec3 &p_wi() const { return p_wi_; }
+    const Quat &q_wi() const { return q_wi_; }
+    const Vec3 &v_wi() const { return v_wi_; }
+    const Vec3 &ba() const { return ba_; }
+    const Vec3 &bg() const { return bg_; }
+    const Vec3 &g_w() const { return g_w_; }
+    const float &time_stamp_s() const { return time_stamp_s_; }
+    const Mat18 &covariance() const { return covariance_; }
+
+private:
+    Vec3 p_wi_ = Vec3::Zero();
+    Quat q_wi_ = Quat::Identity();
+    Vec3 v_wi_ = Vec3::Zero();
+    Vec3 ba_ = Vec3::Zero();
+    Vec3 bg_ = Vec3::Zero();
+    Vec3 g_w_ = Vec3(0, 0, 9.8f);
+
+    float time_stamp_s_ = 0.0f;
+
+    Mat18 covariance_ = Mat18::Zero();
 
 };
 
