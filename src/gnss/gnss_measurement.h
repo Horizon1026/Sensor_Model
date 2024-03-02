@@ -12,7 +12,13 @@ struct GnssMeasurement {
     double longitude_deg = 0.0;
     double latitude_deg = 0.0;
     double altitude_m = 0.0;
-    double yaw_rad = 0.0;
+
+    double yaw_north_rad = 0.0;
+
+    // Velocity with unit : m/s.
+    float vel_east_mps = 0.0f;
+    float vel_north_mps = 0.0f;
+    float vel_up_mps = 0.0f;
 };
 
 }
