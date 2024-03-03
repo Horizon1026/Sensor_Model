@@ -12,7 +12,7 @@ using namespace SLAM_UTILITY;
 using namespace SENSOR_MODEL;
 using namespace SLAM_VISUALIZOR;
 
-void LoadSimDataAndPublish(const std::string &file_name, std::vector<Vec3> &positions) {
+void LoadSimDataAndPublish(const std::string &file_name, std::vector<TVec3<double>> &positions) {
     std::ifstream file(file_name.c_str());
     if (!file.is_open()) {
         ReportError("Failed to load data file " << file_name);
@@ -31,10 +31,11 @@ void LoadSimDataAndPublish(const std::string &file_name, std::vector<Vec3> &posi
         gnss_origin.is_fixed;
 
     Gnss gnss_model;
-    const Vec3 first_position = gnss_model.ConvertLlaToNed(gnss_origin, gnss_origin);
+    const TVec3<double> first_position = gnss_model.ConvertLlaToNed(gnss_origin, gnss_origin);
     positions.emplace_back(first_position);
 
     // Publish each line of data file.
+    double average_residual = 0;
     while (std::getline(file, one_line) && !one_line.empty()) {
         std::istringstream data(one_line);
 
@@ -42,9 +43,18 @@ void LoadSimDataAndPublish(const std::string &file_name, std::vector<Vec3> &posi
         data >> type >> gnss.time_stamp_s >> gnss.longitude_deg >> gnss.latitude_deg >>
             gnss.altitude_m >> gnss.yaw_north_rad >> gnss.is_fixed;
 
-        const Vec3 position = gnss_model.ConvertLlaToNed(gnss_origin, gnss);
-        positions.emplace_back(position);
+        const TVec3<double> ned_pos = gnss_model.ConvertLlaToNed(gnss_origin, gnss);
+        positions.emplace_back(ned_pos);
+
+        // Double check transformation.
+        GnssMeasurement gnss_cal = gnss_model.ConvertNedToLla(gnss_origin, ned_pos);
+        const double residual = std::sqrt((gnss.longitude_deg - gnss_cal.longitude_deg) * (gnss.longitude_deg - gnss_cal.longitude_deg) +
+                                          (gnss.latitude_deg - gnss_cal.latitude_deg) * (gnss.latitude_deg - gnss_cal.latitude_deg) +
+                                          (gnss.altitude_m - gnss_cal.altitude_m) * (gnss.altitude_m - gnss_cal.altitude_m));
+        average_residual += residual;
     }
+    average_residual /= static_cast<double>(positions.size());
+    ReportInfo("Transform residual between LLA and NED is " << average_residual);
 
     file.close();
 }
@@ -56,19 +66,17 @@ int main(int argc, char **argv) {
     }
 
     ReportInfo(YELLOW ">> Test gnss model." RESET_COLOR);
-    LogFixPercision(5);
 
-    std::vector<Vec3> positions;
+    std::vector<TVec3<double>> positions;
     LoadSimDataAndPublish(gnss_file, positions);
 
     Visualizor3D::Clear();
     for (const auto &position : positions) {
         Visualizor3D::points().emplace_back(PointType{
-            .p_w = position,
+            .p_w = position.cast<float>(),
             .color = RgbColor::kCyan,
             .radius = 2,
         });
-        Visualizor3D::Refresh("GNSS Trajectory", 10);
     }
     while (!Visualizor3D::ShouldQuit()) {
         Visualizor3D::Refresh("GNSS Trajectory", 10);

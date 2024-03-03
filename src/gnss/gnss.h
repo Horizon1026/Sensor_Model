@@ -15,9 +15,11 @@ public:
     Gnss() = default;
     virtual ~Gnss() = default;
 
-    Vec3 ConvertLlaToNed(const GnssMeasurement &origin_lla, const GnssMeasurement &lla);
+    TVec3<double> ConvertLlaToNed(const GnssMeasurement &origin_lla, const GnssMeasurement &lla);
+    GnssMeasurement ConvertNedToLla(const GnssMeasurement &origin_lla, const TVec3<double> &ned);
 
 private:
+    double FormatDegree(const double abnormal_degree);
 
 };
 
