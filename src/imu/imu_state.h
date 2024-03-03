@@ -44,7 +44,8 @@ public:
     Vec3 &bg() { return bg_; }
     Vec3 &g_w() { return g_w_; }
     float &time_stamp_s() { return time_stamp_s_; }
-    Mat18 &covariance() { return covariance_; }
+    Mat18 &covariance() { return cov_matrix_; }
+    Mat18 &sqrt_cov() { return cov_matrix_; }
 
     // Const Reference for Member Variables.
     const Vec3 &p_wi() const { return p_wi_; }
@@ -54,7 +55,8 @@ public:
     const Vec3 &bg() const { return bg_; }
     const Vec3 &g_w() const { return g_w_; }
     const float &time_stamp_s() const { return time_stamp_s_; }
-    const Mat18 &covariance() const { return covariance_; }
+    const Mat18 &covariance() const { return cov_matrix_; }
+    const Mat18 &sqrt_cov() const { return cov_matrix_; }
 
 private:
     Vec3 p_wi_ = Vec3::Zero();
@@ -66,7 +68,8 @@ private:
 
     float time_stamp_s_ = 0.0f;
 
-    Mat18 covariance_ = Mat18::Zero();
+    // Shared by covariance and sqrt_covariance.
+    Mat18 cov_matrix_ = Mat18::Zero();
 
 };
 
