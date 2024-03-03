@@ -19,6 +19,12 @@ struct GnssMeasurement {
     float vel_east_mps = 0.0f;
     float vel_north_mps = 0.0f;
     float vel_up_mps = 0.0f;
+
+    // Quality of gnss.
+    bool is_fixed = false;
+    float hacc = 0.0f;
+    float hdop = 0.0f;
+    float pdop = 0.0f;
 };
 
 }

@@ -29,6 +29,11 @@ if ( NOT TARGET lib_imu_model )
     add_subdirectory( src/imu ${PROJECT_SOURCE_DIR}/build/lib_imu_model )
 endif()
 
+# Add gnss model.
+if ( NOT TARGET lib_gnss_model )
+    add_subdirectory( src/gnss ${PROJECT_SOURCE_DIR}/build/lib_gnss_model )
+endif()
+
 # Create executable target to test camera model.
 add_executable( test_camera_model
     test/test_camera_model.cpp
@@ -46,4 +51,13 @@ add_executable( test_imu_model
 include_directories(test)
 target_link_libraries( test_imu_model
     lib_imu_model
+)
+
+# Create executable target to test gnss model.
+add_executable( test_gnss_model
+    test/test_gnss_model.cpp
+)
+include_directories(test)
+target_link_libraries( test_gnss_model
+    lib_gnss_model
 )
