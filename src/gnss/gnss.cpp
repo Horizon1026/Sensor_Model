@@ -8,31 +8,31 @@ namespace {
     constexpr double kWgs84SemiMinorAxisInMeter = 6356752.31414;
 }
 
-TVec3<double> Gnss::ConvertLlaToNed(const GnssMeasurement &origin_lla, const GnssMeasurement &lla) {
-    TVec3<double> ned_position = TVec3<double>::Zero();
+TVec3<double> Gnss::ConvertLlaToEnu(const GnssMeasurement &origin_lla, const GnssMeasurement &lla) {
+    TVec3<double> enu_position = TVec3<double>::Zero();
 
     const double delta_lon = FormatDegree(lla.longitude_deg - origin_lla.longitude_deg);
     const double delta_lat = FormatDegree(lla.latitude_deg - origin_lla.latitude_deg);
     const double radius = origin_lla.altitude_m + kWgs84SemiMajorAxisInMeter;
 
-    ned_position.x() = radius * std::cos(lla.latitude_deg * kDegToRadDouble) * delta_lon;
-    ned_position.y() = radius * delta_lat;
-    ned_position.z() = lla.altitude_m - origin_lla.altitude_m;
+    enu_position.x() = radius * std::cos(lla.latitude_deg * kDegToRadDouble) * delta_lon;
+    enu_position.y() = radius * delta_lat;
+    enu_position.z() = lla.altitude_m - origin_lla.altitude_m;
 
-    return ned_position;
+    return enu_position;
 }
 
-GnssMeasurement Gnss::ConvertNedToLla(const GnssMeasurement &origin_lla, const TVec3<double> &ned) {
+GnssMeasurement Gnss::ConvertEnuToLla(const GnssMeasurement &origin_lla, const TVec3<double> &neu) {
     GnssMeasurement lla;
     const double radius = origin_lla.altitude_m + kWgs84SemiMajorAxisInMeter;
 
-    const double delta_lat = ned.y() / radius;
+    const double delta_lat = neu.y() / radius;
     lla.latitude_deg = FormatDegree(origin_lla.latitude_deg + delta_lat);
 
-    const double delta_lon = ned.x() / radius / std::cos(lla.latitude_deg * kDegToRadDouble);
+    const double delta_lon = neu.x() / radius / std::cos(lla.latitude_deg * kDegToRadDouble);
     lla.longitude_deg = FormatDegree(origin_lla.longitude_deg + delta_lon);
 
-    lla.altitude_m = ned.z() + origin_lla.altitude_m;
+    lla.altitude_m = neu.z() + origin_lla.altitude_m;
 
     return lla;
 }

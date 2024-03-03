@@ -31,7 +31,7 @@ void LoadSimDataAndPublish(const std::string &file_name, std::vector<TVec3<doubl
         gnss_origin.is_fixed;
 
     Gnss gnss_model;
-    const TVec3<double> first_position = gnss_model.ConvertLlaToNed(gnss_origin, gnss_origin);
+    const TVec3<double> first_position = gnss_model.ConvertLlaToEnu(gnss_origin, gnss_origin);
     positions.emplace_back(first_position);
 
     // Publish each line of data file.
@@ -43,11 +43,11 @@ void LoadSimDataAndPublish(const std::string &file_name, std::vector<TVec3<doubl
         data >> type >> gnss.time_stamp_s >> gnss.longitude_deg >> gnss.latitude_deg >>
             gnss.altitude_m >> gnss.yaw_north_rad >> gnss.is_fixed;
 
-        const TVec3<double> ned_pos = gnss_model.ConvertLlaToNed(gnss_origin, gnss);
-        positions.emplace_back(ned_pos);
+        const TVec3<double> enu_pos = gnss_model.ConvertLlaToEnu(gnss_origin, gnss);
+        positions.emplace_back(enu_pos);
 
         // Double check transformation.
-        GnssMeasurement gnss_cal = gnss_model.ConvertNedToLla(gnss_origin, ned_pos);
+        GnssMeasurement gnss_cal = gnss_model.ConvertEnuToLla(gnss_origin, enu_pos);
         const double residual = std::sqrt((gnss.longitude_deg - gnss_cal.longitude_deg) * (gnss.longitude_deg - gnss_cal.longitude_deg) +
                                           (gnss.latitude_deg - gnss_cal.latitude_deg) * (gnss.latitude_deg - gnss_cal.latitude_deg) +
                                           (gnss.altitude_m - gnss_cal.altitude_m) * (gnss.altitude_m - gnss_cal.altitude_m));

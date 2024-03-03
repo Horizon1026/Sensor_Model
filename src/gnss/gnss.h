@@ -15,8 +15,8 @@ public:
     Gnss() = default;
     virtual ~Gnss() = default;
 
-    TVec3<double> ConvertLlaToNed(const GnssMeasurement &origin_lla, const GnssMeasurement &lla);
-    GnssMeasurement ConvertNedToLla(const GnssMeasurement &origin_lla, const TVec3<double> &ned);
+    TVec3<double> ConvertLlaToEnu(const GnssMeasurement &origin_lla, const GnssMeasurement &lla);
+    GnssMeasurement ConvertEnuToLla(const GnssMeasurement &origin_lla, const TVec3<double> &ned);
 
 private:
     double FormatDegree(const double abnormal_degree);

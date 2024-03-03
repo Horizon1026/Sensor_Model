@@ -13,18 +13,16 @@ struct GnssMeasurement {
     double latitude_deg = 0.0;  // 纬度
     double altitude_m = 0.0;    // 椭球高度
 
+    // Yaw defined in ENU frame.
     double yaw_north_rad = 0.0;
 
-    // Velocity with unit : m/s.
+    // Velocity defined in ENU frame with unit : m/s.
     float vel_east_mps = 0.0f;
     float vel_north_mps = 0.0f;
     float vel_up_mps = 0.0f;
 
-    // Quality of gnss.
+    // Status of gnss.
     bool is_fixed = false;
-    float hacc = 0.0f;
-    float hdop = 0.0f;
-    float pdop = 0.0f;
 };
 
 }
