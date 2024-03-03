@@ -9,9 +9,9 @@ namespace SENSOR_MODEL {
 struct GnssMeasurement {
     float time_stamp_s = 0.0f;
 
-    double longitude_deg = 0.0;
-    double latitude_deg = 0.0;
-    double altitude_m = 0.0;
+    double longitude_deg = 0.0; // 经度
+    double latitude_deg = 0.0;  // 纬度
+    double altitude_m = 0.0;    // 椭球高度
 
     double yaw_north_rad = 0.0;
 

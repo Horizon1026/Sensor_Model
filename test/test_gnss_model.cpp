@@ -1,6 +1,7 @@
 #include "datatype_basic.h"
 #include "slam_operations.h"
 #include "log_report.h"
+#include "visualizor_3d.h"
 
 #include <fstream>
 #include <iostream>
@@ -9,6 +10,7 @@
 
 using namespace SLAM_UTILITY;
 using namespace SENSOR_MODEL;
+using namespace SLAM_VISUALIZOR;
 
 void LoadSimDataAndPublish(const std::string &file_name, std::vector<Vec3> &positions) {
     std::ifstream file(file_name.c_str());
@@ -59,8 +61,17 @@ int main(int argc, char **argv) {
     std::vector<Vec3> positions;
     LoadSimDataAndPublish(gnss_file, positions);
 
+    Visualizor3D::Clear();
     for (const auto &position : positions) {
-        ReportInfo(LogVec(position));
+        Visualizor3D::points().emplace_back(PointType{
+            .p_w = position,
+            .color = RgbColor::kCyan,
+            .radius = 2,
+        });
+        Visualizor3D::Refresh("GNSS Trajectory", 10);
+    }
+    while (!Visualizor3D::ShouldQuit()) {
+        Visualizor3D::Refresh("GNSS Trajectory", 10);
     }
 
     return 0;

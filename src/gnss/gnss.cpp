@@ -13,7 +13,7 @@ Vec3 Gnss::ConvertLlaToNed(const GnssMeasurement &origin_lla, const GnssMeasurem
 
     const double delta_lon = lla.longitude_deg - origin_lla.longitude_deg;
     const double delta_lat = lla.latitude_deg - origin_lla.latitude_deg;
-    const double radius = origin_lla.altitude_m + kWgs84SemiMajorAxisInMeter;
+    const double radius = lla.altitude_m + kWgs84SemiMajorAxisInMeter;
 
     ned_position.x() = radius * std::cos(lla.latitude_deg * kDegToRadDouble) * delta_lon;
     ned_position.y() = radius * delta_lat;

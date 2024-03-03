@@ -12,6 +12,10 @@ set( VISUALIZOR_PATH ${PROJECT_SOURCE_DIR}/../Visualizor2D )
 if ( NOT TARGET lib_image_visualizor )
     add_subdirectory( ${VISUALIZOR_PATH}/src ${PROJECT_SOURCE_DIR}/build/lib_image_visualizor )
 endif()
+set( VISUALIZOR_PATH ${PROJECT_SOURCE_DIR}/../Visualizor3D )
+if ( NOT TARGET lib_3d_visualizor )
+    add_subdirectory( ${VISUALIZOR_PATH}/src ${PROJECT_SOURCE_DIR}/build/lib_3d_visualizor )
+endif()
 
 # Add feature point/line detector and feature descriptor.
 set( FEATURE_DETECTOR_PATH ${PROJECT_SOURCE_DIR}/../Feature_Detector )
@@ -60,4 +64,5 @@ add_executable( test_gnss_model
 include_directories(test)
 target_link_libraries( test_gnss_model
     lib_gnss_model
+    lib_3d_visualizor
 )
