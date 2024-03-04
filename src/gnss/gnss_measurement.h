@@ -14,7 +14,7 @@ struct GnssMeasurement {
     double altitude_m = 0.0;    // 椭球高度
 
     // Yaw defined in ENU frame.
-    double yaw_north_rad = 0.0;
+    double yaw_ned_deg = 0.0;
 
     // Velocity defined in ENU frame with unit : m/s.
     float vel_east_mps = 0.0f;
@@ -22,7 +22,9 @@ struct GnssMeasurement {
     float vel_up_mps = 0.0f;
 
     // Status of gnss.
-    bool is_fixed = false;
+    bool is_lla_valid = false;
+    bool is_yaw_valid = false;
+    bool is_vel_valid = false;
 };
 
 }
