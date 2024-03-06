@@ -1,5 +1,6 @@
 #include "gnss.h"
 #include "math_kinematics.h"
+#include "log_report.h"
 
 namespace SENSOR_MODEL {
 
@@ -15,8 +16,8 @@ TVec3<double> Gnss::ConvertLlaToEnu(const GnssMeasurement &origin_lla, const Gns
     const double delta_lat = FormatDegree(lla.latitude_deg - origin_lla.latitude_deg);
     const double radius = origin_lla.altitude_m + kWgs84SemiMajorAxisInMeter;
 
-    enu_position.x() = radius * std::cos(lla.latitude_deg * kDegToRadDouble) * delta_lon;
-    enu_position.y() = radius * delta_lat;
+    enu_position.x() = radius * std::cos(lla.latitude_deg * kDegToRadDouble) * delta_lon * kDegToRadDouble;
+    enu_position.y() = radius * delta_lat * kDegToRadDouble;
     enu_position.z() = lla.altitude_m - origin_lla.altitude_m;
 
     return enu_position;
@@ -24,12 +25,12 @@ TVec3<double> Gnss::ConvertLlaToEnu(const GnssMeasurement &origin_lla, const Gns
 
 GnssMeasurement Gnss::ConvertEnuToLla(const GnssMeasurement &origin_lla, const TVec3<double> &neu) {
     GnssMeasurement lla;
-    const double radius = origin_lla.altitude_m + kWgs84SemiMajorAxisInMeter;
+    const double radius_inv = 1.0 / (origin_lla.altitude_m + kWgs84SemiMajorAxisInMeter);
 
-    const double delta_lat = neu.y() / radius;
+    const double delta_lat = neu.y() * radius_inv * kRadToDegDouble;
     lla.latitude_deg = FormatDegree(origin_lla.latitude_deg + delta_lat);
 
-    const double delta_lon = neu.x() / radius / std::cos(lla.latitude_deg * kDegToRadDouble);
+    const double delta_lon = neu.x() * radius_inv / std::cos(lla.latitude_deg * kDegToRadDouble) * kRadToDegDouble;
     lla.longitude_deg = FormatDegree(origin_lla.longitude_deg + delta_lon);
 
     lla.altitude_m = neu.z() + origin_lla.altitude_m;
@@ -38,12 +39,10 @@ GnssMeasurement Gnss::ConvertEnuToLla(const GnssMeasurement &origin_lla, const T
 }
 
 double Gnss::FormatDegree(const double abnormal_degree) {
-    if (abnormal_degree < kPaiDouble * 0.5) {
-        return abnormal_degree + kPaiDouble;
-    }
-
-    if (abnormal_degree > kPaiDouble * 0.5) {
-        return abnormal_degree - kPaiDouble;
+    if (abnormal_degree < - 180.0) {
+        return abnormal_degree + 180.0 * 2.0;
+    } else if (abnormal_degree > 180.0) {
+        return abnormal_degree - 180.0 * 2.0;
     }
 
     return abnormal_degree;
