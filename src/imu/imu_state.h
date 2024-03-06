@@ -36,6 +36,17 @@ public:
         p_wi_(p_wi), q_wi_(q_wi), v_wi_(v_wi), ba_(ba), bg_(bg), g_w_(g_w), time_stamp_s_(t) {}
     virtual ~ImuState() = default;
 
+    void Clear() {
+        p_wi_ = Vec3::Zero();
+        q_wi_ = Quat::Identity();
+        v_wi_ = Vec3::Zero();
+        ba_ = Vec3::Zero();
+        bg_ = Vec3::Zero();
+        g_w_ = Vec3(0, 0, 9.8f);
+        time_stamp_s_ = 0.0f;
+        cov_matrix_ = Mat18::Zero();
+    }
+
     // Reference for Member Variables.
     Vec3 &p_wi() { return p_wi_; }
     Quat &q_wi() { return q_wi_; }
