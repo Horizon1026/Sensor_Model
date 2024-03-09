@@ -88,11 +88,11 @@ bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_i,
     G.block<3, 3>(ImuIndex::kBiasAccel, ImuIndex::kRandomWalkAccel) = sqrt_dt_I3;
     G.block<3, 3>(ImuIndex::kBiasGyro, ImuIndex::kRandomWalkGyro) = sqrt_dt_I3;
 
-    if (noise_sigma_(0) != options_.kAccelNoise) {
-        noise_sigma_.segment<3>(ImuIndex::kNoiseAccel).array() = options_.kAccelNoise;
-        noise_sigma_.segment<3>(ImuIndex::kNoiseGyro).array() = options_.kGyroNoise;
-        noise_sigma_.segment<3>(ImuIndex::kRandomWalkAccel).array() = options_.kAccelRandomWalk;
-        noise_sigma_.segment<3>(ImuIndex::kRandomWalkGyro).array() = options_.kGyroRandomWalk;
+    if (noise_sigma_(0) != options_.kAccelNoiseSigma) {
+        noise_sigma_.segment<3>(ImuIndex::kNoiseAccel).array() = options_.kAccelNoiseSigma;
+        noise_sigma_.segment<3>(ImuIndex::kNoiseGyro).array() = options_.kGyroNoiseSigma;
+        noise_sigma_.segment<3>(ImuIndex::kRandomWalkAccel).array() = options_.kAccelRandomWalkSigma;
+        noise_sigma_.segment<3>(ImuIndex::kRandomWalkGyro).array() = options_.kGyroRandomWalkSigma;
     }
 
     // In order to compute G * Q * G.t, decompose Q as sqrt(Q), and compute G * sqrt(Q) with noise model.

@@ -12,14 +12,31 @@ namespace SENSOR_MODEL {
 class Gnss {
 
 public:
+/* Options of Gnss Model. */
+struct Options {
+    float kPositionNoiseSigma = 1.0f;
+    float kVelocityNoiseSigma = 0.5f;
+    float kHeadingNoiseSigma = 3.0f;
+};
+
+public:
     Gnss() = default;
     virtual ~Gnss() = default;
 
     TVec3<double> ConvertLlaToEnu(const GnssMeasurement &origin_lla, const GnssMeasurement &lla);
     GnssMeasurement ConvertEnuToLla(const GnssMeasurement &origin_lla, const TVec3<double> &ned);
 
+    // Reference for member variables.
+    Options &options() { return options_; }
+
+    // Const reference for member variables.
+    const Options &options() const { return options_; }
+
 private:
     double FormatDegree(const double abnormal_degree);
+
+private:
+    Options options_;
 
 };
 

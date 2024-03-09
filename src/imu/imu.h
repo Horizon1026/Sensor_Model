@@ -9,15 +9,18 @@
 
 namespace SENSOR_MODEL {
 
-struct ImuModelOptions {
-    float kAccelNoise = 1e-6f;
-    float kGyroNoise = 1e-6f;
-    float kAccelRandomWalk = 1e-6f;
-    float kGyroRandomWalk = 1e-6f;
-};
 
 /* Class IMU model Declaration. */
 class Imu {
+
+public:
+/* Options of IMU Model. */
+struct Options {
+    float kAccelNoiseSigma = 1e-6f;
+    float kGyroNoiseSigma = 1e-6f;
+    float kAccelRandomWalkSigma = 1e-6f;
+    float kGyroRandomWalkSigma = 1e-6f;
+};
 
 public:
     Imu() = default;
@@ -52,15 +55,15 @@ public:
                                           Mat15 &cov_j);
 
     // Reference for member variables.
-    ImuModelOptions &options() { return options_; }
+    Options &options() { return options_; }
     Vec12 &noise_sigma() { return noise_sigma_; }
 
     // Const reference for member variables.
-    const ImuModelOptions &options() const { return options_; }
+    const Options &options() const { return options_; }
     const Vec12 &noise_sigma() const { return noise_sigma_; }
 
 private:
-    ImuModelOptions options_;
+    Options options_;
 
     // Sequence is na, ng, nwa, nwg
     Vec12 noise_sigma_ = Vec12::Ones() * 1e-6f;
