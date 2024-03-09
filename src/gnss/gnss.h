@@ -25,15 +25,13 @@ public:
 
     TVec3<double> ConvertLlaToEnu(const GnssMeasurement &origin_lla, const GnssMeasurement &lla);
     GnssMeasurement ConvertEnuToLla(const GnssMeasurement &origin_lla, const TVec3<double> &ned);
+    double FormatDegree(const double abnormal_degree);
 
     // Reference for member variables.
     Options &options() { return options_; }
 
     // Const reference for member variables.
     const Options &options() const { return options_; }
-
-private:
-    double FormatDegree(const double abnormal_degree);
 
 private:
     Options options_;
