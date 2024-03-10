@@ -54,7 +54,7 @@ void LoadSimDataAndPublish(const std::string &file_name, std::vector<TVec3<doubl
         average_residual += residual;
     }
     average_residual /= static_cast<double>(positions.size());
-    ReportInfo("Transform residual between LLA and NED is " << average_residual);
+    ReportInfo("Transform residual between LLA and ENU is " << average_residual);
 
     file.close();
 }

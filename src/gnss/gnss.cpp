@@ -23,17 +23,17 @@ TVec3<double> Gnss::ConvertLlaToEnu(const GnssMeasurement &origin_lla, const Gns
     return enu_position;
 }
 
-GnssMeasurement Gnss::ConvertEnuToLla(const GnssMeasurement &origin_lla, const TVec3<double> &neu) {
+GnssMeasurement Gnss::ConvertEnuToLla(const GnssMeasurement &origin_lla, const TVec3<double> &enu) {
     GnssMeasurement lla;
     const double radius_inv = 1.0 / (origin_lla.altitude_m + kWgs84SemiMajorAxisInMeter);
 
-    const double delta_lat = neu.y() * radius_inv * kRadToDegDouble;
+    const double delta_lat = enu.y() * radius_inv * kRadToDegDouble;
     lla.latitude_deg = FormatDegree(origin_lla.latitude_deg + delta_lat);
 
-    const double delta_lon = neu.x() * radius_inv / std::cos(lla.latitude_deg * kDegToRadDouble) * kRadToDegDouble;
+    const double delta_lon = enu.x() * radius_inv / std::cos(lla.latitude_deg * kDegToRadDouble) * kRadToDegDouble;
     lla.longitude_deg = FormatDegree(origin_lla.longitude_deg + delta_lon);
 
-    lla.altitude_m = neu.z() + origin_lla.altitude_m;
+    lla.altitude_m = enu.z() + origin_lla.altitude_m;
 
     return lla;
 }
