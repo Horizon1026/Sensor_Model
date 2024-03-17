@@ -16,7 +16,7 @@ public:
 struct Options {
     float kPositionNoiseSigma = 1.0f;
     float kVelocityNoiseSigma = 0.5f;
-    float kHeadingNoiseSigma = 3.0f;
+    float kAttitudeNoiseSigma = 3.0f;
 };
 
 public:
