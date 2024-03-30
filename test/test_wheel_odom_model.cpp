@@ -17,10 +17,11 @@ void LoadSimDataAndPublish(const std::string &file_name, std::vector<Vec3> &velo
         return;
     }
 
-
     WheelOdom odom_model;
-    odom_model.options().kEncoderCountInOneCircle = 400.0f;
-    odom_model.options().kWheelRadiusInMeter = 0.4f;
+    odom_model.options().kEncoderCountInOneCircle = 1024.0f;
+    odom_model.options().kWheelRadiusInMeter = 0.155f;
+    odom_model.options().kEncoderSamplePeriodInSecond = 0.1f;
+    odom_model.options().kVelocityNoiseSigma = 0.5f;
 
     // Publish each line of data file.
     std::string one_line;

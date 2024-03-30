@@ -8,20 +8,24 @@
 
 namespace SENSOR_MODEL {
 
-/* Class WheelOdom Model Declaration. */
+/* Class Wheel Odom Model Declaration. */
 class WheelOdom {
 
 public:
-/* Options of WheelOdom Model. */
+/* Options of Wheel Odom Model. */
 struct Options {
     float kWheelRadiusInMeter = 0.0f;
     float kEncoderCountInOneCircle = 0.0f;
+    float kEncoderSamplePeriodInSecond = 0.0f;
+
+    float kVelocityNoiseSigma = 0.0f;
 };
 
 public:
     WheelOdom() = default;
     virtual ~WheelOdom() = default;
 
+    // Process measurements to be state observations.
     Vec3 ConvertEncoderCountToVelocity(const WheelOdomMeasurement &measure);
 
     // Reference for member variables.

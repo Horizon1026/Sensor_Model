@@ -23,6 +23,7 @@ public:
     Gnss() = default;
     virtual ~Gnss() = default;
 
+    // Process measurements to be state observations.
     TVec3<double> ConvertLlaToEnu(const GnssMeasurement &origin_lla, const GnssMeasurement &lla);
     GnssMeasurement ConvertEnuToLla(const GnssMeasurement &origin_lla, const TVec3<double> &enu);
     double FormatDegree(const double abnormal_degree);
