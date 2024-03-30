@@ -38,6 +38,11 @@ if ( NOT TARGET lib_gnss_model )
     add_subdirectory( src/gnss ${PROJECT_SOURCE_DIR}/build/lib_gnss_model )
 endif()
 
+# Add wheel odom model.
+if ( NOT TARGET lib_wheel_odom_model )
+    add_subdirectory( src/wheel_odom ${PROJECT_SOURCE_DIR}/build/lib_wheel_odom_model )
+endif()
+
 # Create executable target to test camera model.
 add_executable( test_camera_model
     test/test_camera_model.cpp
@@ -64,5 +69,15 @@ add_executable( test_gnss_model
 include_directories(test)
 target_link_libraries( test_gnss_model
     lib_gnss_model
+    lib_3d_visualizor
+)
+
+# Create executable target to test wheel odom model.
+add_executable( test_wheel_odom_model
+    test/test_wheel_odom_model.cpp
+)
+include_directories(test)
+target_link_libraries( test_wheel_odom_model
+    lib_wheel_odom_model
     lib_3d_visualizor
 )
