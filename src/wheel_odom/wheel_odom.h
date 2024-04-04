@@ -27,6 +27,8 @@ public:
 
     // Process measurements to be state observations.
     Vec3 ConvertEncoderCountToVelocity(const WheelOdomMeasurement &measure);
+    Vec3 ConvertLeftEncoderCountToVelocity(const WheelOdomMeasurement &measure);
+    Vec3 ConvertRightEncoderCountToVelocity(const WheelOdomMeasurement &measure);
 
     // Reference for member variables.
     Options &options() { return options_; }
