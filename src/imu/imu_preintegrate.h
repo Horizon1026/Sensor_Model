@@ -1,7 +1,7 @@
 #ifndef _SENSOR_MODEL_IMU_PREINTEGRATE_H_
 #define _SENSOR_MODEL_IMU_PREINTEGRATE_H_
 
-#include "datatype_basic.h"
+#include "basic_type.h"
 #include "slam_basic_math.h"
 #include "imu_measurement.h"
 #include "imu_state.h"

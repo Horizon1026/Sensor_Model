@@ -1,7 +1,7 @@
 #ifndef _SENSOR_MODEL_CAMERA_MEASUREMENT_H_
 #define _SENSOR_MODEL_CAMERA_MEASUREMENT_H_
 
-#include "datatype_basic.h"
+#include "basic_type.h"
 #include "datatype_image.h"
 
 namespace SENSOR_MODEL {

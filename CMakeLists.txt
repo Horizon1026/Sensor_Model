@@ -9,8 +9,8 @@ set( CMAKE_CXX_STANDARD 17 )
 
 # Add visualizor.
 set( VISUALIZOR_PATH ${PROJECT_SOURCE_DIR}/../Visualizor2D )
-if ( NOT TARGET lib_image_visualizor )
-    add_subdirectory( ${VISUALIZOR_PATH}/src ${PROJECT_SOURCE_DIR}/build/lib_image_visualizor )
+if ( NOT TARGET lib_2d_visualizor )
+    add_subdirectory( ${VISUALIZOR_PATH}/src ${PROJECT_SOURCE_DIR}/build/lib_2d_visualizor )
 endif()
 set( VISUALIZOR_PATH ${PROJECT_SOURCE_DIR}/../Visualizor3D )
 if ( NOT TARGET lib_3d_visualizor )
@@ -48,7 +48,7 @@ add_executable( test_camera_model
     test/test_camera_model.cpp
 )
 target_link_libraries( test_camera_model
-    lib_image_visualizor
+    lib_2d_visualizor
     lib_feature_point_detector
     lib_camera_model
 )

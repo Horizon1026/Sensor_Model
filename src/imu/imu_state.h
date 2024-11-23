@@ -1,7 +1,7 @@
 #ifndef _SENSOR_MODEL_IMU_STATE_H_
 #define _SENSOR_MODEL_IMU_STATE_H_
 
-#include "datatype_basic.h"
+#include "basic_type.h"
 
 namespace SENSOR_MODEL {
 
