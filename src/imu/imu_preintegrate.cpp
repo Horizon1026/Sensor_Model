@@ -1,5 +1,5 @@
 #include "imu_preintegrate.h"
-#include "log_report.h"
+#include "slam_log_reporter.h"
 
 namespace SENSOR_MODEL {
 

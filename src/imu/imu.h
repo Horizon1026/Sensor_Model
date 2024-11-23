@@ -2,7 +2,7 @@
 #define _SENSOR_MODEL_IMU_BASIC_H_
 
 #include "datatype_basic.h"
-#include "math_kinematics.h"
+#include "slam_basic_math.h"
 #include "imu_measurement.h"
 #include "imu_state.h"
 #include "imu_preintegrate.h"

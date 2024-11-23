@@ -1,4 +1,4 @@
-#include "log_report.h"
+#include "slam_log_reporter.h"
 #include "imu.h"
 #include "imu_state.h"
 #include "imu_measurement.h"

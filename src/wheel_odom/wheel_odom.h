@@ -2,7 +2,7 @@
 #define _SENSOR_MODEL_WHEEL_ODOM_BASIC_H_
 
 #include "datatype_basic.h"
-#include "math_kinematics.h"
+#include "slam_basic_math.h"
 
 #include "wheel_odom_measurement.h"
 

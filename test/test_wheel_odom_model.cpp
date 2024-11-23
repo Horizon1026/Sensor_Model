@@ -1,6 +1,6 @@
 #include "datatype_basic.h"
 #include "slam_operations.h"
-#include "log_report.h"
+#include "slam_log_reporter.h"
 
 #include <fstream>
 #include <iostream>

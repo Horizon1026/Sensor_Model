@@ -2,7 +2,7 @@
 #define _SENSOR_MODEL_IMU_MEASUREMENT_H_
 
 #include "datatype_basic.h"
-#include "math_kinematics.h"
+#include "slam_basic_math.h"
 
 namespace SENSOR_MODEL {
 
