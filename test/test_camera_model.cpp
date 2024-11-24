@@ -4,7 +4,7 @@
 #include "pinhole.h"
 #include "fisheye.h"
 
-#include "visualizor.h"
+#include "visualizor_2d.h"
 
 #include "feature_point_detector.h"
 #include "feature_harris.h"
