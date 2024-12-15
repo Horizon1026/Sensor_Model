@@ -39,8 +39,8 @@ void TestPinholeCameraModel() {
     // Load image, allocate memory.
     GrayImage raw_image;
     GrayImage corr_image;
-    Visualizor::LoadImage(image_filepath, raw_image);
-    Visualizor::LoadImage(image_filepath, corr_image);
+    Visualizor2D::LoadImage(image_filepath, raw_image);
+    Visualizor2D::LoadImage(image_filepath, corr_image);
     std::vector<Vec2> distort_features, undistort_features;
     DetectFeaturesInRawImage(raw_image, distort_features);
     undistort_features.reserve(distort_features.size());
@@ -74,11 +74,11 @@ void TestPinholeCameraModel() {
     ReportInfo("   Undistortion average residual is " << average_residual);
 
     // Show undistortion image.
-    Visualizor::ShowImageWithDetectedFeatures("Pinhole distorted image with detected features",
+    Visualizor2D::ShowImageWithDetectedFeatures("Pinhole distorted image with detected features",
         raw_image, distort_features);
-    Visualizor::ShowImageWithDetectedFeatures("Pinhole undistorted image with detected features",
+    Visualizor2D::ShowImageWithDetectedFeatures("Pinhole undistorted image with detected features",
         corr_image, undistort_features);
-    Visualizor::WaitKey(1);
+    Visualizor2D::WaitKey(1);
 }
 
 void TestFisheyeCameraModel() {
@@ -99,8 +99,8 @@ void TestFisheyeCameraModel() {
     // Load image, allocate memory.
     GrayImage raw_image;
     GrayImage corr_image;
-    Visualizor::LoadImage(image_filepath, raw_image);
-    Visualizor::LoadImage(image_filepath, corr_image);
+    Visualizor2D::LoadImage(image_filepath, raw_image);
+    Visualizor2D::LoadImage(image_filepath, corr_image);
     std::vector<Vec2> distort_features, undistort_features;
     DetectFeaturesInRawImage(raw_image, distort_features);
     undistort_features.reserve(distort_features.size());
@@ -134,11 +134,11 @@ void TestFisheyeCameraModel() {
     ReportInfo("   Undistortion average residual is " << average_residual);
 
     // Show undistortion image.
-    Visualizor::ShowImageWithDetectedFeatures("Fisheye distorted image with detected features",
+    Visualizor2D::ShowImageWithDetectedFeatures("Fisheye distorted image with detected features",
         raw_image, distort_features);
-    Visualizor::ShowImageWithDetectedFeatures("Fisheye undistorted image with detected features",
+    Visualizor2D::ShowImageWithDetectedFeatures("Fisheye undistorted image with detected features",
         corr_image, undistort_features);
-    Visualizor::WaitKey(1);
+    Visualizor2D::WaitKey(1);
 }
 
 int main(int argc, char **argv) {
@@ -147,7 +147,7 @@ int main(int argc, char **argv) {
     TestPinholeCameraModel();
     TestFisheyeCameraModel();
 
-    Visualizor::WaitKey(0);
+    Visualizor2D::WaitKey(0);
 
     return 0;
 }
