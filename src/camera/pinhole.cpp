@@ -67,7 +67,7 @@ bool Pinhole::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_x
                     y * temp_x + 2.0f * p_[0] * x + 2.0f * p_[1] * y,
                     temp_xy + y * temp_y + p_[0] * 6.0f * y + 2.0f * p_[1] * x;
 
-        if (std::fabs(jacobian.determinant()) < kZero) {
+        if (std::fabs(jacobian.determinant()) < kZerofloat) {
             return false;
         }
 

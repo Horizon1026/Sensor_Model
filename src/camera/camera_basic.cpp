@@ -19,7 +19,7 @@ void CameraBasic::LiftFromNormalizedPlaneToUnitSphere(const Vec3 sphere_xyz, Vec
 
 // Lift 3d point in camera frame on normalized plane.
 void CameraBasic::LiftFromCameraFrameToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) {
-    if (p_c.z() < kZero) {
+    if (p_c.z() < kZerofloat) {
         norm_xy.setZero();
     } else {
         norm_xy.x() = p_c.x() / p_c.z();
