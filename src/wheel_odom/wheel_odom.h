@@ -17,7 +17,6 @@ struct Options {
     float kWheelRadiusInMeter = 0.0f;
     float kEncoderCountInOneCircle = 0.0f;
     float kEncoderSamplePeriodInSecond = 0.0f;
-
     float kVelocityNoiseSigma = 0.0f;
 };
 

@@ -9,7 +9,6 @@
 
 namespace SENSOR_MODEL {
 
-
 /* Class IMU model Declaration. */
 class Imu {
 
