@@ -9,37 +9,37 @@ set( CMAKE_CXX_STANDARD 20 )
 
 # Add visualizor.
 set( VISUALIZOR_PATH ${PROJECT_SOURCE_DIR}/../Visualizor2D )
-if ( NOT TARGET lib_2d_visualizor )
+if( NOT TARGET lib_2d_visualizor )
     add_subdirectory( ${VISUALIZOR_PATH}/src ${PROJECT_SOURCE_DIR}/build/lib_2d_visualizor )
 endif()
 set( VISUALIZOR_PATH ${PROJECT_SOURCE_DIR}/../Visualizor3D )
-if ( NOT TARGET lib_3d_visualizor )
+if( NOT TARGET lib_3d_visualizor )
     add_subdirectory( ${VISUALIZOR_PATH}/src ${PROJECT_SOURCE_DIR}/build/lib_3d_visualizor )
 endif()
 
 # Add feature point/line detector and feature descriptor.
 set( FEATURE_DETECTOR_PATH ${PROJECT_SOURCE_DIR}/../Feature_Detector )
-if ( NOT TARGET lib_feature_point_detector )
+if( NOT TARGET lib_feature_point_detector )
 add_subdirectory( ${FEATURE_DETECTOR_PATH}/src/feature_point_detector ${PROJECT_SOURCE_DIR}/build/lib_feature_point_detector )
 endif()
 
 # Add camera model.
-if ( NOT TARGET lib_camera_model )
+if( NOT TARGET lib_camera_model )
     add_subdirectory( src/camera ${PROJECT_SOURCE_DIR}/build/lib_camera_model )
 endif()
 
 # Add imu model.
-if ( NOT TARGET lib_imu_model )
+if( NOT TARGET lib_imu_model )
     add_subdirectory( src/imu ${PROJECT_SOURCE_DIR}/build/lib_imu_model )
 endif()
 
 # Add gnss model.
-if ( NOT TARGET lib_gnss_model )
+if( NOT TARGET lib_gnss_model )
     add_subdirectory( src/gnss ${PROJECT_SOURCE_DIR}/build/lib_gnss_model )
 endif()
 
 # Add wheel odom model.
-if ( NOT TARGET lib_wheel_odom_model )
+if( NOT TARGET lib_wheel_odom_model )
     add_subdirectory( src/wheel_odom ${PROJECT_SOURCE_DIR}/build/lib_wheel_odom_model )
 endif()
 
