@@ -41,16 +41,16 @@ void CameraBasic::LiftFromImagePlaneToNormalizedPlane(const Vec2 pixel_uv, Vec2 
 
 // Lift 3d point in camera frame on normalized plane, and do undistortion.
 bool CameraBasic::LiftFromCameraFrameToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy) {
-    Vec2 distort_xy;
+    Vec2 distort_xy = Vec2::Zero();
     LiftFromImagePlaneToNormalizedPlane(pixel_uv, distort_xy);
     return UndistortOnNormalizedPlane(distort_xy, undistort_xy);
 }
 
 bool CameraBasic::DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv) {
-    Vec2 undistort_xy = Vec2((undistort_uv(0) - cx()) / fx(),
-                             (undistort_uv(1) - cy()) / fy());
+    const Vec2 undistort_xy = Vec2((undistort_uv(0) - cx()) / fx(),
+                                   (undistort_uv(1) - cy()) / fy());
 
-    Vec2 distort_xy;
+    Vec2 distort_xy = Vec2::Zero();
     RETURN_FALSE_IF_FALSE(DistortOnNormalizedPlane(undistort_xy, distort_xy));
 
     distort_uv(0) = distort_xy(0) * fx() + cx();
@@ -60,27 +60,21 @@ bool CameraBasic::DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv)
 }
 
 bool CameraBasic::UndistortOnImagePlane(const Vec2 distort_uv, Vec2 &undistort_uv) {
-    Vec2 distort_xy = Vec2((distort_uv(0) - cx()) / fx(),
-                           (distort_uv(1) - cy()) / fy());
+    const Vec2 distort_xy = Vec2((distort_uv(0) - cx()) / fx(),
+                                 (distort_uv(1) - cy()) / fy());
 
-    Vec2 undistort_xy;
+    Vec2 undistort_xy = Vec2::Zero();
     RETURN_FALSE_IF_FALSE(UndistortOnNormalizedPlane(distort_xy, undistort_xy));
 
     undistort_uv(0) = undistort_xy(0) * fx() + cx();
     undistort_uv(1) = undistort_xy(1) * fy() + cy();
-
     return true;
 }
 
 // Undistort image.
 bool CameraBasic::CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, float scale) {
-    if (raw_image.data() == nullptr || corrected_image.data() == nullptr) {
-        return false;
-    }
-
-    if (raw_image.cols() != corrected_image.cols() || raw_image.rows() != corrected_image.rows()) {
-        return false;
-    }
+    RETURN_FALSE_IF(raw_image.data() == nullptr || corrected_image.data() == nullptr);
+    RETURN_FALSE_IF(raw_image.cols() != corrected_image.cols() || raw_image.rows() != corrected_image.rows());
 
     const int32_t rows = corrected_image.rows();
     const int32_t cols = corrected_image.cols();
