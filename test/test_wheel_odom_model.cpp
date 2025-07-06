@@ -10,7 +10,7 @@
 using namespace SLAM_UTILITY;
 using namespace SENSOR_MODEL;
 
-void LoadSimDataAndPublish(const std::string &file_name, std::vector<Vec3> &velocities) {
+void LoadWheelOdomMeasurements(const std::string &file_name, std::vector<Vec3> &velocities) {
     std::ifstream file(file_name.c_str());
     if (!file.is_open()) {
         ReportError("Failed to load data file " << file_name);
@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
     ReportInfo(YELLOW ">> Test wheel odom model." RESET_COLOR);
 
     std::vector<Vec3> velocities;
-    LoadSimDataAndPublish(odom_file, velocities);
+    LoadWheelOdomMeasurements(odom_file, velocities);
 
     return 0;
 }

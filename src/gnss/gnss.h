@@ -1,5 +1,5 @@
-#ifndef _SENSOR_MODEL_GNSS_BASIC_H_
-#define _SENSOR_MODEL_GNSS_BASIC_H_
+#ifndef _SENSOR_MODEL_GNSS_MODEL_H_
+#define _SENSOR_MODEL_GNSS_MODEL_H_
 
 #include "basic_type.h"
 #include "slam_basic_math.h"
@@ -41,4 +41,4 @@ private:
 
 }
 
-#endif // end of _SENSOR_MODEL_GNSS_BASIC_H_
+#endif // end of _SENSOR_MODEL_GNSS_MODEL_H_

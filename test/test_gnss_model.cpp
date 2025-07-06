@@ -12,7 +12,7 @@ using namespace SLAM_UTILITY;
 using namespace SENSOR_MODEL;
 using namespace SLAM_VISUALIZOR;
 
-void LoadSimDataAndPublish(const std::string &file_name, std::vector<TVec3<double>> &positions) {
+void LoadGnssMeasurements(const std::string &file_name, std::vector<TVec3<double>> &positions) {
     std::ifstream file(file_name.c_str());
     if (!file.is_open()) {
         ReportError("Failed to load data file " << file_name);
@@ -68,8 +68,9 @@ int main(int argc, char **argv) {
     ReportInfo(YELLOW ">> Test gnss model." RESET_COLOR);
 
     std::vector<TVec3<double>> positions;
-    LoadSimDataAndPublish(gnss_file, positions);
+    LoadGnssMeasurements(gnss_file, positions);
 
+    Visualizor3D::camera_view().p_wc = Vec3(-50, 120, -300);
     Visualizor3D::Clear();
     for (const auto &position : positions) {
         Visualizor3D::points().emplace_back(PointType{
@@ -79,7 +80,7 @@ int main(int argc, char **argv) {
         });
     }
     while (!Visualizor3D::ShouldQuit()) {
-        Visualizor3D::Refresh("GNSS Trajectory", 10);
+        Visualizor3D::Refresh("GNSS Trajectory", 30);
     }
 
     return 0;

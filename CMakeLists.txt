@@ -43,6 +43,11 @@ if( NOT TARGET lib_wheel_odom_model )
     add_subdirectory( src/wheel_odom ${PROJECT_SOURCE_DIR}/build/lib_wheel_odom_model )
 endif()
 
+# Add lidar model.
+if( NOT TARGET lib_lidar_model )
+    add_subdirectory( src/lidar ${PROJECT_SOURCE_DIR}/build/lib_lidar_model )
+endif()
+
 # Create executable target to test camera model.
 add_executable( test_camera_model
     test/test_camera_model.cpp
@@ -57,7 +62,6 @@ target_link_libraries( test_camera_model
 add_executable( test_imu_model
     test/test_imu_model.cpp
 )
-include_directories(test)
 target_link_libraries( test_imu_model
     lib_imu_model
 )
@@ -66,7 +70,6 @@ target_link_libraries( test_imu_model
 add_executable( test_gnss_model
     test/test_gnss_model.cpp
 )
-include_directories(test)
 target_link_libraries( test_gnss_model
     lib_gnss_model
     lib_3d_visualizor
@@ -76,8 +79,16 @@ target_link_libraries( test_gnss_model
 add_executable( test_wheel_odom_model
     test/test_wheel_odom_model.cpp
 )
-include_directories(test)
 target_link_libraries( test_wheel_odom_model
     lib_wheel_odom_model
+    lib_3d_visualizor
+)
+
+# Create executable target to test lidar model.
+add_executable( test_lidar_model
+    test/test_lidar_model.cpp
+)
+target_link_libraries( test_lidar_model
+    lib_lidar_model
     lib_3d_visualizor
 )
