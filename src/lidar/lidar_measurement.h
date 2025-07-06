@@ -5,8 +5,8 @@
 
 namespace SENSOR_MODEL {
 
-/* Measurement of GNSS. */
-struct GnssMeasurement {
+/* Measurement of Lidar. */
+struct LidarMeasurement {
     float time_stamp_s = 0.0f;
     std::vector<float> time_stamp_s_of_points;
     std::vector<Vec3> raw_points;
