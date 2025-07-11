@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
 
     Visualizor3D::camera_view().p_wc = Vec3(0, 0, -40);
     Visualizor3D::Clear();
-    for (const auto &point : lidar_points) {
+    for (const auto &point: lidar_points) {
         Visualizor3D::points().emplace_back(PointType{
             .p_w = point.cast<float>(),
             .color = RgbColor::kCyan,

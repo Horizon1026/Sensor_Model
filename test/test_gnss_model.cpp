@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
 
     Visualizor3D::camera_view().p_wc = Vec3(-50, 120, -300);
     Visualizor3D::Clear();
-    for (const auto &position : positions) {
+    for (const auto &position: positions) {
         Visualizor3D::points().emplace_back(PointType{
             .p_w = position.cast<float>(),
             .color = RgbColor::kCyan,
