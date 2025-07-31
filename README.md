@@ -4,11 +4,13 @@ The model of sensors for slam, for example, imu, camera, and so on.
 # Components
 - [x] Camera model
 - [x] Imu model
+- [x] Wheel odom model
 - [ ] GPS model
 - [ ] Lidar model
 
 # Dependence
 - Slam_Utility
+- Feature_Detector
 - Visualizor2D (only for test)
 
 # Compile and Run

@@ -23,29 +23,25 @@ if( NOT TARGET lib_feature_point_detector )
 add_subdirectory( ${FEATURE_DETECTOR_PATH}/src/feature_point_detector ${PROJECT_SOURCE_DIR}/build/lib_feature_point_detector )
 endif()
 
-# Add camera model.
+# Add sensors model.
+set( SENSOR_MODEL_PATH ${PROJECT_SOURCE_DIR}/../Sensor_Model )
 if( NOT TARGET lib_camera_model )
-    add_subdirectory( src/camera ${PROJECT_SOURCE_DIR}/build/lib_camera_model )
+    add_subdirectory( ${SENSOR_MODEL_PATH}/src/camera ${PROJECT_SOURCE_DIR}/build/lib_camera_model )
 endif()
-
-# Add imu model.
+if( NOT TARGET lib_virtual_camera_model )
+    add_subdirectory( ${SENSOR_MODEL_PATH}/src/virtual_camera ${PROJECT_SOURCE_DIR}/build/lib_virtual_camera_model )
+endif()
 if( NOT TARGET lib_imu_model )
-    add_subdirectory( src/imu ${PROJECT_SOURCE_DIR}/build/lib_imu_model )
+    add_subdirectory( ${SENSOR_MODEL_PATH}/src/imu ${PROJECT_SOURCE_DIR}/build/lib_imu_model )
 endif()
-
-# Add gnss model.
 if( NOT TARGET lib_gnss_model )
-    add_subdirectory( src/gnss ${PROJECT_SOURCE_DIR}/build/lib_gnss_model )
+    add_subdirectory( ${SENSOR_MODEL_PATH}/src/gnss ${PROJECT_SOURCE_DIR}/build/lib_gnss_model )
 endif()
-
-# Add wheel odom model.
 if( NOT TARGET lib_wheel_odom_model )
-    add_subdirectory( src/wheel_odom ${PROJECT_SOURCE_DIR}/build/lib_wheel_odom_model )
+    add_subdirectory( ${SENSOR_MODEL_PATH}/src/wheel_odom ${PROJECT_SOURCE_DIR}/build/lib_wheel_odom_model )
 endif()
-
-# Add lidar model.
 if( NOT TARGET lib_lidar_model )
-    add_subdirectory( src/lidar ${PROJECT_SOURCE_DIR}/build/lib_lidar_model )
+    add_subdirectory( ${SENSOR_MODEL_PATH}/src/lidar ${PROJECT_SOURCE_DIR}/build/lib_lidar_model )
 endif()
 
 # Create executable target to test camera model.
@@ -56,6 +52,16 @@ target_link_libraries( test_camera_model
     lib_2d_visualizor
     lib_feature_point_detector
     lib_camera_model
+)
+
+# Create executable target to test virtual camera model.
+add_executable( test_virtual_camera_model
+    test/test_virtual_camera_model.cpp
+)
+target_link_libraries( test_virtual_camera_model
+    lib_2d_visualizor
+    lib_feature_point_detector
+    lib_virtual_camera_model
 )
 
 # Create executable target to test imu model.
