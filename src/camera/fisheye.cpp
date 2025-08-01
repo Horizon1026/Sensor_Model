@@ -1,10 +1,15 @@
 #include "fisheye.h"
 #include "slam_basic_math.h"
+#include "slam_log_reporter.h"
 
 namespace SENSOR_MODEL {
 
 bool Fisheye::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
     const float r = undistort_xy.norm();
+    if (r < kZeroFloat) {
+        distort_xy = undistort_xy;
+        return true;
+    }
     const float theta = std::atan(r);
     const float theta2 = theta * theta;
     const float theta4 = theta2 * theta2;
@@ -20,7 +25,7 @@ bool Fisheye::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy
 
 bool Fisheye::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) {
     switch (options().kUndistortMethod) {
-        case UndistortMethod::kFixePointIteration:
+        case UndistortMethod::kFixedPointIteration:
         default:
             return UndistortByFixePointIteration(distort_xy, undistort_xy);
     }

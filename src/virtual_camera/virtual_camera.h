@@ -12,18 +12,21 @@ class VirtualCamera {
 
 public:
     struct Options {
-        const Quat kTargetQwc = Quat::Identity();
-        const int32_t kVirtualImageRows = 100;
-        const int32_t kVirtualImageCols = 100;
-        const float kVirtualCameraFocusLength = 400.0f;
+        Quat kTargetQwc = Quat::Identity();
+        int32_t kVirtualImageRows = 100;
+        int32_t kVirtualImageCols = 100;
+        float kVirtualCameraFocusLength = 400.0f;
     };
 
 public:
     VirtualCamera() = default;
     virtual ~VirtualCamera() = default;
 
-    bool GenerateMaphex();
-    bool RemapVirtualCameraImage();
+    bool GenerateMaphex(const Quat &q_wc);
+    bool GenerateMaphex(const Quat &q_wc, const Quat &target_q_wc);
+    bool RemapVirtualCameraImage(const GrayImage &raw_image);
+    bool RemapPixelUvFromVirtualCameraToRawCamera(const Vec2 &virtual_pixel_uv, Vec2 &raw_distort_pixel_uv);
+    bool RemapPixelUvFromRawCameraToVirtualCamera(const Vec2 &raw_distort_pixel_uv, Vec2 &virtual_pixel_uv);
 
     // Reference for member variables.
     Options &options() { return options_; }
@@ -39,11 +42,13 @@ public:
 
 private:
     Options options_;
+    std::unique_ptr<CameraBasic> virtual_camera_model_ = nullptr;
     std::unique_ptr<CameraBasic> raw_camera_model_ = nullptr;
     MatImg virtual_camera_image_;
     MatImg virtual_camera_mask_;
     Mat maphex_row_;
     Mat maphex_col_;
+    Mat3 H_cc0_ = Mat3::Identity();
 };
 
 }

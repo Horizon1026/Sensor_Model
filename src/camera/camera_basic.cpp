@@ -19,7 +19,7 @@ void CameraBasic::LiftFromNormalizedPlaneToUnitSphere(const Vec3 sphere_xyz, Vec
 
 // Lift 3d point in camera frame on normalized plane.
 void CameraBasic::LiftFromCameraFrameToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) {
-    if (p_c.z() < kZerofloat) {
+    if (p_c.z() < kZeroFloat) {
         norm_xy.setZero();
     } else {
         norm_xy.x() = p_c.x() / p_c.z();
@@ -49,13 +49,11 @@ bool CameraBasic::LiftFromCameraFrameToNormalizedPlaneAndUndistort(const Vec2 pi
 bool CameraBasic::DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv) {
     const Vec2 undistort_xy = Vec2((undistort_uv(0) - cx()) / fx(),
                                    (undistort_uv(1) - cy()) / fy());
-
     Vec2 distort_xy = Vec2::Zero();
     RETURN_FALSE_IF_FALSE(DistortOnNormalizedPlane(undistort_xy, distort_xy));
 
     distort_uv(0) = distort_xy(0) * fx() + cx();
     distort_uv(1) = distort_xy(1) * fy() + cy();
-
     return true;
 }
 

@@ -23,7 +23,7 @@ bool Pinhole::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_
     switch (options().kUndistortMethod) {
         case UndistortMethod::kGradientDesent:
             return UndistortByGradienDesent(distort_xy, undistort_xy);
-        case UndistortMethod::kFixePointIteration:
+        case UndistortMethod::kFixedPointIteration:
         default:
             return UndistortByFixePointIteration(distort_xy, undistort_xy);
     }
@@ -67,7 +67,7 @@ bool Pinhole::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_x
                     y * temp_x + 2.0f * p_[0] * x + 2.0f * p_[1] * y,
                     temp_xy + y * temp_y + p_[0] * 6.0f * y + 2.0f * p_[1] * x;
 
-        if (std::fabs(jacobian.determinant()) < kZerofloat) {
+        if (std::fabs(jacobian.determinant()) < kZeroFloat) {
             return false;
         }
 

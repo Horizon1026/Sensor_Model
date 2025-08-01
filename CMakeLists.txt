@@ -61,6 +61,7 @@ add_executable( test_virtual_camera_model
 target_link_libraries( test_virtual_camera_model
     lib_2d_visualizor
     lib_feature_point_detector
+    lib_camera_model
     lib_virtual_camera_model
 )
 

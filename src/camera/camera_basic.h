@@ -8,7 +8,7 @@ namespace SENSOR_MODEL {
 
 enum class UndistortMethod : uint8_t {
     kGradientDesent = 0,
-    kFixePointIteration = 1,
+    kFixedPointIteration = 1,
     kBisection = 2,
     kNewtonIteration = 3,
 };
