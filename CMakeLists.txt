@@ -44,6 +44,12 @@ if( NOT TARGET lib_lidar_model )
     add_subdirectory( ${SENSOR_MODEL_PATH}/src/lidar ${PROJECT_SOURCE_DIR}/build/lib_lidar_model )
 endif()
 
+# Add image painter.
+set( IMAGE_PAINTER_PATH ${PROJECT_SOURCE_DIR}/../Image_Painter )
+if( NOT TARGET lib_image_painter )
+    add_subdirectory( ${IMAGE_PAINTER_PATH}/src ${PROJECT_SOURCE_DIR}/build/lib_image_painter )
+endif()
+
 # Create executable target to test camera model.
 add_executable( test_camera_model
     test/test_camera_model.cpp
@@ -60,7 +66,7 @@ add_executable( test_virtual_camera_model
 )
 target_link_libraries( test_virtual_camera_model
     lib_2d_visualizor
-    lib_feature_point_detector
+    lib_image_painter
     lib_camera_model
     lib_virtual_camera_model
 )

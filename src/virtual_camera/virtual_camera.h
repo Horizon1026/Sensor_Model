@@ -12,6 +12,7 @@ class VirtualCamera {
 
 public:
     struct Options {
+        Quat kCurrentQwc = Quat::Identity();
         Quat kTargetQwc = Quat::Identity();
         int32_t kVirtualImageRows = 100;
         int32_t kVirtualImageCols = 100;
@@ -22,11 +23,14 @@ public:
     VirtualCamera() = default;
     virtual ~VirtualCamera() = default;
 
+    bool GenerateMaphex();
     bool GenerateMaphex(const Quat &q_wc);
     bool GenerateMaphex(const Quat &q_wc, const Quat &target_q_wc);
     bool RemapVirtualCameraImage(const GrayImage &raw_image);
     bool RemapPixelUvFromVirtualCameraToRawCamera(const Vec2 &virtual_pixel_uv, Vec2 &raw_distort_pixel_uv);
     bool RemapPixelUvFromRawCameraToVirtualCamera(const Vec2 &raw_distort_pixel_uv, Vec2 &virtual_pixel_uv);
+
+    Vec2 GetVirtualCameraFov() const;
 
     // Reference for member variables.
     Options &options() { return options_; }

@@ -37,11 +37,11 @@ public:
     virtual void LiftFromNormalizedPlaneToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv);
     // Lift 2d point in image plane back on normalized plane.
     virtual void LiftFromImagePlaneToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy);
+    // Lift 2d point in image plane on normalized plane, and do undistortion.
+    bool LiftFromImagePlaneToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy);
 
     // Lift 3d point in camera frame on normalized plane.
     void LiftFromCameraFrameToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy);
-    // Lift 3d point in camera frame on normalized plane, and do undistortion.
-    bool LiftFromCameraFrameToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy);
 
     // Do distortion and undistortion on normalized plane.
     virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) { return false; }
