@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     ReportInfo("Fov(H * V) is " << LogVec(fov) << " deg.");
 
     // Generate image of virtual camera.
-    if (virtual_camera.GenerateMaphex(Quat::Identity(), Quat(Eigen::AngleAxisf(-20.0f * kDegToRad, Vec3::UnitY())))) {
+    if (virtual_camera.GenerateMaphex(Quat::Identity(), Quat(Eigen::AngleAxisf(-30.0f * kDegToRad, Vec3::UnitY())))) {
         ReportInfo("Succeed to generate maphex.");
     } else {
         ReportError("Failed to generate maphex.");
