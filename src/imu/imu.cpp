@@ -38,8 +38,9 @@ bool Imu::PropagateNominalState(const ImuMeasurement &meas_i,
     state_j.q_wi() = (state_i.q_wi() * dq).normalized();
 
     // Propagate nominal velocity.
-    mid_accel = 0.5f * (state_i.q_wi() * (meas_i.accel - bias_a) + state_j.q_wi() * (meas_j.accel - bias_a));
-    state_j.v_wi() = state_i.v_wi() + (mid_accel - gravity) * dt;
+    mid_accel = 0.5f * (meas_i.accel + meas_j.accel) - bias_a;
+    const Vec3 mid_accel_w = 0.5f * (state_i.q_wi() * (meas_i.accel - bias_a) + state_j.q_wi() * (meas_j.accel - bias_a));
+    state_j.v_wi() = state_i.v_wi() + (mid_accel_w - gravity) * dt;
 
     // Propagate nominal position.
     state_j.p_wi() = state_i.p_wi() + 0.5f * (state_i.v_wi() + state_j.v_wi()) * dt;
@@ -70,9 +71,7 @@ bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_i,
     }
 
     const float dt = meas_j.time_stamp_s - meas_i.time_stamp_s;
-    const float sqrt_dt = std::sqrt(dt);
     const Mat3 dt_I3 = dt * Mat3::Identity();
-    const Mat3 sqrt_dt_I3 = sqrt_dt * Mat3::Identity();
     const Mat3 R_wi_i = state_i.q_wi().matrix();
 
     Mat15 F = Mat15::Identity();
@@ -83,10 +82,11 @@ bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_i,
     F.block<3, 3>(ImuIndex::kRotation, ImuIndex::kBiasGyro) = - dt_I3;
 
     Mat15x12 G = Mat15x12::Zero();
-    G.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kNoiseAccel) = dt * R_wi_i;
-    G.block<3, 3>(ImuIndex::kRotation, ImuIndex::kNoiseGyro) = dt_I3;
-    G.block<3, 3>(ImuIndex::kBiasAccel, ImuIndex::kRandomWalkAccel) = sqrt_dt_I3;
-    G.block<3, 3>(ImuIndex::kBiasGyro, ImuIndex::kRandomWalkGyro) = sqrt_dt_I3;
+    G.block<3, 3>(ImuIndex::kPosition, ImuIndex::kNoiseAccel) = - 0.5f * dt * dt * R_wi_i;
+    G.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kNoiseAccel) = - dt * R_wi_i;
+    G.block<3, 3>(ImuIndex::kRotation, ImuIndex::kNoiseGyro) = - dt_I3;
+    G.block<3, 3>(ImuIndex::kBiasAccel, ImuIndex::kRandomWalkAccel) = dt_I3;
+    G.block<3, 3>(ImuIndex::kBiasGyro, ImuIndex::kRandomWalkGyro) = dt_I3;
 
     if (noise_sigma_(0) != options_.kAccelNoiseSigma) {
         noise_sigma_.segment<3>(ImuIndex::kNoiseAccel).array() = options_.kAccelNoiseSigma;
