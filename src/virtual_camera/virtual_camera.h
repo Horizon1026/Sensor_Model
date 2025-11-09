@@ -5,7 +5,7 @@
 #include "camera_basic.h"
 #include "memory"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 /* Class VirtualCamera Declaration. */
 class VirtualCamera {
@@ -55,6 +55,6 @@ private:
     Mat3 H_cc0_ = Mat3::Identity();
 };
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
 
 #endif  // end of _SENSOR_MODEL_VIRTUAL_CAMERA_H_

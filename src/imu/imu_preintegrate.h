@@ -6,7 +6,7 @@
 #include "imu_state.h"
 #include "slam_basic_math.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 /* Imu preintegrate block. */
 template <typename Scalar = float>
@@ -78,6 +78,6 @@ private:
     Scalar integrate_time_s_ = static_cast<Scalar>(0);
 };
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
 
 #endif  // end of _SENSOR_MODEL_IMU_PREINTEGRATE_H_

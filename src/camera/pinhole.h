@@ -3,7 +3,7 @@
 
 #include "camera_basic.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 class Pinhole : public CameraBasic {
 
@@ -40,6 +40,6 @@ private:
     std::array<float, 2> p_ = {};
 };
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
 
 #endif  // end of _SENSOR_MODEL_PINHOLE_CAMERA_MODEL_H_

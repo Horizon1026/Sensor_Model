@@ -4,7 +4,7 @@
 #include "basic_type.h"
 #include "datatype_image.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 /* Measurement of camera. */
 struct CameraMeasurement {
@@ -12,6 +12,6 @@ struct CameraMeasurement {
     float time_stamp_s = 0.0f;
 };
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
 
 #endif  // end of _SENSOR_MODEL_CAMERA_MEASUREMENT_H_

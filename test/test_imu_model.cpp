@@ -6,7 +6,7 @@
 
 #include <fstream>
 
-using namespace SENSOR_MODEL;
+using namespace sensor_model;
 
 bool LoadImuMeasurements(const std::string &imu_file, std::vector<ImuMeasurement> &measurements, std::vector<Vec3> &position, std::vector<Quat> &rotation) {
     ReportInfo(">> Load imu data from " << imu_file);

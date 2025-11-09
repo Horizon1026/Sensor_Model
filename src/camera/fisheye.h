@@ -3,7 +3,7 @@
 
 #include "camera_basic.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 class Fisheye : public CameraBasic {
 
@@ -43,6 +43,6 @@ private:
     std::array<float, 5> k_ = {};
 };
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
 
 #endif  // end of _SENSOR_MODEL_FISHEYE_CAMERA_MODEL_H_

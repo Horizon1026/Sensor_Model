@@ -2,7 +2,7 @@
 #include "slam_basic_math.h"
 #include "slam_operations.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 // Lift 2d point in normalized plane on unit sphere.
 void CameraBasic::LiftFromNormalizedPlaneToUnitSphere(const Vec2 norm_xy, Vec3 &sphere_xyz) {
@@ -104,4 +104,4 @@ void CameraBasic::SetIntrinsicParameter(float fx, float fy, float cx, float cy) 
     cy_ = cy;
 }
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model

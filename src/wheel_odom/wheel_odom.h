@@ -6,7 +6,7 @@
 
 #include "wheel_odom_measurement.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 /* Class Wheel Odom Model Declaration. */
 class WheelOdom {
@@ -39,6 +39,6 @@ private:
     Options options_;
 };
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
 
 #endif  // end of _SENSOR_MODEL_WHEEL_ODOM_BASIC_H_

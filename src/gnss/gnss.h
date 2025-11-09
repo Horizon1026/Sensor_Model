@@ -6,7 +6,7 @@
 
 #include "gnss_measurement.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 /* Class Gnss Model Declaration. */
 class Gnss {
@@ -38,6 +38,6 @@ private:
     Options options_;
 };
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
 
 #endif  // end of _SENSOR_MODEL_GNSS_MODEL_H_

@@ -3,7 +3,7 @@
 #include "slam_log_reporter.h"
 #include "slam_operations.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 bool VirtualCamera::GenerateMaphex() { return GenerateMaphex(options_.kCurrentQwc, options_.kTargetQwc); }
 
@@ -86,4 +86,4 @@ Vec2 VirtualCamera::GetVirtualCameraFov() const {
            kRadToDeg;
 }
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model

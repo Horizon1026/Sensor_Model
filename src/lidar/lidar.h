@@ -5,7 +5,7 @@
 #include "lidar_measurement.h"
 #include "slam_basic_math.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 /* Class Lidar Model Declaration. */
 class Lidar {
@@ -30,6 +30,6 @@ private:
     Options options_;
 };
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
 
 #endif  // end of _SENSOR_MODEL_LIDAR_MODEL_H_

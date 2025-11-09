@@ -1,7 +1,7 @@
 #include "imu_preintegrate.h"
 #include "slam_log_reporter.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 template class ImuPreintegrateBlock<float>;
 template class ImuPreintegrateBlock<double>;
@@ -166,4 +166,4 @@ void ImuPreintegrateBlock<Scalar>::SetImuNoiseSigma(const Scalar accel_noise, co
         gyro_noise, accel_random_walk, accel_random_walk, accel_random_walk, gyro_random_walk, gyro_random_walk, gyro_random_walk;
 }
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model

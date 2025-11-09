@@ -8,9 +8,9 @@
 
 #include "gnss.h"
 
-using namespace SLAM_UTILITY;
-using namespace SENSOR_MODEL;
-using namespace SLAM_VISUALIZOR;
+using namespace slam_utility;
+using namespace sensor_model;
+using namespace slam_visualizor;
 
 void LoadGnssMeasurements(const std::string &file_name, std::vector<TVec3<double>> &positions) {
     std::ifstream file(file_name.c_str());

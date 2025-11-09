@@ -3,7 +3,7 @@
 
 #include "basic_type.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 /* Measurement of Wheel Odom. */
 struct WheelOdomMeasurement {
@@ -15,6 +15,6 @@ struct WheelOdomMeasurement {
     float encoder_right_cnt = 0;
 };
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
 
 #endif  // end of _SENSOR_MODEL_WHEEL_ODOM_MEASUREMENT_H_

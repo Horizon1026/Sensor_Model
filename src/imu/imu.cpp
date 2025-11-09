@@ -1,7 +1,7 @@
 #include "imu.h"
 #include "slam_log_reporter.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 bool Imu::PropagateNominalState(const ImuMeasurement &meas_i, const ImuMeasurement &meas_j, const ImuState &state_i, ImuState &state_j) {
     if (meas_i.time_stamp_s > meas_j.time_stamp_s) {
@@ -87,4 +87,4 @@ bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_i, const I
     return true;
 }
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model

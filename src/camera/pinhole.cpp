@@ -1,7 +1,7 @@
 #include "pinhole.h"
 #include "slam_basic_math.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 bool Pinhole::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
     const float x = undistort_xy(0);
@@ -132,4 +132,4 @@ bool Pinhole::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undist
     return true;
 }
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model

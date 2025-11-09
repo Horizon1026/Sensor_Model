@@ -3,7 +3,7 @@
 
 #include "basic_type.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 /* Measurement of GNSS. */
 struct GnssMeasurement {
@@ -26,6 +26,6 @@ struct GnssMeasurement {
     float vel_up_mps = 0.0f;
 };
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
 
 #endif  // end of _SENSOR_MODEL_GNSS_MEASUREMENT_H_

@@ -2,7 +2,7 @@
 #include "slam_basic_math.h"
 #include "slam_log_reporter.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 Vec3 WheelOdom::ConvertEncoderCountToVelocity(const WheelOdomMeasurement &measure) {
     if (!measure.is_wheel_velocity_valid) {
@@ -39,4 +39,4 @@ Vec3 WheelOdom::ConvertRightEncoderCountToVelocity(const WheelOdomMeasurement &m
     return Vec3(velocity_right_mps, 0, 0);
 }
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model

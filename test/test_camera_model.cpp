@@ -9,8 +9,8 @@
 #include "feature_harris.h"
 #include "feature_point_detector.h"
 
-using namespace SLAM_VISUALIZOR;
-using namespace FEATURE_DETECTOR;
+using namespace slam_visualizor;
+using namespace feature_detector;
 
 void DetectFeaturesInRawImage(const GrayImage &image, std::vector<Vec2> &pixel_uv) {
     // Detect features.
@@ -46,7 +46,7 @@ void TestPinholeCameraModel() {
     undistort_features.reserve(distort_features.size());
 
     // Initialize pinhole camera.
-    SENSOR_MODEL::Pinhole camera;
+    sensor_model::Pinhole camera;
     camera.SetIntrinsicParameter(fx, fy, cx, cy);
     camera.SetDistortionParameter(std::vector<float> {k1, k2, k3, p1, p2});
 
@@ -104,7 +104,7 @@ void TestFisheyeCameraModel() {
     undistort_features.reserve(distort_features.size());
 
     // Initialize fisheye camera.
-    SENSOR_MODEL::Fisheye camera;
+    sensor_model::Fisheye camera;
     camera.SetIntrinsicParameter(fx, fy, cx, cy);
     camera.SetDistortionParameter(std::vector<float> {k1, k2, k3, k4, k5});
 

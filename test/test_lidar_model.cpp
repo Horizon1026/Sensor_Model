@@ -10,9 +10,9 @@
 
 #include "visualizor_3d.h"
 
-using namespace SLAM_UTILITY;
-using namespace SENSOR_MODEL;
-using namespace SLAM_VISUALIZOR;
+using namespace slam_utility;
+using namespace sensor_model;
+using namespace slam_visualizor;
 
 void LoadLidarMeasurements(const std::string &file_name, std::vector<Vec3> &points) {
     std::ifstream imu_file(file_name.c_str());

@@ -7,8 +7,8 @@
 
 #include "wheel_odom.h"
 
-using namespace SLAM_UTILITY;
-using namespace SENSOR_MODEL;
+using namespace slam_utility;
+using namespace sensor_model;
 
 void LoadWheelOdomMeasurements(const std::string &file_name, std::vector<Vec3> &velocities) {
     std::ifstream file(file_name.c_str());

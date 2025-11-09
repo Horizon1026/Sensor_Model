@@ -3,7 +3,7 @@
 
 #include "basic_type.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 /* Measurement of Lidar. */
 struct LidarMeasurement {
@@ -13,6 +13,6 @@ struct LidarMeasurement {
     std::vector<Vec3> undistorted_points;
 };
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
 
 #endif  // end of _SENSOR_MODEL_LIDAR_MEASUREMENT_H_

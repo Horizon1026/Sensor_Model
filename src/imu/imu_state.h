@@ -3,7 +3,7 @@
 
 #include "basic_type.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 /* Indice of imu state. */
 enum ImuIndex : uint8_t {
@@ -111,6 +111,6 @@ private:
     Mat24 cov_matrix_ = Mat24::Zero();
 };
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
 
 #endif  // end of _SENSOR_MODEL_IMU_STATE_H_

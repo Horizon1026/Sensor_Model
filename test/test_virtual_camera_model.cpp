@@ -8,9 +8,9 @@
 #include "virtual_camera.h"
 #include "visualizor_2d.h"
 
-using namespace SLAM_VISUALIZOR;
-using namespace SENSOR_MODEL;
-using namespace IMAGE_PAINTER;
+using namespace slam_visualizor;
+using namespace sensor_model;
+using namespace image_painter;
 
 int main(int argc, char **argv) {
     ReportInfo(YELLOW ">> Test virtual camera model." RESET_COLOR);

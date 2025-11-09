@@ -4,7 +4,7 @@
 #include "basic_type.h"
 #include "datatype_image.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 enum class UndistortMethod : uint8_t {
     kGradientDesent = 0,
@@ -81,6 +81,6 @@ private:
     CameraModelOptions options_;
 };
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
 
 #endif  // end of _SENSOR_MODEL_CAMERA_BASIC_H_

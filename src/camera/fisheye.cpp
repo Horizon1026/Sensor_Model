@@ -2,7 +2,7 @@
 #include "slam_basic_math.h"
 #include "slam_log_reporter.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 bool Fisheye::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
     const float r = undistort_xy.norm();
@@ -85,4 +85,4 @@ bool Fisheye::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undist
     return true;
 }
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model

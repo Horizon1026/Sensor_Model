@@ -7,7 +7,7 @@
 #include "imu_state.h"
 #include "slam_basic_math.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 /* Class IMU model Declaration. */
 class Imu {
@@ -51,6 +51,6 @@ private:
     Vec12 noise_sigma_ = Vec12::Ones() * 1e-6f;
 };
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
 
 #endif

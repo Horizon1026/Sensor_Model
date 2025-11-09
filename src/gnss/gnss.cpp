@@ -2,7 +2,7 @@
 #include "slam_basic_math.h"
 #include "slam_log_reporter.h"
 
-namespace SENSOR_MODEL {
+namespace sensor_model {
 
 namespace {
     constexpr double kWgs84SemiMajorAxisInMeter = 6378137.0;
@@ -48,4 +48,4 @@ double Gnss::FormatDegree(const double abnormal_degree) {
     return abnormal_degree;
 }
 
-}  // namespace SENSOR_MODEL
+}  // namespace sensor_model
