@@ -1,17 +1,14 @@
-#include "slam_log_reporter.h"
 #include "imu.h"
-#include "imu_state.h"
 #include "imu_measurement.h"
 #include "imu_preintegrate.h"
+#include "imu_state.h"
+#include "slam_log_reporter.h"
 
 #include <fstream>
 
 using namespace SENSOR_MODEL;
 
-bool LoadImuMeasurements(const std::string &imu_file,
-                         std::vector<ImuMeasurement> &measurements,
-                         std::vector<Vec3> &position,
-                         std::vector<Quat> &rotation) {
+bool LoadImuMeasurements(const std::string &imu_file, std::vector<ImuMeasurement> &measurements, std::vector<Vec3> &position, std::vector<Quat> &rotation) {
     ReportInfo(">> Load imu data from " << imu_file);
 
     measurements.clear();
@@ -32,8 +29,8 @@ bool LoadImuMeasurements(const std::string &imu_file,
     uint32_t cnt = 0;
     while (std::getline(fsIMU, oneLine) && !oneLine.empty()) {
         std::istringstream imuData(oneLine);
-        imuData >> time_stamp_s >> q.w() >> q.x() >> q.y() >> q.z() >> pos.x() >> pos.y() >> pos.z()
-            >> gyr.x() >> gyr.y() >> gyr.z() >> acc.x() >> acc.y() >> acc.z();
+        imuData >> time_stamp_s >> q.w() >> q.x() >> q.y() >> q.z() >> pos.x() >> pos.y() >> pos.z() >> gyr.x() >> gyr.y() >> gyr.z() >> acc.x() >> acc.y() >>
+            acc.z();
 
         ImuMeasurement meas;
         meas.accel = acc.cast<float>();
@@ -50,9 +47,7 @@ bool LoadImuMeasurements(const std::string &imu_file,
     return true;
 }
 
-void TestImuPreintegration(std::vector<ImuMeasurement> &measurements,
-                           std::vector<Vec3> &position,
-                           std::vector<Quat> &rotation) {
+void TestImuPreintegration(std::vector<ImuMeasurement> &measurements, std::vector<Vec3> &position, std::vector<Quat> &rotation) {
     ReportInfo(YELLOW ">> Test imu preintegration." RESET_COLOR);
 
     // Define range.
@@ -74,9 +69,7 @@ void TestImuPreintegration(std::vector<ImuMeasurement> &measurements,
     ReportInfo("dp_dbg\n" << block.dp_dbg());
 }
 
-void TestImuIntegration(std::vector<ImuMeasurement> &measurements,
-                        std::vector<Vec3> &position,
-                        std::vector<Quat> &rotation) {
+void TestImuIntegration(std::vector<ImuMeasurement> &measurements, std::vector<Vec3> &position, std::vector<Quat> &rotation) {
     ReportInfo(YELLOW ">> Test imu integration." RESET_COLOR);
 
     // Define range.
@@ -88,10 +81,10 @@ void TestImuIntegration(std::vector<ImuMeasurement> &measurements,
     const Quat q_wi_j = rotation[end_index];
     const Vec3 p_wi_i = position[start_index];
     const Vec3 p_wi_j = position[end_index];
-    const Vec3 v_wi_i = (position[start_index + 1] - position[start_index - 1])
-        / (measurements[start_index + 1].time_stamp_s - measurements[start_index - 1].time_stamp_s);
-    const Vec3 v_wi_j = (position[end_index + 1] - position[end_index - 1])
-        / (measurements[end_index + 1].time_stamp_s - measurements[end_index - 1].time_stamp_s);
+    const Vec3 v_wi_i =
+        (position[start_index + 1] - position[start_index - 1]) / (measurements[start_index + 1].time_stamp_s - measurements[start_index - 1].time_stamp_s);
+    const Vec3 v_wi_j =
+        (position[end_index + 1] - position[end_index - 1]) / (measurements[end_index + 1].time_stamp_s - measurements[end_index - 1].time_stamp_s);
     const Vec3 g_w = Vec3(0, 0, 9.81);
 
     // Prepare for integration.

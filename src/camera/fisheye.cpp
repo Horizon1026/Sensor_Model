@@ -85,4 +85,4 @@ bool Fisheye::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undist
     return true;
 }
 
-}
+}  // namespace SENSOR_MODEL

@@ -1,11 +1,11 @@
 #include "basic_type.h"
+#include "fisheye.h"
+#include "image_painter.h"
+#include "pinhole.h"
+#include "slam_basic_math.h"
 #include "slam_log_reporter.h"
 #include "slam_operations.h"
-#include "pinhole.h"
-#include "fisheye.h"
 #include "virtual_camera.h"
-#include "slam_basic_math.h"
-#include "image_painter.h"
 #include "visualizor_2d.h"
 
 using namespace SLAM_VISUALIZOR;
@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     virtual_camera.options().kVirtualImageRows = 500;
     virtual_camera.options().kVirtualImageCols = 500;
     virtual_camera.raw_camera_model() = std::make_unique<Fisheye>(fx, fy, cx, cy);
-    virtual_camera.raw_camera_model()->SetDistortionParameter(std::vector<float>{k1, k2, k3, k4, k5});
+    virtual_camera.raw_camera_model()->SetDistortionParameter(std::vector<float> {k1, k2, k3, k4, k5});
 
     // Report fov of virtual camera.
     const Vec2 fov = virtual_camera.GetVirtualCameraFov();
@@ -54,14 +54,10 @@ int main(int argc, char **argv) {
     } else {
         ReportError("Failed to remap virtual camera image.");
     }
-    GrayImage virtual_image(virtual_camera.virtual_camera_image().data(),
-                            virtual_camera.virtual_camera_image().rows(),
-                            virtual_camera.virtual_camera_image().cols(),
-                            false);
-    GrayImage virtual_mask(virtual_camera.virtual_camera_mask().data(),
-                           virtual_camera.virtual_camera_mask().rows(),
-                           virtual_camera.virtual_camera_mask().cols(),
-                           false);
+    GrayImage virtual_image(virtual_camera.virtual_camera_image().data(), virtual_camera.virtual_camera_image().rows(),
+                            virtual_camera.virtual_camera_image().cols(), false);
+    GrayImage virtual_mask(virtual_camera.virtual_camera_mask().data(), virtual_camera.virtual_camera_mask().rows(),
+                           virtual_camera.virtual_camera_mask().cols(), false);
 
     // Draw range of virtual image in raw image.
     uint8_t mark_value = 0;

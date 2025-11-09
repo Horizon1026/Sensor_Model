@@ -22,8 +22,8 @@ Vec3 WheelOdom::ConvertLeftEncoderCountToVelocity(const WheelOdomMeasurement &me
         return Vec3::Zero();
     }
 
-    const float velocity_left_mps = options_.kWheelRadiusInMeter * measure.encoder_left_cnt /
-        options_.kEncoderCountInOneCircle / options_.kEncoderSamplePeriodInSecond * 2.0f * kPai;
+    const float velocity_left_mps =
+        options_.kWheelRadiusInMeter * measure.encoder_left_cnt / options_.kEncoderCountInOneCircle / options_.kEncoderSamplePeriodInSecond * 2.0f * kPai;
 
     return Vec3(velocity_left_mps, 0, 0);
 }
@@ -33,10 +33,10 @@ Vec3 WheelOdom::ConvertRightEncoderCountToVelocity(const WheelOdomMeasurement &m
         return Vec3::Zero();
     }
 
-    const float velocity_right_mps = options_.kWheelRadiusInMeter * measure.encoder_right_cnt /
-        options_.kEncoderCountInOneCircle / options_.kEncoderSamplePeriodInSecond * 2.0f * kPai;
+    const float velocity_right_mps =
+        options_.kWheelRadiusInMeter * measure.encoder_right_cnt / options_.kEncoderCountInOneCircle / options_.kEncoderSamplePeriodInSecond * 2.0f * kPai;
 
     return Vec3(velocity_right_mps, 0, 0);
 }
 
-}
+}  // namespace SENSOR_MODEL

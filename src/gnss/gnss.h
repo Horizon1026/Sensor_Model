@@ -12,12 +12,12 @@ namespace SENSOR_MODEL {
 class Gnss {
 
 public:
-/* Options of Gnss Model. */
-struct Options {
-    float kPositionNoiseSigma = 1.0f;
-    float kVelocityNoiseSigma = 0.5f;
-    float kAttitudeNoiseSigma = 3.0f;
-};
+    /* Options of Gnss Model. */
+    struct Options {
+        float kPositionNoiseSigma = 1.0f;
+        float kVelocityNoiseSigma = 0.5f;
+        float kAttitudeNoiseSigma = 3.0f;
+    };
 
 public:
     Gnss() = default;
@@ -36,9 +36,8 @@ public:
 
 private:
     Options options_;
-
 };
 
-}
+}  // namespace SENSOR_MODEL
 
-#endif // end of _SENSOR_MODEL_GNSS_MODEL_H_
+#endif  // end of _SENSOR_MODEL_GNSS_MODEL_H_

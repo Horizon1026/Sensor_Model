@@ -12,6 +12,6 @@ struct CameraMeasurement {
     float time_stamp_s = 0.0f;
 };
 
-}
+}  // namespace SENSOR_MODEL
 
-#endif // end of _SENSOR_MODEL_CAMERA_MEASUREMENT_H_
+#endif  // end of _SENSOR_MODEL_CAMERA_MEASUREMENT_H_

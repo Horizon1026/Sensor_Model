@@ -13,6 +13,6 @@ struct LidarMeasurement {
     std::vector<Vec3> undistorted_points;
 };
 
-}
+}  // namespace SENSOR_MODEL
 
-#endif // end of _SENSOR_MODEL_LIDAR_MEASUREMENT_H_
+#endif  // end of _SENSOR_MODEL_LIDAR_MEASUREMENT_H_

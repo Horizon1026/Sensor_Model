@@ -2,8 +2,8 @@
 #define _SENSOR_MODEL_LIDAR_MODEL_H_
 
 #include "basic_type.h"
-#include "slam_basic_math.h"
 #include "lidar_measurement.h"
+#include "slam_basic_math.h"
 
 namespace SENSOR_MODEL {
 
@@ -28,9 +28,8 @@ public:
 
 private:
     Options options_;
-
 };
 
-}
+}  // namespace SENSOR_MODEL
 
-#endif // end of _SENSOR_MODEL_LIDAR_MODEL_H_
+#endif  // end of _SENSOR_MODEL_LIDAR_MODEL_H_

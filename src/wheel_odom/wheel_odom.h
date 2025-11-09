@@ -12,13 +12,13 @@ namespace SENSOR_MODEL {
 class WheelOdom {
 
 public:
-/* Options of Wheel Odom Model. */
-struct Options {
-    float kWheelRadiusInMeter = 0.0f;
-    float kEncoderCountInOneCircle = 0.0f;
-    float kEncoderSamplePeriodInSecond = 0.0f;
-    float kVelocityNoiseSigma = 0.0f;
-};
+    /* Options of Wheel Odom Model. */
+    struct Options {
+        float kWheelRadiusInMeter = 0.0f;
+        float kEncoderCountInOneCircle = 0.0f;
+        float kEncoderSamplePeriodInSecond = 0.0f;
+        float kVelocityNoiseSigma = 0.0f;
+    };
 
 public:
     WheelOdom() = default;
@@ -37,9 +37,8 @@ public:
 
 private:
     Options options_;
-
 };
 
-}
+}  // namespace SENSOR_MODEL
 
-#endif // end of _SENSOR_MODEL_WHEEL_ODOM_BASIC_H_
+#endif  // end of _SENSOR_MODEL_WHEEL_ODOM_BASIC_H_

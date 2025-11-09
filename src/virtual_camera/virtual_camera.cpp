@@ -1,13 +1,11 @@
 #include "virtual_camera.h"
+#include "slam_basic_math.h"
 #include "slam_log_reporter.h"
 #include "slam_operations.h"
-#include "slam_basic_math.h"
 
 namespace SENSOR_MODEL {
 
-bool VirtualCamera::GenerateMaphex() {
-    return GenerateMaphex(options_.kCurrentQwc, options_.kTargetQwc);
-}
+bool VirtualCamera::GenerateMaphex() { return GenerateMaphex(options_.kCurrentQwc, options_.kTargetQwc); }
 
 bool VirtualCamera::GenerateMaphex(const Quat &q_wc) {
     options_.kCurrentQwc = q_wc;
@@ -19,10 +17,8 @@ bool VirtualCamera::GenerateMaphex(const Quat &q_wc, const Quat &target_q_wc) {
     RETURN_FALSE_IF(options_.kVirtualImageRows <= 0);
     RETURN_FALSE_IF(options_.kVirtualImageCols <= 0);
     options_.kTargetQwc = target_q_wc;
-    virtual_camera_model_ = std::make_unique<CameraBasic>(options_.kVirtualCameraFocusLength,
-                                                          options_.kVirtualCameraFocusLength,
-                                                          options_.kVirtualImageCols * 0.5f,
-                                                          options_.kVirtualImageRows * 0.5f);
+    virtual_camera_model_ = std::make_unique<CameraBasic>(options_.kVirtualCameraFocusLength, options_.kVirtualCameraFocusLength,
+                                                          options_.kVirtualImageCols * 0.5f, options_.kVirtualImageRows * 0.5f);
 
     const Mat3 R_wc0 = options_.kTargetQwc.toRotationMatrix();
     const Mat3 R_wc = q_wc.toRotationMatrix();
@@ -85,10 +81,9 @@ bool VirtualCamera::RemapPixelUvFromRawCameraToVirtualCamera(const Vec2 &raw_dis
 }
 
 Vec2 VirtualCamera::GetVirtualCameraFov() const {
-    return Vec2(
-        std::atan2(static_cast<float>(options_.kVirtualImageCols) * 0.5f, options_.kVirtualCameraFocusLength),
-        std::atan2(static_cast<float>(options_.kVirtualImageRows) * 0.5f, options_.kVirtualCameraFocusLength)
-    ) * kRadToDeg;
+    return Vec2(std::atan2(static_cast<float>(options_.kVirtualImageCols) * 0.5f, options_.kVirtualCameraFocusLength),
+                std::atan2(static_cast<float>(options_.kVirtualImageRows) * 0.5f, options_.kVirtualCameraFocusLength)) *
+           kRadToDeg;
 }
 
-}
+}  // namespace SENSOR_MODEL

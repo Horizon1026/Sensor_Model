@@ -57,15 +57,13 @@ bool Pinhole::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_x
         const float temp_y = 2.0f * k_[0] * y + 4.0f * k_[1] * r2 * y + 6.0f * k_[2] * r4 * y;
 
         // Compute residual.
-        const Vec2 residual = distort_xy - Vec2(x * temp_xy + 2.0f * p_[0] * xy + p_[1] * (r2 + 2.0f * x2),
-                                                y * temp_xy + 2.0f * p_[1] * xy + p_[0] * (r2 + 2.0f * y2));
+        const Vec2 residual =
+            distort_xy - Vec2(x * temp_xy + 2.0f * p_[0] * xy + p_[1] * (r2 + 2.0f * x2), y * temp_xy + 2.0f * p_[1] * xy + p_[0] * (r2 + 2.0f * y2));
 
         // Compute jacobian, d_r / d_distort
         Mat2 jacobian;
-        jacobian << temp_xy + x * temp_x + 2.0f * p_[0] * y + p_[1] * 6.0f * x,
-                    x * temp_y + 2.0f * p_[0] * x + 2.0f * p_[1] * y,
-                    y * temp_x + 2.0f * p_[0] * x + 2.0f * p_[1] * y,
-                    temp_xy + y * temp_y + p_[0] * 6.0f * y + 2.0f * p_[1] * x;
+        jacobian << temp_xy + x * temp_x + 2.0f * p_[0] * y + p_[1] * 6.0f * x, x * temp_y + 2.0f * p_[0] * x + 2.0f * p_[1] * y,
+            y * temp_x + 2.0f * p_[0] * x + 2.0f * p_[1] * y, temp_xy + y * temp_y + p_[0] * 6.0f * y + 2.0f * p_[1] * x;
 
         if (std::fabs(jacobian.determinant()) < kZeroFloat) {
             return false;
@@ -108,8 +106,8 @@ bool Pinhole::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undist
         const float temp_xy = 1.0f + k_[0] * r2 + k_[1] * r4 + k_[2] * r6;
 
         // Compute f(x) = residual.
-        const Vec2 f = distort_xy - Vec2(x * temp_xy + 2.0f * p_[0] * xy + p_[1] * (r2 + 2.0f * x2),
-                                      y * temp_xy + 2.0f * p_[1] * xy + p_[0] * (r2 + 2.0f * y2));
+        const Vec2 f =
+            distort_xy - Vec2(x * temp_xy + 2.0f * p_[0] * xy + p_[1] * (r2 + 2.0f * x2), y * temp_xy + 2.0f * p_[1] * xy + p_[0] * (r2 + 2.0f * y2));
 
         // Compute g(x) = x + k * f(x)
         const float k = 1.f;
@@ -134,4 +132,4 @@ bool Pinhole::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undist
     return true;
 }
 
-}
+}  // namespace SENSOR_MODEL

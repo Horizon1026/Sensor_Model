@@ -15,6 +15,6 @@ struct WheelOdomMeasurement {
     float encoder_right_cnt = 0;
 };
 
-}
+}  // namespace SENSOR_MODEL
 
-#endif // end of _SENSOR_MODEL_WHEEL_ODOM_MEASUREMENT_H_
+#endif  // end of _SENSOR_MODEL_WHEEL_ODOM_MEASUREMENT_H_

@@ -67,8 +67,7 @@ void ImuPreintegrateBlock<Scalar>::SimpleInformation() const {
 
 // Propagate integrate block.
 template <typename Scalar>
-bool ImuPreintegrateBlock<Scalar>::Propagate(const ImuMeasurement &measure_i,
-                                             const ImuMeasurement &measure_j) {
+bool ImuPreintegrateBlock<Scalar>::Propagate(const ImuMeasurement &measure_i, const ImuMeasurement &measure_j) {
     // Check integrate time.
     const double dt = measure_j.time_stamp_s - measure_i.time_stamp_s;
     if (dt < 0) {
@@ -84,8 +83,7 @@ bool ImuPreintegrateBlock<Scalar>::Propagate(const ImuMeasurement &measure_i,
     const TQuat<Scalar> new_q_ij = (q_ij_ * dq).normalized();
 
     // Compute delta position and velocity.
-    const TVec3<Scalar> mid_accel = 0.5 * (q_ij_ * (measure_i.accel.cast<Scalar>() - bias_accel_)
-        + new_q_ij * (measure_j.accel.cast<Scalar>() - bias_accel_));
+    const TVec3<Scalar> mid_accel = 0.5 * (q_ij_ * (measure_i.accel.cast<Scalar>() - bias_accel_) + new_q_ij * (measure_j.accel.cast<Scalar>() - bias_accel_));
     const TVec3<Scalar> new_p_ij = p_ij_ + v_ij_ * dt + 0.5 * mid_accel * dt2;
     const TVec3<Scalar> new_v_ij = v_ij_ + mid_accel * dt;
 
@@ -100,28 +98,28 @@ bool ImuPreintegrateBlock<Scalar>::Propagate(const ImuMeasurement &measure_i,
 
     TMat15<Scalar> F = TMat15<Scalar>::Zero();
     F.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kPosition) = I3;
-    F.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kRotation) = - 0.25 * Ri * Rai * dt2 - 0.25 * Rj * Raj * (I3 - Rw * dt) * dt2;
+    F.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kRotation) = -0.25 * Ri * Rai * dt2 - 0.25 * Rj * Raj * (I3 - Rw * dt) * dt2;
     F.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kVelocity) = dt_I3;
-    F.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kBiasAccel) = - 0.25 * (Ri + Rj) * dt2;
+    F.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kBiasAccel) = -0.25 * (Ri + Rj) * dt2;
     F.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kBiasGyro) = 0.25 * Rj * Raj * dt2 * dt;
     F.template block<3, 3>(ImuIndex::kRotation, ImuIndex::kRotation) = I3 - Rw * dt;
-    F.template block<3, 3>(ImuIndex::kRotation, ImuIndex::kBiasGyro) = - dt_I3;
-    F.template block<3, 3>(ImuIndex::kVelocity, ImuIndex::kRotation) = - Ri * Rai * half_dt - Rj * Raj * (I3 - Rw * dt) * half_dt;
+    F.template block<3, 3>(ImuIndex::kRotation, ImuIndex::kBiasGyro) = -dt_I3;
+    F.template block<3, 3>(ImuIndex::kVelocity, ImuIndex::kRotation) = -Ri * Rai * half_dt - Rj * Raj * (I3 - Rw * dt) * half_dt;
     F.template block<3, 3>(ImuIndex::kVelocity, ImuIndex::kVelocity) = I3;
-    F.template block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasAccel) = - (Ri + Rj) * half_dt;
+    F.template block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasAccel) = -(Ri + Rj) * half_dt;
     F.template block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasGyro) = 0.5 * Rj * Raj * dt2;
     F.template block<3, 3>(ImuIndex::kBiasAccel, ImuIndex::kBiasAccel) = I3;
     F.template block<3, 3>(ImuIndex::kBiasGyro, ImuIndex::kBiasGyro) = I3;
 
     TMat15x18<Scalar> V = TMat15x18<Scalar>::Zero();
     V.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kMidValueNoiseAccel0) = 0.25 * Ri * dt2;
-    V.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kMidValueNoiseGyro0) = - 0.25 * Rj * Raj * dt2 * half_dt;
+    V.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kMidValueNoiseGyro0) = -0.25 * Rj * Raj * dt2 * half_dt;
     V.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kMidValueNoiseAccel1) = 0.25 * Rj * dt2;
     V.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kMidValueNoiseGyro1) = V.template block<3, 3>(ImuIndex::kPosition, ImuIndex::kMidValueNoiseGyro0);
     V.template block<3, 3>(ImuIndex::kRotation, ImuIndex::kMidValueNoiseGyro0) = 0.5 * dt_I3;
     V.template block<3, 3>(ImuIndex::kRotation, ImuIndex::kMidValueNoiseGyro1) = 0.5 * dt_I3;
     V.template block<3, 3>(ImuIndex::kVelocity, ImuIndex::kMidValueNoiseAccel0) = Ri * half_dt;
-    V.template block<3, 3>(ImuIndex::kVelocity, ImuIndex::kMidValueNoiseGyro0) = - Rj * Raj * half_dt * half_dt;
+    V.template block<3, 3>(ImuIndex::kVelocity, ImuIndex::kMidValueNoiseGyro0) = -Rj * Raj * half_dt * half_dt;
     V.template block<3, 3>(ImuIndex::kVelocity, ImuIndex::kMidValueNoiseAccel1) = Rj * half_dt;
     V.template block<3, 3>(ImuIndex::kVelocity, ImuIndex::kMidValueNoiseGyro1) = V.template block<3, 3>(ImuIndex::kVelocity, ImuIndex::kMidValueNoiseGyro0);
     V.template block<3, 3>(ImuIndex::kBiasAccel, ImuIndex::kMidValueRandomWalkAccel) = dt_I3;
@@ -147,10 +145,7 @@ bool ImuPreintegrateBlock<Scalar>::Propagate(const ImuMeasurement &measure_i,
 
 // Correct integrate block with new bias_a and bias_g.
 template <typename Scalar>
-void ImuPreintegrateBlock<Scalar>::Correct(const TVec3<Scalar> &new_ba,
-                                           const TVec3<Scalar> &new_bg,
-                                           TVec3<Scalar> &corr_p_ij,
-                                           TQuat<Scalar> &corr_q_ij,
+void ImuPreintegrateBlock<Scalar>::Correct(const TVec3<Scalar> &new_ba, const TVec3<Scalar> &new_bg, TVec3<Scalar> &corr_p_ij, TQuat<Scalar> &corr_q_ij,
                                            TVec3<Scalar> &corr_v_ij) {
     const TVec3<Scalar> delta_ba = new_ba - bias_accel_;
     const TVec3<Scalar> delta_bg = new_bg - bias_gyro_;
@@ -165,16 +160,10 @@ void ImuPreintegrateBlock<Scalar>::Correct(const TVec3<Scalar> &new_ba,
 
 // Set noise sigma vector.
 template <typename Scalar>
-void ImuPreintegrateBlock<Scalar>::SetImuNoiseSigma(const Scalar accel_noise,
-                                                    const Scalar gyro_noise,
-                                                    const Scalar accel_random_walk,
+void ImuPreintegrateBlock<Scalar>::SetImuNoiseSigma(const Scalar accel_noise, const Scalar gyro_noise, const Scalar accel_random_walk,
                                                     const Scalar gyro_random_walk) {
-    noise_sigma_ << accel_noise, accel_noise, accel_noise,
-                    gyro_noise, gyro_noise, gyro_noise,
-                    accel_noise, accel_noise, accel_noise,
-                    gyro_noise, gyro_noise, gyro_noise,
-                    accel_random_walk, accel_random_walk, accel_random_walk,
-                    gyro_random_walk, gyro_random_walk, gyro_random_walk;
+    noise_sigma_ << accel_noise, accel_noise, accel_noise, gyro_noise, gyro_noise, gyro_noise, accel_noise, accel_noise, accel_noise, gyro_noise, gyro_noise,
+        gyro_noise, accel_random_walk, accel_random_walk, accel_random_walk, gyro_random_walk, gyro_random_walk, gyro_random_walk;
 }
 
-}
+}  // namespace SENSOR_MODEL

@@ -11,9 +11,9 @@ struct GnssMeasurement {
 
     // LLA observations.
     bool is_lla_valid = false;
-    double longitude_deg = 0.0; // 经度
-    double latitude_deg = 0.0;  // 纬度
-    double altitude_m = 0.0;    // 椭球高度
+    double longitude_deg = 0.0;  // 经度
+    double latitude_deg = 0.0;   // 纬度
+    double altitude_m = 0.0;     // 椭球高度
 
     // Yaw defined in ENU frame.
     bool is_yaw_valid = false;
@@ -26,6 +26,6 @@ struct GnssMeasurement {
     float vel_up_mps = 0.0f;
 };
 
-}
+}  // namespace SENSOR_MODEL
 
-#endif // end of _SENSOR_MODEL_GNSS_MEASUREMENT_H_
+#endif  // end of _SENSOR_MODEL_GNSS_MEASUREMENT_H_

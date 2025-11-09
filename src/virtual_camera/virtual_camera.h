@@ -55,6 +55,6 @@ private:
     Mat3 H_cc0_ = Mat3::Identity();
 };
 
-}
+}  // namespace SENSOR_MODEL
 
-#endif // end of _SENSOR_MODEL_VIRTUAL_CAMERA_H_
+#endif  // end of _SENSOR_MODEL_VIRTUAL_CAMERA_H_

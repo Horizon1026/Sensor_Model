@@ -7,7 +7,7 @@ namespace SENSOR_MODEL {
 namespace {
     constexpr double kWgs84SemiMajorAxisInMeter = 6378137.0;
     constexpr double kWgs84SemiMinorAxisInMeter = 6356752.31414;
-}
+}  // namespace
 
 TVec3<double> Gnss::ConvertLlaToEnu(const GnssMeasurement &origin_lla, const GnssMeasurement &lla) {
     TVec3<double> enu_position = TVec3<double>::Zero();
@@ -39,7 +39,7 @@ GnssMeasurement Gnss::ConvertEnuToLla(const GnssMeasurement &origin_lla, const T
 }
 
 double Gnss::FormatDegree(const double abnormal_degree) {
-    if (abnormal_degree < - 180.0) {
+    if (abnormal_degree < -180.0) {
         return abnormal_degree + 180.0 * 2.0;
     } else if (abnormal_degree > 180.0) {
         return abnormal_degree - 180.0 * 2.0;
@@ -48,4 +48,4 @@ double Gnss::FormatDegree(const double abnormal_degree) {
     return abnormal_degree;
 }
 
-}
+}  // namespace SENSOR_MODEL

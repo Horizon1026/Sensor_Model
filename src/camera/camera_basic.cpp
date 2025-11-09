@@ -1,6 +1,6 @@
 #include "camera_basic.h"
-#include "slam_operations.h"
 #include "slam_basic_math.h"
+#include "slam_operations.h"
 
 namespace SENSOR_MODEL {
 
@@ -47,8 +47,7 @@ bool CameraBasic::LiftFromImagePlaneToNormalizedPlaneAndUndistort(const Vec2 pix
 }
 
 bool CameraBasic::DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv) {
-    const Vec2 undistort_xy = Vec2((undistort_uv(0) - cx()) / fx(),
-                                   (undistort_uv(1) - cy()) / fy());
+    const Vec2 undistort_xy = Vec2((undistort_uv(0) - cx()) / fx(), (undistort_uv(1) - cy()) / fy());
     Vec2 distort_xy = Vec2::Zero();
     RETURN_FALSE_IF_FALSE(DistortOnNormalizedPlane(undistort_xy, distort_xy));
 
@@ -58,8 +57,7 @@ bool CameraBasic::DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv)
 }
 
 bool CameraBasic::UndistortOnImagePlane(const Vec2 distort_uv, Vec2 &undistort_uv) {
-    const Vec2 distort_xy = Vec2((distort_uv(0) - cx()) / fx(),
-                                 (distort_uv(1) - cy()) / fy());
+    const Vec2 distort_xy = Vec2((distort_uv(0) - cx()) / fx(), (distort_uv(1) - cy()) / fy());
 
     Vec2 undistort_xy = Vec2::Zero();
     RETURN_FALSE_IF_FALSE(UndistortOnNormalizedPlane(distort_xy, undistort_xy));
@@ -106,4 +104,4 @@ void CameraBasic::SetIntrinsicParameter(float fx, float fy, float cx, float cy) 
     cy_ = cy;
 }
 
-}
+}  // namespace SENSOR_MODEL

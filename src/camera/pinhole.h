@@ -8,8 +8,10 @@ namespace SENSOR_MODEL {
 class Pinhole : public CameraBasic {
 
 public:
-    Pinhole() : CameraBasic() {}
-    Pinhole(float fx, float fy, float cx, float cy) : CameraBasic(fx, fy, cx, cy) {}
+    Pinhole()
+        : CameraBasic() {}
+    Pinhole(float fx, float fy, float cx, float cy)
+        : CameraBasic(fx, fy, cx, cy) {}
     virtual ~Pinhole() = default;
     Pinhole(const Pinhole &pinhole) = delete;
 
@@ -36,9 +38,8 @@ private:
     // Distortion model parameters.
     std::array<float, 3> k_ = {};
     std::array<float, 2> p_ = {};
-
 };
 
-}
+}  // namespace SENSOR_MODEL
 
-#endif // end of _SENSOR_MODEL_PINHOLE_CAMERA_MODEL_H_
+#endif  // end of _SENSOR_MODEL_PINHOLE_CAMERA_MODEL_H_

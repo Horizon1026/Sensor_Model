@@ -2,9 +2,9 @@
 #define _SENSOR_MODEL_IMU_PREINTEGRATE_H_
 
 #include "basic_type.h"
-#include "slam_basic_math.h"
 #include "imu_measurement.h"
 #include "imu_state.h"
+#include "slam_basic_math.h"
 
 namespace SENSOR_MODEL {
 
@@ -25,21 +25,13 @@ public:
     void SimpleInformation() const;
 
     // Propagate integrate block.
-    bool Propagate(const ImuMeasurement &measure_i,
-                   const ImuMeasurement &measure_j);
+    bool Propagate(const ImuMeasurement &measure_i, const ImuMeasurement &measure_j);
 
     // Correct integrate block with new bias_a and bias_g.
-    void Correct(const TVec3<Scalar> &new_ba,
-                 const TVec3<Scalar> &new_bg,
-                 TVec3<Scalar> &corr_p_ij,
-                 TQuat<Scalar> &corr_q_ij,
-                 TVec3<Scalar> &corr_v_ij);
+    void Correct(const TVec3<Scalar> &new_ba, const TVec3<Scalar> &new_bg, TVec3<Scalar> &corr_p_ij, TQuat<Scalar> &corr_q_ij, TVec3<Scalar> &corr_v_ij);
 
     // Set noise sigma vector.
-    void SetImuNoiseSigma(const Scalar accel_noise,
-                          const Scalar gyro_noise,
-                          const Scalar accel_random_walk,
-                          const Scalar gyro_random_walk);
+    void SetImuNoiseSigma(const Scalar accel_noise, const Scalar gyro_noise, const Scalar accel_random_walk, const Scalar gyro_random_walk);
 
     // Reference for member variables.
     TVec3<Scalar> &p_ij() { return p_ij_; }
@@ -84,9 +76,8 @@ private:
     TVec18<Scalar> noise_sigma_ = TVec18<Scalar>::Ones() * static_cast<Scalar>(1e-6);
 
     Scalar integrate_time_s_ = static_cast<Scalar>(0);
-
 };
 
-}
+}  // namespace SENSOR_MODEL
 
-#endif // end of _SENSOR_MODEL_IMU_PREINTEGRATE_H_
+#endif  // end of _SENSOR_MODEL_IMU_PREINTEGRATE_H_

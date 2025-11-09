@@ -13,6 +13,6 @@ struct ImuMeasurement {
     float time_stamp_s = -1.0f;
 };
 
-}
+}  // namespace SENSOR_MODEL
 
-#endif // end of _SENSOR_MODEL_IMU_MEASUREMENT_H_
+#endif  // end of _SENSOR_MODEL_IMU_MEASUREMENT_H_

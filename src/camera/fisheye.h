@@ -8,8 +8,10 @@ namespace SENSOR_MODEL {
 class Fisheye : public CameraBasic {
 
 public:
-    Fisheye() : CameraBasic() {}
-    Fisheye(float fx, float fy, float cx, float cy) : CameraBasic(fx, fy, cx, cy) {}
+    Fisheye()
+        : CameraBasic() {}
+    Fisheye(float fx, float fy, float cx, float cy)
+        : CameraBasic(fx, fy, cx, cy) {}
     virtual ~Fisheye() = default;
     Fisheye(const Fisheye &fisheye) = delete;
 
@@ -39,9 +41,8 @@ private:
 private:
     // Distortion model parameters.
     std::array<float, 5> k_ = {};
-
 };
 
-}
+}  // namespace SENSOR_MODEL
 
-#endif // end of _SENSOR_MODEL_FISHEYE_CAMERA_MODEL_H_
+#endif  // end of _SENSOR_MODEL_FISHEYE_CAMERA_MODEL_H_

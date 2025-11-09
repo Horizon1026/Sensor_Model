@@ -1,13 +1,13 @@
 #include "basic_type.h"
 #include "slam_log_reporter.h"
 
-#include "pinhole.h"
 #include "fisheye.h"
+#include "pinhole.h"
 
 #include "visualizor_2d.h"
 
-#include "feature_point_detector.h"
 #include "feature_harris.h"
+#include "feature_point_detector.h"
 
 using namespace SLAM_VISUALIZOR;
 using namespace FEATURE_DETECTOR;
@@ -48,7 +48,7 @@ void TestPinholeCameraModel() {
     // Initialize pinhole camera.
     SENSOR_MODEL::Pinhole camera;
     camera.SetIntrinsicParameter(fx, fy, cx, cy);
-    camera.SetDistortionParameter(std::vector<float>{k1, k2, k3, p1, p2});
+    camera.SetDistortionParameter(std::vector<float> {k1, k2, k3, p1, p2});
 
     // Undistort the whole image.
     camera.CorrectDistortedImage(raw_image, corr_image);
@@ -74,10 +74,8 @@ void TestPinholeCameraModel() {
     ReportInfo("   Undistortion average residual is " << average_residual);
 
     // Show undistortion image.
-    Visualizor2D::ShowImageWithDetectedFeatures("Pinhole distorted image with detected features",
-        raw_image, distort_features);
-    Visualizor2D::ShowImageWithDetectedFeatures("Pinhole undistorted image with detected features",
-        corr_image, undistort_features);
+    Visualizor2D::ShowImageWithDetectedFeatures("Pinhole distorted image with detected features", raw_image, distort_features);
+    Visualizor2D::ShowImageWithDetectedFeatures("Pinhole undistorted image with detected features", corr_image, undistort_features);
     Visualizor2D::WaitKey(1);
 }
 
@@ -108,7 +106,7 @@ void TestFisheyeCameraModel() {
     // Initialize fisheye camera.
     SENSOR_MODEL::Fisheye camera;
     camera.SetIntrinsicParameter(fx, fy, cx, cy);
-    camera.SetDistortionParameter(std::vector<float>{k1, k2, k3, k4, k5});
+    camera.SetDistortionParameter(std::vector<float> {k1, k2, k3, k4, k5});
 
     // Undistort the whole image.
     camera.CorrectDistortedImage(raw_image, corr_image);
@@ -134,10 +132,8 @@ void TestFisheyeCameraModel() {
     ReportInfo("   Undistortion average residual is " << average_residual);
 
     // Show undistortion image.
-    Visualizor2D::ShowImageWithDetectedFeatures("Fisheye distorted image with detected features",
-        raw_image, distort_features);
-    Visualizor2D::ShowImageWithDetectedFeatures("Fisheye undistorted image with detected features",
-        corr_image, undistort_features);
+    Visualizor2D::ShowImageWithDetectedFeatures("Fisheye distorted image with detected features", raw_image, distort_features);
+    Visualizor2D::ShowImageWithDetectedFeatures("Fisheye undistorted image with detected features", corr_image, undistort_features);
     Visualizor2D::WaitKey(1);
 }
 
