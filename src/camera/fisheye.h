@@ -5,13 +5,11 @@
 
 namespace sensor_model {
 
-class Fisheye : public CameraBasic {
+class Fisheye: public CameraBasic {
 
 public:
-    Fisheye()
-        : CameraBasic() {}
-    Fisheye(float fx, float fy, float cx, float cy)
-        : CameraBasic(fx, fy, cx, cy) {}
+    Fisheye(): CameraBasic() {}
+    Fisheye(float fx, float fy, float cx, float cy): CameraBasic(fx, fy, cx, cy) {}
     virtual ~Fisheye() = default;
     Fisheye(const Fisheye &fisheye) = delete;
 

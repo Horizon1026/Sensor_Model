@@ -34,25 +34,10 @@ class ImuState {
 
 public:
     ImuState() = default;
-    ImuState(const Vec3 &p_wi, const Quat &q_wi, const Vec3 &v_wi, const Vec3 &ba, const Vec3 &bg, const Vec3 &g_w, const float t)
-        : p_wi_(p_wi)
-        , q_wi_(q_wi)
-        , v_wi_(v_wi)
-        , ba_(ba)
-        , bg_(bg)
-        , g_w_(g_w)
-        , time_stamp_s_(t) {}
+    ImuState(const Vec3 &p_wi, const Quat &q_wi, const Vec3 &v_wi, const Vec3 &ba, const Vec3 &bg, const Vec3 &g_w, const float t):
+        p_wi_(p_wi), q_wi_(q_wi), v_wi_(v_wi), ba_(ba), bg_(bg), g_w_(g_w), time_stamp_s_(t) {}
     ImuState(const Vec3 &p_wi, const Quat &q_wi, const Vec3 &v_wi, const Vec3 &ba, const Vec3 &bg, const Vec3 &g_w, const Vec3 &gyro, const Vec3 &accel,
-             const float t)
-        : p_wi_(p_wi)
-        , q_wi_(q_wi)
-        , v_wi_(v_wi)
-        , ba_(ba)
-        , bg_(bg)
-        , g_w_(g_w)
-        , gyro_(gyro)
-        , accel_(accel)
-        , time_stamp_s_(t) {}
+             const float t): p_wi_(p_wi), q_wi_(q_wi), v_wi_(v_wi), ba_(ba), bg_(bg), g_w_(g_w), gyro_(gyro), accel_(accel), time_stamp_s_(t) {}
     virtual ~ImuState() = default;
 
     void Clear() {

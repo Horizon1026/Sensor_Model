@@ -5,13 +5,11 @@
 
 namespace sensor_model {
 
-class Pinhole : public CameraBasic {
+class Pinhole: public CameraBasic {
 
 public:
-    Pinhole()
-        : CameraBasic() {}
-    Pinhole(float fx, float fy, float cx, float cy)
-        : CameraBasic(fx, fy, cx, cy) {}
+    Pinhole(): CameraBasic() {}
+    Pinhole(float fx, float fy, float cx, float cy): CameraBasic(fx, fy, cx, cy) {}
     virtual ~Pinhole() = default;
     Pinhole(const Pinhole &pinhole) = delete;
 

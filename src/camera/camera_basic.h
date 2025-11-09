@@ -23,11 +23,7 @@ class CameraBasic {
 
 public:
     CameraBasic() = default;
-    CameraBasic(float fx, float fy, float cx, float cy)
-        : fx_(fx)
-        , fy_(fy)
-        , cx_(cx)
-        , cy_(cy) {}
+    CameraBasic(float fx, float fy, float cx, float cy): fx_(fx), fy_(fy), cx_(cx), cy_(cy) {}
     virtual ~CameraBasic() = default;
     CameraBasic(const CameraBasic &camera_basic) = delete;
 
