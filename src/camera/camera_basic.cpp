@@ -4,17 +4,67 @@
 
 namespace sensor_model {
 
-// Lift 2d point in normalized plane on unit sphere.
+// Lift 2d point in normalized plane to other coordinate systems.
 void CameraBasic::LiftFromNormalizedPlaneToUnitSphere(const Vec2 norm_xy, Vec3 &sphere_xyz) {
     const float yita = 2.0f / (1.0f + norm_xy.squaredNorm());
     sphere_xyz.head<2>() = norm_xy * yita;
     sphere_xyz.z() = yita - 1.0f;
 }
+void CameraBasic::LiftFromNormalizedPlaneToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv) {
+    pixel_uv(0) = fx_ * norm_xy(0) + cx_;
+    pixel_uv(1) = fy_ * norm_xy(1) + cy_;
+}
+void CameraBasic::LiftFromNormalizedPlaneToBearingVector(const Vec2 norm_xy, Vec3 &bearing_vector) {
+    bearing_vector.head<2>() = norm_xy;
+    bearing_vector.z() = 1.0f;
+    bearing_vector.normalize();
+}
 
-// Lift 3d point in unit sphere on normalized plane.
-void CameraBasic::LiftFromNormalizedPlaneToUnitSphere(const Vec3 sphere_xyz, Vec2 &norm_xy) {
+// Lift 3d point in unit sphere to other coordinate systems.
+void CameraBasic::LiftFromUnitSphereToNormalizedPlane(const Vec3 sphere_xyz, Vec2 &norm_xy) {
     const float yita = sphere_xyz.z() + 1.0f;
     norm_xy = sphere_xyz.head<2>() / yita;
+}
+void CameraBasic::LiftFromUnitSphereToBearingVector(const Vec3 sphere_xyz, Vec3 &bearing_vector) {
+    Vec2 norm_xy = Vec2::Zero();
+    LiftFromUnitSphereToNormalizedPlane(sphere_xyz, norm_xy);
+    LiftFromNormalizedPlaneToBearingVector(norm_xy, bearing_vector);
+}
+void CameraBasic::LiftFromUnitSphereToImagePlane(const Vec3 sphere_xyz, Vec2 &pixel_uv) {
+    Vec2 norm_xy = Vec2::Zero();
+    LiftFromUnitSphereToNormalizedPlane(sphere_xyz, norm_xy);
+    LiftFromNormalizedPlaneToImagePlane(norm_xy, pixel_uv);
+}
+
+// Lift 3d point in bearing vector to other coordinate systems.
+void CameraBasic::LiftFromBearingVectorToNormalizedPlane(const Vec3 bearing_vector, Vec2 &norm_xy) {
+    norm_xy = bearing_vector.head<2>() / bearing_vector.z();
+}
+void CameraBasic::LiftFromBearingVectorToUnitSphere(const Vec3 bearing_vector, Vec3 &sphere_xyz) {
+    Vec2 norm_xy = Vec2::Zero();
+    LiftFromBearingVectorToNormalizedPlane(bearing_vector, norm_xy);
+    LiftFromNormalizedPlaneToUnitSphere(norm_xy, sphere_xyz);
+}
+void CameraBasic::LiftFromBearingVectorToImagePlane(const Vec3 bearing_vector, Vec2 &pixel_uv) {
+    Vec2 norm_xy = Vec2::Zero();
+    LiftFromBearingVectorToNormalizedPlane(bearing_vector, norm_xy);
+    LiftFromNormalizedPlaneToImagePlane(norm_xy, pixel_uv);
+}
+
+// Lift 2d point in image plane back on normalized plane.
+void CameraBasic::LiftFromImagePlaneToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) {
+    norm_xy(0) = (pixel_uv(0) - cx_) / fx_;
+    norm_xy(1) = (pixel_uv(1) - cy_) / fy_;
+}
+void CameraBasic::LiftFromImagePlaneToBearingVector(const Vec2 pixel_uv, Vec3 &bearing_vector) {
+    Vec2 norm_xy = Vec2::Zero();
+    LiftFromImagePlaneToNormalizedPlane(pixel_uv, norm_xy);
+    LiftFromNormalizedPlaneToBearingVector(norm_xy, bearing_vector);
+}
+void CameraBasic::LiftFromImagePlaneToUnitSphere(const Vec2 pixel_uv, Vec3 &sphere_xyz) {
+    Vec2 norm_xy = Vec2::Zero();
+    LiftFromImagePlaneToNormalizedPlane(pixel_uv, norm_xy);
+    LiftFromNormalizedPlaneToUnitSphere(norm_xy, sphere_xyz);
 }
 
 // Lift 3d point in camera frame on normalized plane.
@@ -27,20 +77,22 @@ void CameraBasic::LiftFromCameraFrameToNormalizedPlane(const Vec3 p_c, Vec2 &nor
     }
 }
 
-// Lift 2d point in normalized plane on image plane.
-void CameraBasic::LiftFromNormalizedPlaneToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv) {
-    pixel_uv(0) = fx_ * norm_xy(0) + cx_;
-    pixel_uv(1) = fy_ * norm_xy(1) + cy_;
+// Distort on normalized plane.
+bool CameraBasic::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
+    // For camera basic, view it as rectify image, so no distortion.
+    distort_xy = undistort_xy;
+    return true;
 }
 
-// Lift 2d point in image plane back on normalized plane.
-void CameraBasic::LiftFromImagePlaneToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) {
-    norm_xy(0) = (pixel_uv(0) - cx_) / fx_;
-    norm_xy(1) = (pixel_uv(1) - cy_) / fy_;
+// Undistort on normalized plane.
+bool CameraBasic::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) {
+    // For camera basic, view it as rectify image, so no undistortion.
+    undistort_xy = distort_xy;
+    return true;
 }
 
 // Lift 3d point in image plane on normalized plane, and do undistortion.
-bool CameraBasic::LiftFromImagePlaneToNormalizedPlaneAndUndistort(const Vec2 pixel_uv, Vec2 &undistort_xy) {
+bool CameraBasic::LiftFromRawImagePlaneToUndistortedNormalizedPlane(const Vec2 pixel_uv, Vec2 &undistort_xy) {
     Vec2 distort_xy = Vec2::Zero();
     LiftFromImagePlaneToNormalizedPlane(pixel_uv, distort_xy);
     return UndistortOnNormalizedPlane(distort_xy, undistort_xy);
@@ -50,20 +102,15 @@ bool CameraBasic::DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv)
     const Vec2 undistort_xy = Vec2((undistort_uv(0) - cx()) / fx(), (undistort_uv(1) - cy()) / fy());
     Vec2 distort_xy = Vec2::Zero();
     RETURN_FALSE_IF_FALSE(DistortOnNormalizedPlane(undistort_xy, distort_xy));
-
-    distort_uv(0) = distort_xy(0) * fx() + cx();
-    distort_uv(1) = distort_xy(1) * fy() + cy();
+    LiftFromNormalizedPlaneToImagePlane(distort_xy, distort_uv);
     return true;
 }
 
 bool CameraBasic::UndistortOnImagePlane(const Vec2 distort_uv, Vec2 &undistort_uv) {
     const Vec2 distort_xy = Vec2((distort_uv(0) - cx()) / fx(), (distort_uv(1) - cy()) / fy());
-
     Vec2 undistort_xy = Vec2::Zero();
     RETURN_FALSE_IF_FALSE(UndistortOnNormalizedPlane(distort_xy, undistort_xy));
-
-    undistort_uv(0) = undistort_xy(0) * fx() + cx();
-    undistort_uv(1) = undistort_xy(1) * fy() + cy();
+    LiftFromNormalizedPlaneToImagePlane(undistort_xy, undistort_uv);
     return true;
 }
 

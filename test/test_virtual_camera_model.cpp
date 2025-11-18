@@ -36,8 +36,8 @@ int main(int argc, char **argv) {
     virtual_camera.options().kVirtualCameraFocusLength = 200.0f;
     virtual_camera.options().kVirtualImageRows = 500;
     virtual_camera.options().kVirtualImageCols = 500;
-    virtual_camera.raw_camera_model() = std::make_unique<Fisheye>(fx, fy, cx, cy);
-    virtual_camera.raw_camera_model()->SetDistortionParameter(std::vector<float> {k1, k2, k3, k4, k5});
+    virtual_camera.real_camera_model() = std::make_unique<Fisheye>(fx, fy, cx, cy);
+    virtual_camera.real_camera_model()->SetDistortionParameter(std::vector<float> {k1, k2, k3, k4, k5});
 
     // Report fov of virtual camera.
     const Vec2 fov = virtual_camera.GetVirtualCameraFov();

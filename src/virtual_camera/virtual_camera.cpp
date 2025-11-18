@@ -13,7 +13,7 @@ bool VirtualCamera::GenerateMaphex(const Quat &q_wc) {
 }
 
 bool VirtualCamera::GenerateMaphex(const Quat &q_wc, const Quat &target_q_wc) {
-    RETURN_FALSE_IF(raw_camera_model_ == nullptr);
+    RETURN_FALSE_IF(real_camera_model_ == nullptr);
     RETURN_FALSE_IF(options_.kVirtualImageRows <= 0);
     RETURN_FALSE_IF(options_.kVirtualImageCols <= 0);
     options_.kTargetQwc = target_q_wc;
@@ -28,11 +28,11 @@ bool VirtualCamera::GenerateMaphex(const Quat &q_wc, const Quat &target_q_wc) {
 
     for (int32_t row = 0; row < options_.kVirtualImageRows; ++row) {
         for (int32_t col = 0; col < options_.kVirtualImageCols; ++col) {
-            const Vec2 virtual_pixel_uv = Vec2(col, row);
-            Vec2 raw_distort_pixel_uv = Vec2::Zero();
-            RETURN_FALSE_IF(!RemapPixelUvFromVirtualCameraToRawCamera(virtual_pixel_uv, raw_distort_pixel_uv));
-            maphex_col_(row, col) = raw_distort_pixel_uv.x();
-            maphex_row_(row, col) = raw_distort_pixel_uv.y();
+            const Vec2 virtual_distort_pixel_uv = Vec2(col, row);
+            Vec2 real_distort_pixel_uv = Vec2::Zero();
+            RETURN_FALSE_IF(!RemapPixelUvFromVirtualCameraToRawCamera(virtual_distort_pixel_uv, real_distort_pixel_uv));
+            maphex_col_(row, col) = real_distort_pixel_uv.x();
+            maphex_row_(row, col) = real_distort_pixel_uv.y();
         }
     }
 
@@ -58,25 +58,27 @@ bool VirtualCamera::RemapVirtualCameraImage(const GrayImage &raw_image) {
     return true;
 }
 
-bool VirtualCamera::RemapPixelUvFromVirtualCameraToRawCamera(const Vec2 &virtual_pixel_uv, Vec2 &raw_distort_pixel_uv) {
+bool VirtualCamera::RemapPixelUvFromVirtualCameraToRawCamera(const Vec2 &virtual_distort_pixel_uv, Vec2 &real_distort_pixel_uv) {
     Vec2 virtual_norm_xy = Vec2::Zero();
-    virtual_camera_model_->LiftFromImagePlaneToNormalizedPlane(virtual_pixel_uv, virtual_norm_xy);
-    Vec3 raw_undistort_norm_xy1 = H_cc0_ * Vec3(virtual_norm_xy.x(), virtual_norm_xy.y(), 1.0f);
-    RETURN_FALSE_IF(raw_undistort_norm_xy1.z() < kZeroFloat);
-    raw_undistort_norm_xy1 /= raw_undistort_norm_xy1.z();
-    Vec2 raw_distort_norm_xy = Vec2::Zero();
-    raw_camera_model_->DistortOnNormalizedPlane(raw_undistort_norm_xy1.head<2>(), raw_distort_norm_xy);
-    raw_camera_model_->LiftFromNormalizedPlaneToImagePlane(raw_distort_norm_xy, raw_distort_pixel_uv);
+    virtual_camera_model_->LiftFromRawImagePlaneToUndistortedNormalizedPlane(virtual_distort_pixel_uv, virtual_norm_xy);
+    Vec3 real_undistort_norm_xy1 = H_cc0_ * Vec3(virtual_norm_xy.x(), virtual_norm_xy.y(), 1.0f);
+    RETURN_FALSE_IF(real_undistort_norm_xy1.z() < kZeroFloat);
+    real_undistort_norm_xy1 /= real_undistort_norm_xy1.z();
+    Vec2 real_distort_norm_xy = Vec2::Zero();
+    real_camera_model_->DistortOnNormalizedPlane(real_undistort_norm_xy1.head<2>(), real_distort_norm_xy);
+    real_camera_model_->LiftFromNormalizedPlaneToImagePlane(real_distort_norm_xy, real_distort_pixel_uv);
     return true;
 }
 
-bool VirtualCamera::RemapPixelUvFromRawCameraToVirtualCamera(const Vec2 &raw_distort_pixel_uv, Vec2 &virtual_pixel_uv) {
-    Vec2 raw_undistort_norm_xy = Vec2::Zero();
-    raw_camera_model_->LiftFromImagePlaneToNormalizedPlaneAndUndistort(raw_distort_pixel_uv, raw_undistort_norm_xy);
-    Vec3 virtual_norm_xy1 = H_cc0_.transpose() * Vec3(raw_undistort_norm_xy.x(), raw_undistort_norm_xy.y(), 1.0f);
-    RETURN_FALSE_IF(virtual_norm_xy1.z() < kZeroFloat);
-    virtual_norm_xy1 / virtual_norm_xy1.z();
-    virtual_camera_model_->LiftFromImagePlaneToNormalizedPlane(virtual_norm_xy1.head<2>(), virtual_pixel_uv);
+bool VirtualCamera::RemapPixelUvFromRawCameraToVirtualCamera(const Vec2 &real_distort_pixel_uv, Vec2 &virtual_distort_pixel_uv) {
+    Vec2 real_undistort_norm_xy = Vec2::Zero();
+    real_camera_model_->LiftFromRawImagePlaneToUndistortedNormalizedPlane(real_distort_pixel_uv, real_undistort_norm_xy);
+    Vec3 virtual_undistort_norm_xy1 = H_cc0_.transpose() * Vec3(real_undistort_norm_xy.x(), real_undistort_norm_xy.y(), 1.0f);
+    RETURN_FALSE_IF(virtual_undistort_norm_xy1.z() < kZeroFloat);
+    virtual_undistort_norm_xy1 / virtual_undistort_norm_xy1.z();
+    Vec2 virtual_distort_norm_xy = Vec2::Zero();
+    virtual_camera_model_->DistortOnNormalizedPlane(virtual_undistort_norm_xy1.head<2>(), virtual_distort_norm_xy);
+    virtual_camera_model_->LiftFromImagePlaneToNormalizedPlane(virtual_distort_norm_xy, virtual_distort_pixel_uv);
     return true;
 }
 

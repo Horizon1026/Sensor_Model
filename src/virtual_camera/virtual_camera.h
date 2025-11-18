@@ -34,20 +34,20 @@ public:
 
     // Reference for member variables.
     Options &options() { return options_; }
-    std::unique_ptr<CameraBasic> &raw_camera_model() { return raw_camera_model_; }
+    std::unique_ptr<CameraBasic> &real_camera_model() { return real_camera_model_; }
     MatImg &virtual_camera_image() { return virtual_camera_image_; }
     MatImg &virtual_camera_mask() { return virtual_camera_mask_; }
 
     // Const reference for member variables.
     const Options &options() const { return options_; }
-    const std::unique_ptr<CameraBasic> &raw_camera_model() const { return raw_camera_model_; }
+    const std::unique_ptr<CameraBasic> &real_camera_model() const { return real_camera_model_; }
     const MatImg &virtual_camera_image() const { return virtual_camera_image_; }
     const MatImg &virtual_camera_mask() const { return virtual_camera_mask_; }
 
 private:
     Options options_;
     std::unique_ptr<CameraBasic> virtual_camera_model_ = nullptr;
-    std::unique_ptr<CameraBasic> raw_camera_model_ = nullptr;
+    std::unique_ptr<CameraBasic> real_camera_model_ = nullptr;
     MatImg virtual_camera_image_;
     MatImg virtual_camera_mask_;
     Mat maphex_row_;

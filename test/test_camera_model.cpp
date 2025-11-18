@@ -6,7 +6,7 @@
 
 #include "visualizor_2d.h"
 
-#include "feature_harris.h"
+#include "feature_point_harris_detector.h"
 #include "feature_point_detector.h"
 
 using namespace slam_visualizor;
@@ -14,10 +14,9 @@ using namespace feature_detector;
 
 void DetectFeaturesInRawImage(const GrayImage &image, std::vector<Vec2> &pixel_uv) {
     // Detect features.
-    FeaturePointDetector<HarrisFeature> detector;
+    FeaturePointHarrisDetector detector;
     detector.options().kMinFeatureDistance = 25;
-    detector.feature().options().kHalfPatchSize = 1;
-    detector.feature().options().kMinValidResponse = 40.0f;
+    detector.options().kMinValidResponse = 40.0f;
     detector.DetectGoodFeatures(image, 20, pixel_uv);
 }
 
