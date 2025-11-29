@@ -3,70 +3,70 @@
 
 namespace sensor_model {
 
-bool Imu::PropagateNominalState(const ImuMeasurement &meas_i, const ImuMeasurement &meas_j, const ImuState &state_i, ImuState &state_j) {
-    if (meas_i.time_stamp_s > meas_j.time_stamp_s) {
+bool Imu::PropagateNominalState(const ImuMeasurement &meas_prev, const ImuMeasurement &meas_next, const ImuState &state_prev, ImuState &state_next) {
+    if (meas_prev.time_stamp_s > meas_next.time_stamp_s) {
         return false;
     }
 
     // Propagate nominal state.
-    Vec3 mid_accel = Vec3::Zero();
-    Vec3 mid_gyro = Vec3::Zero();
-    return PropagateNominalState(meas_i, meas_j, state_i, state_j, mid_accel, mid_gyro);
+    Vec3 mid_accel_i = Vec3::Zero();
+    Vec3 mid_gyro_i = Vec3::Zero();
+    return PropagateNominalState(meas_prev, meas_next, state_prev, state_next, mid_accel_i, mid_gyro_i);
 }
 
-bool Imu::PropagateNominalState(const ImuMeasurement &meas_i, const ImuMeasurement &meas_j, const ImuState &state_i, ImuState &state_j, Vec3 &mid_accel,
-                                Vec3 &mid_gyro) {
-    if (meas_i.time_stamp_s > meas_j.time_stamp_s) {
+bool Imu::PropagateNominalState(const ImuMeasurement &meas_prev, const ImuMeasurement &meas_next, const ImuState &state_prev, ImuState &state_next,
+                                Vec3 &mid_accel_i, Vec3 &mid_gyro_i) {
+    if (meas_prev.time_stamp_s > meas_next.time_stamp_s) {
         return false;
     }
 
-    const float dt = meas_j.time_stamp_s - meas_i.time_stamp_s;
-    const Vec3 &bias_a = state_i.ba();
-    const Vec3 &bias_g = state_i.bg();
-    const Vec3 &gravity = state_i.g_w();
+    const float dt = meas_next.time_stamp_s - meas_prev.time_stamp_s;
+    const Vec3 &bias_a = state_prev.ba();
+    const Vec3 &bias_g = state_prev.bg();
+    const Vec3 &gravity = state_prev.g_w();
 
     // Propagate nominal attitude.
-    mid_gyro = 0.5f * (meas_i.gyro + meas_j.gyro) - bias_g;
-    Quat dq = Utility::DeltaQ(mid_gyro * dt);
-    state_j.q_wi() = (state_i.q_wi() * dq).normalized();
+    mid_gyro_i = 0.5f * (meas_prev.gyro + meas_next.gyro) - bias_g;
+    Quat dq = Utility::DeltaQ(mid_gyro_i * dt);
+    state_next.q_wi() = (state_prev.q_wi() * dq).normalized();
 
     // Propagate nominal velocity.
-    mid_accel = 0.5f * (meas_i.accel + meas_j.accel) - bias_a;
-    const Vec3 mid_accel_w = 0.5f * (state_i.q_wi() * (meas_i.accel - bias_a) + state_j.q_wi() * (meas_j.accel - bias_a));
-    state_j.v_wi() = state_i.v_wi() + (mid_accel_w - gravity) * dt;
+    mid_accel_i = 0.5f * (meas_prev.accel + meas_next.accel) - bias_a;
+    const Vec3 mid_accel_w = 0.5f * (state_prev.q_wi() * (meas_prev.accel - bias_a) + state_next.q_wi() * (meas_next.accel - bias_a));
+    state_next.v_wi() = state_prev.v_wi() + (mid_accel_w - gravity) * dt;
 
     // Propagate nominal position.
-    state_j.p_wi() = state_i.p_wi() + 0.5f * (state_i.v_wi() + state_j.v_wi()) * dt;
+    state_next.p_wi() = state_prev.p_wi() + 0.5f * (state_prev.v_wi() + state_next.v_wi()) * dt;
 
     return true;
 }
 
-bool Imu::PropagateNominalStateCovariance(const ImuMeasurement &meas_i, const ImuMeasurement &meas_j, const Vec3 &mid_accel, const Vec3 &mid_gyro,
-                                          const ImuState &state_i, const Mat15 &cov_i, Mat15 &cov_j) {
-    return PropagateResidualStateCovariance(meas_i, meas_j, mid_accel, mid_gyro, state_i, cov_i, cov_j);
+bool Imu::PropagateNominalStateCovariance(const ImuMeasurement &meas_prev, const ImuMeasurement &meas_next, const Vec3 &mid_accel_i, const Vec3 &mid_gyro_i,
+                                          const ImuState &state_prev, const Mat15 &cov_prev, Mat15 &cov_next) {
+    return PropagateResidualStateCovariance(meas_prev, meas_next, mid_accel_i, mid_gyro_i, state_prev, cov_prev, cov_next);
 }
 
-bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_i, const ImuMeasurement &meas_j, const Vec3 &mid_accel, const Vec3 &mid_gyro,
-                                           const ImuState &state_i, const Mat15 &cov_i, Mat15 &cov_j) {
+bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_prev, const ImuMeasurement &meas_next, const Vec3 &mid_accel_i, const Vec3 &mid_gyro_i,
+                                           const ImuState &state_prev, const Mat15 &cov_prev, Mat15 &cov_next) {
 
-    if (meas_j.time_stamp_s - meas_i.time_stamp_s < 0) {
+    if (meas_next.time_stamp_s - meas_prev.time_stamp_s < 0) {
         return false;
     }
 
-    const float dt = meas_j.time_stamp_s - meas_i.time_stamp_s;
+    const float dt = meas_next.time_stamp_s - meas_prev.time_stamp_s;
     const Mat3 dt_I3 = dt * Mat3::Identity();
-    const Mat3 R_wi_i = state_i.q_wi().matrix();
+    const Mat3 R_wi_prev = state_prev.q_wi().matrix();
 
     Mat15 F = Mat15::Identity();
     F.block<3, 3>(ImuIndex::kPosition, ImuIndex::kVelocity) = dt_I3;
-    F.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kRotation) = -dt * R_wi_i * Utility::SkewSymmetricMatrix(mid_accel);
-    F.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasAccel) = -dt * R_wi_i;
-    F.block<3, 3>(ImuIndex::kRotation, ImuIndex::kRotation) = Mat3::Identity() - dt * Utility::SkewSymmetricMatrix(mid_gyro);
+    F.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kRotation) = -dt * R_wi_prev * Utility::SkewSymmetricMatrix(mid_accel_i);
+    F.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kBiasAccel) = -dt * R_wi_prev;
+    F.block<3, 3>(ImuIndex::kRotation, ImuIndex::kRotation) = Mat3::Identity() - dt * Utility::SkewSymmetricMatrix(mid_gyro_i);
     F.block<3, 3>(ImuIndex::kRotation, ImuIndex::kBiasGyro) = -dt_I3;
 
     Mat15x12 G = Mat15x12::Zero();
-    G.block<3, 3>(ImuIndex::kPosition, ImuIndex::kNoiseAccel) = -0.5f * dt * dt * R_wi_i;
-    G.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kNoiseAccel) = -dt * R_wi_i;
+    G.block<3, 3>(ImuIndex::kPosition, ImuIndex::kNoiseAccel) = -0.5f * dt * dt * R_wi_prev;
+    G.block<3, 3>(ImuIndex::kVelocity, ImuIndex::kNoiseAccel) = -dt * R_wi_prev;
     G.block<3, 3>(ImuIndex::kRotation, ImuIndex::kNoiseGyro) = -dt_I3;
     G.block<3, 3>(ImuIndex::kBiasAccel, ImuIndex::kRandomWalkAccel) = dt_I3;
     G.block<3, 3>(ImuIndex::kBiasGyro, ImuIndex::kRandomWalkGyro) = dt_I3;
@@ -82,7 +82,7 @@ bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_i, const I
     for (uint32_t i = 0; i < 12; ++i) {
         G.col(i).noalias() = G.col(i) * noise_sigma_(i);
     }
-    cov_j = F * cov_i * F.transpose() + G * G.transpose();
+    cov_next = F * cov_prev * F.transpose() + G * G.transpose();
 
     return true;
 }

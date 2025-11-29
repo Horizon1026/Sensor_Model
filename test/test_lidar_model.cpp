@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
     LoadLidarMeasurements(lidar_scan_file, lidar_points);
 
     Visualizor3D::camera_view().q_wc = Quat(0.1f, -0.2f, -0.8f, 0.4f).normalized();
-    Visualizor3D::camera_view().p_wc = Vec3(15.0f, 30.0f, 30.0f);
+    Visualizor3D::camera_view().p_wc = Vec3(165.0f, 315.0f, 270.0f);
     Visualizor3D::Clear();
     for (const auto &point: lidar_points) {
         Visualizor3D::points().emplace_back(PointType {

@@ -25,16 +25,16 @@ public:
     Imu() = default;
     virtual ~Imu() = default;
 
-    bool PropagateNominalState(const ImuMeasurement &meas_i, const ImuMeasurement &meas_j, const ImuState &state_i, ImuState &state_j);
+    bool PropagateNominalState(const ImuMeasurement &meas_prev, const ImuMeasurement &meas_next, const ImuState &state_prev, ImuState &state_next);
 
-    bool PropagateNominalState(const ImuMeasurement &meas_i, const ImuMeasurement &meas_j, const ImuState &state_i, ImuState &state_j, Vec3 &mid_accel,
-                               Vec3 &mid_gyro);
+    bool PropagateNominalState(const ImuMeasurement &meas_prev, const ImuMeasurement &meas_next, const ImuState &state_prev, ImuState &state_next,
+                               Vec3 &mid_accel, Vec3 &mid_gyro);
 
-    bool PropagateNominalStateCovariance(const ImuMeasurement &meas_i, const ImuMeasurement &meas_j, const Vec3 &mid_accel, const Vec3 &mid_gyro,
-                                         const ImuState &state_i, const Mat15 &cov_i, Mat15 &cov_j);
+    bool PropagateNominalStateCovariance(const ImuMeasurement &meas_prev, const ImuMeasurement &meas_next, const Vec3 &mid_accel, const Vec3 &mid_gyro,
+                                         const ImuState &state_prev, const Mat15 &cov_prev, Mat15 &cov_next);
 
-    bool PropagateResidualStateCovariance(const ImuMeasurement &meas_i, const ImuMeasurement &meas_j, const Vec3 &mid_accel, const Vec3 &mid_gyro,
-                                          const ImuState &state_i, const Mat15 &cov_i, Mat15 &cov_j);
+    bool PropagateResidualStateCovariance(const ImuMeasurement &meas_prev, const ImuMeasurement &meas_next, const Vec3 &mid_accel, const Vec3 &mid_gyro,
+                                          const ImuState &state_prev, const Mat15 &cov_prev, Mat15 &cov_next);
 
     // Reference for member variables.
     Options &options() { return options_; }

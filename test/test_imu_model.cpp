@@ -88,7 +88,7 @@ void TestImuIntegration(std::vector<ImuMeasurement> &measurements, std::vector<V
     const Vec3 g_w = Vec3(0, 0, 9.81);
 
     // Prepare for integration.
-    ImuState state_i(p_wi_i, q_wi_i, v_wi_i, Vec3::Zero(), Vec3::Zero(), g_w, measurements[start_index].time_stamp_s);
+    ImuState state_i(measurements[start_index].time_stamp_s, p_wi_i, q_wi_i, v_wi_i, Vec3::Zero(), Vec3::Zero(), g_w);
     ImuState state_j = state_i;
     Mat15 cov_i = Mat15::Zero();
     Mat15 cov_j = cov_i;

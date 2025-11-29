@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
     LoadGnssMeasurements(gnss_file, positions);
 
     Visualizor3D::camera_view().q_wc = Quat(0.4f, -0.8f, -0.3f, 0.2f).normalized();
-    Visualizor3D::camera_view().p_wc = Vec3(110.0f, -70.0f, 180.0f);
+    Visualizor3D::camera_view().p_wc = Vec3(900.0f, -800.0f, 900.0f);
     Visualizor3D::Clear();
     for (const auto &position: positions) {
         Visualizor3D::points().emplace_back(PointType {
