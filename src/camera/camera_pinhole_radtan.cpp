@@ -1,9 +1,9 @@
-#include "pinhole.h"
+#include "camera_pinhole_radtan.h"
 #include "slam_basic_math.h"
 
 namespace sensor_model {
 
-bool Pinhole::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
+bool CameraPinholeRadtan::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
     const float x = undistort_xy(0);
     const float y = undistort_xy(1);
     const float xy = x * y;
@@ -19,7 +19,7 @@ bool Pinhole::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy
     return true;
 }
 
-bool Pinhole::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) {
+bool CameraPinholeRadtan::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) {
     switch (options().kUndistortMethod) {
         case UndistortMethod::kGradientDesent:
             return UndistortByGradienDesent(distort_xy, undistort_xy);
@@ -29,7 +29,7 @@ bool Pinhole::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_
     }
 }
 
-void Pinhole::SetDistortionParameter(const std::vector<float> &params) {
+void CameraPinholeRadtan::SetDistortionParameter(const std::vector<float> &params) {
     k_[0] = params[0];
     k_[1] = params[1];
     k_[2] = params[2];
@@ -37,7 +37,7 @@ void Pinhole::SetDistortionParameter(const std::vector<float> &params) {
     p_[1] = params[4];
 }
 
-bool Pinhole::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_xy) {
+bool CameraPinholeRadtan::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_xy) {
     // Set initial value.
     undistort_xy = distort_xy;
 
@@ -88,7 +88,7 @@ bool Pinhole::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_x
     return true;
 }
 
-bool Pinhole::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) {
+bool CameraPinholeRadtan::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) {
     // Set initial value.
     undistort_xy = distort_xy;
 

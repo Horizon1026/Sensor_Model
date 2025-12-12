@@ -1,16 +1,64 @@
 #include "basic_type.h"
-#include "fisheye.h"
+#include "camera_model.h"
 #include "image_painter.h"
-#include "pinhole.h"
 #include "slam_basic_math.h"
 #include "slam_log_reporter.h"
 #include "slam_operations.h"
 #include "virtual_camera.h"
 #include "visualizor_2d.h"
 
+#include "enable_stack_backward.h"
+
 using namespace slam_visualizor;
 using namespace sensor_model;
 using namespace image_painter;
+
+void TestVirtualCameraModel(const std::string &test_name, const GrayImage &raw_image, VirtualCamera &virtual_camera) {
+    // Generate image of virtual camera.
+    if (virtual_camera.GenerateMaphex(Quat(Eigen::AngleAxisf(-30.0f * kDegToRad, Vec3::UnitY())))) {
+        ReportInfo("Succeed to generate maphex.");
+    } else {
+        ReportError("Failed to generate maphex.");
+    }
+
+    // Report parameters of virtual camera.
+    ReportInfo("Image rows is " << virtual_camera.GetVirtualCameraImageRows());
+    ReportInfo("Image cols is " << virtual_camera.GetVirtualCameraImageCols());
+    ReportInfo("Fov(H * V) is " << LogVec(virtual_camera.GetVirtualCameraFov()) << " deg.");
+
+    // Remap virtual camera image.
+    if (virtual_camera.RemapVirtualCameraImage(raw_image)) {
+        ReportInfo("Succeed to remap virtual camera image.");
+    } else {
+        ReportError("Failed to remap virtual camera image.");
+    }
+    GrayImage virtual_image(virtual_camera.virtual_camera_image().data(), virtual_camera.virtual_camera_image().rows(),
+                            virtual_camera.virtual_camera_image().cols(), false);
+    GrayImage virtual_mask(virtual_camera.virtual_camera_mask().data(), virtual_camera.virtual_camera_mask().rows(),
+                           virtual_camera.virtual_camera_mask().cols(), false);
+
+    // Draw range of virtual image in raw image.
+    MatImg show_image_mat = MatImg(raw_image.rows(), raw_image.cols());
+    GrayImage show_image(show_image_mat.data(), show_image_mat.rows(), show_image_mat.cols(), false);
+    uint8_t mark_value = 0;
+    Vec2 pixel_uv = Vec2::Zero();
+    for (int32_t row = 0; row < virtual_camera.GetVirtualCameraImageRows(); ++row) {
+        virtual_camera.RemapPixelUvFromVirtualCameraToRawCamera(Vec2(0, row), pixel_uv);
+        ImagePainter::DrawSolidCircle(show_image, pixel_uv.x(), pixel_uv.y(), 2, mark_value);
+        virtual_camera.RemapPixelUvFromVirtualCameraToRawCamera(Vec2(virtual_camera.GetVirtualCameraImageCols(), row), pixel_uv);
+        ImagePainter::DrawSolidCircle(show_image, pixel_uv.x(), pixel_uv.y(), 2, mark_value);
+    }
+    for (int32_t col = 0; col < virtual_camera.GetVirtualCameraImageCols(); ++col) {
+        virtual_camera.RemapPixelUvFromVirtualCameraToRawCamera(Vec2(col, 0), pixel_uv);
+        ImagePainter::DrawSolidCircle(show_image, pixel_uv.x(), pixel_uv.y(), 2, mark_value);
+        virtual_camera.RemapPixelUvFromVirtualCameraToRawCamera(Vec2(col, virtual_camera.GetVirtualCameraImageRows()), pixel_uv);
+        ImagePainter::DrawSolidCircle(show_image, pixel_uv.x(), pixel_uv.y(), 2, mark_value);
+    }
+
+    // Visualize result.
+    Visualizor2D::ShowImage(std::string(test_name) + " - virtual image", virtual_image);
+    Visualizor2D::ShowImage(std::string(test_name) + " - virtual mask", virtual_mask);
+}
 
 int main(int argc, char **argv) {
     ReportInfo(YELLOW ">> Test virtual camera model." RESET_COLOR);
@@ -30,56 +78,19 @@ int main(int argc, char **argv) {
     // Load image, allocate memory.
     GrayImage raw_image;
     Visualizor2D::LoadImage(image_filepath, raw_image);
-
-    // Initialize virtual camera.
-    VirtualCamera virtual_camera;
-    virtual_camera.options().kVirtualCameraFocusLength = 200.0f;
-    virtual_camera.options().kVirtualImageRows = 500;
-    virtual_camera.options().kVirtualImageCols = 500;
-    virtual_camera.real_camera_model() = std::make_unique<Fisheye>(fx, fy, cx, cy);
-    virtual_camera.real_camera_model()->SetDistortionParameter(std::vector<float> {k1, k2, k3, k4, k5});
-
-    // Report fov of virtual camera.
-    const Vec2 fov = virtual_camera.GetVirtualCameraFov();
-    ReportInfo("Fov(H * V) is " << LogVec(fov) << " deg.");
-
-    // Generate image of virtual camera.
-    if (virtual_camera.GenerateMaphex(Quat::Identity(), Quat(Eigen::AngleAxisf(-30.0f * kDegToRad, Vec3::UnitY())))) {
-        ReportInfo("Succeed to generate maphex.");
-    } else {
-        ReportError("Failed to generate maphex.");
-    }
-    if (virtual_camera.RemapVirtualCameraImage(raw_image)) {
-        ReportInfo("Succeed to remap virtual camera image.");
-    } else {
-        ReportError("Failed to remap virtual camera image.");
-    }
-    GrayImage virtual_image(virtual_camera.virtual_camera_image().data(), virtual_camera.virtual_camera_image().rows(),
-                            virtual_camera.virtual_camera_image().cols(), false);
-    GrayImage virtual_mask(virtual_camera.virtual_camera_mask().data(), virtual_camera.virtual_camera_mask().rows(),
-                           virtual_camera.virtual_camera_mask().cols(), false);
-
-    // Draw range of virtual image in raw image.
-    uint8_t mark_value = 0;
-    Vec2 pixel_uv = Vec2::Zero();
-    for (int32_t row = 0; row < virtual_camera.options().kVirtualImageRows; ++row) {
-        virtual_camera.RemapPixelUvFromVirtualCameraToRawCamera(Vec2(0, row), pixel_uv);
-        ImagePainter::DrawSolidCircle(raw_image, pixel_uv.x(), pixel_uv.y(), 2, mark_value);
-        virtual_camera.RemapPixelUvFromVirtualCameraToRawCamera(Vec2(virtual_camera.options().kVirtualImageCols, row), pixel_uv);
-        ImagePainter::DrawSolidCircle(raw_image, pixel_uv.x(), pixel_uv.y(), 2, mark_value);
-    }
-    for (int32_t col = 0; col < virtual_camera.options().kVirtualImageCols; ++col) {
-        virtual_camera.RemapPixelUvFromVirtualCameraToRawCamera(Vec2(col, 0), pixel_uv);
-        ImagePainter::DrawSolidCircle(raw_image, pixel_uv.x(), pixel_uv.y(), 2, mark_value);
-        virtual_camera.RemapPixelUvFromVirtualCameraToRawCamera(Vec2(col, virtual_camera.options().kVirtualImageRows), pixel_uv);
-        ImagePainter::DrawSolidCircle(raw_image, pixel_uv.x(), pixel_uv.y(), 2, mark_value);
-    }
-
-    // Visualize result.
     Visualizor2D::ShowImage("raw image", raw_image);
-    Visualizor2D::ShowImage("virtual image", virtual_image);
-    Visualizor2D::ShowImage("virtual mask", virtual_mask);
-    Visualizor2D::WaitKey(0);
 
+    // Initialize virtual camera to be default pinhold model with no distortion.
+    VirtualCamera virtual_camera;
+    virtual_camera.real_camera_model() = std::make_unique<CameraPinholeEquidistant>(fx, fy, cx, cy);
+    virtual_camera.real_camera_model()->SetDistortionParameter(std::vector<float> {k1, k2, k3, k4, k5});
+    TestVirtualCameraModel("pinhole-equidistant to virtual rectify", raw_image, virtual_camera);
+
+    // Initialize virtual camera to be pinhole-equidistant camera model.
+    virtual_camera.virtual_camera_model() = std::make_unique<CameraPinholeEquidistant>(fx, fy, cx, cy);
+    virtual_camera.virtual_camera_model()->SetDistortionParameter(std::vector<float> {k1, k2, k3, k4, k5});
+    TestVirtualCameraModel("pinhole-equidistant to pinhole-equidistant", raw_image, virtual_camera);
+
+    Visualizor2D::WaitKey(0);
     return 0;
 }

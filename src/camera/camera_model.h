@@ -1,0 +1,8 @@
+#ifndef _SENSOR_MODEL_CAMERA_MODEL_H_
+#define _SENSOR_MODEL_CAMERA_MODEL_H_
+
+#include "camera_pinhole.h"
+#include "camera_pinhole_equidistant.h"
+#include "camera_pinhole_radtan.h"
+
+#endif  // end of _SENSOR_MODEL_CAMERA_MODEL_H_

@@ -1,12 +1,12 @@
-#ifndef _SENSOR_MODEL_CAMERA_BASIC_H_
-#define _SENSOR_MODEL_CAMERA_BASIC_H_
+#ifndef _SENSOR_MODEL_CAMERA_PINHOLE_H_
+#define _SENSOR_MODEL_CAMERA_PINHOLE_H_
 
 #include "basic_type.h"
 #include "datatype_image.h"
 
 namespace sensor_model {
 
-class CameraBasic {
+class CameraPinhole {
 
 public:
     enum class UndistortMethod : uint8_t {
@@ -23,10 +23,22 @@ public:
     };
 
 public:
-    CameraBasic() = default;
-    CameraBasic(float fx, float fy, float cx, float cy): fx_(fx), fy_(fy), cx_(cx), cy_(cy) {}
-    virtual ~CameraBasic() = default;
-    CameraBasic(const CameraBasic &camera_basic) = delete;
+    CameraPinhole() = default;
+    CameraPinhole(float fx, float fy, float cx, float cy): fx_(fx), fy_(fy), cx_(cx), cy_(cy) {
+        image_rows_ = static_cast<int32_t>(cy * 2.0f);
+        image_cols_ = static_cast<int32_t>(cx * 2.0f);
+    }
+    CameraPinhole(float fx, float fy, float cx, float cy, int32_t image_rows, int32_t image_cols):
+        fx_(fx), fy_(fy), cx_(cx), cy_(cy), image_rows_(image_rows), image_cols_(image_cols) {
+        if (image_rows <= 0) {
+            image_rows_ = static_cast<int32_t>(cy * 2.0f);
+        }
+        if (image_cols <= 0) {
+            image_cols_ = static_cast<int32_t>(cx * 2.0f);
+        }
+    }
+    virtual ~CameraPinhole() = default;
+    CameraPinhole(const CameraPinhole &camera_basic) = delete;
 
 public:
     // Lift 2d point in normalized plane to other coordinate systems.
@@ -79,16 +91,21 @@ public:
     const float &fy() const { return fy_; }
     const float &cx() const { return cx_; }
     const float &cy() const { return cy_; }
+    const int32_t &image_rows() const { return image_rows_; }
+    const int32_t &image_cols() const { return image_cols_; }
 
 private:
+    Options options_;
+
     float fx_ = 0.0f;
     float fy_ = 0.0f;
     float cx_ = 0.0f;
     float cy_ = 0.0f;
 
-    Options options_;
+    int32_t image_rows_ = 0;
+    int32_t image_cols_ = 0;
 };
 
 }  // namespace sensor_model
 
-#endif  // end of _SENSOR_MODEL_CAMERA_BASIC_H_
+#endif  // end of _SENSOR_MODEL_CAMERA_PINHOLE_H_

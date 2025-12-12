@@ -2,7 +2,7 @@
 #define _SENSOR_MODEL_VIRTUAL_CAMERA_H_
 
 #include "basic_type.h"
-#include "camera_basic.h"
+#include "camera_model.h"
 #include "memory"
 
 namespace sensor_model {
@@ -12,42 +12,44 @@ class VirtualCamera {
 
 public:
     struct Options {
-        Quat kCurrentQwc = Quat::Identity();
-        Quat kTargetQwc = Quat::Identity();
-        int32_t kVirtualImageRows = 100;
-        int32_t kVirtualImageCols = 100;
-        float kVirtualCameraFocusLength = 400.0f;
+        Quat kQrv = Quat::Identity();
+        int32_t kDefaultVirtualCameraImageRows = 640;
+        int32_t kDefaultVirtualCameraImageCols = 640;
+        float kDefaultVirtualCameraFocalLength = 450.0f;
     };
 
 public:
     VirtualCamera() = default;
     virtual ~VirtualCamera() = default;
 
+    bool CreateDefaultVirtualCameraModel();
     bool GenerateMaphex();
-    bool GenerateMaphex(const Quat &q_wc);
-    bool GenerateMaphex(const Quat &q_wc, const Quat &target_q_wc);
+    bool GenerateMaphex(const Quat &q_rv);
     bool RemapVirtualCameraImage(const GrayImage &raw_image);
     bool RemapPixelUvFromVirtualCameraToRawCamera(const Vec2 &virtual_pixel_uv, Vec2 &raw_distort_pixel_uv);
     bool RemapPixelUvFromRawCameraToVirtualCamera(const Vec2 &raw_distort_pixel_uv, Vec2 &virtual_pixel_uv);
 
     Vec2 GetVirtualCameraFov() const;
+    int32_t GetVirtualCameraImageRows() const;
+    int32_t GetVirtualCameraImageCols() const;
 
     // Reference for member variables.
     Options &options() { return options_; }
-    std::unique_ptr<CameraBasic> &real_camera_model() { return real_camera_model_; }
+    std::unique_ptr<CameraPinhole> &virtual_camera_model() { return virtual_camera_model_; }
+    std::unique_ptr<CameraPinhole> &real_camera_model() { return real_camera_model_; }
     MatImg &virtual_camera_image() { return virtual_camera_image_; }
     MatImg &virtual_camera_mask() { return virtual_camera_mask_; }
-
     // Const reference for member variables.
     const Options &options() const { return options_; }
-    const std::unique_ptr<CameraBasic> &real_camera_model() const { return real_camera_model_; }
+    const std::unique_ptr<CameraPinhole> &virtual_camera_model() const { return virtual_camera_model_; }
+    const std::unique_ptr<CameraPinhole> &real_camera_model() const { return real_camera_model_; }
     const MatImg &virtual_camera_image() const { return virtual_camera_image_; }
     const MatImg &virtual_camera_mask() const { return virtual_camera_mask_; }
 
 private:
     Options options_;
-    std::unique_ptr<CameraBasic> virtual_camera_model_ = nullptr;
-    std::unique_ptr<CameraBasic> real_camera_model_ = nullptr;
+    std::unique_ptr<CameraPinhole> virtual_camera_model_ = nullptr;
+    std::unique_ptr<CameraPinhole> real_camera_model_ = nullptr;
     MatImg virtual_camera_image_;
     MatImg virtual_camera_mask_;
     Mat maphex_row_;

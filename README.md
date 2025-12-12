@@ -3,9 +3,15 @@ The model of sensors for slam, for example, imu, camera, and so on.
 
 # Components
 - [x] Camera model
+    - [x] Pinhole
+        - [x] Radtan
+        - [x] Equidistant
+    - [ ] Omni
+        - [ ] Radtan
+        - [ ] Equidistant
 - [x] Imu model
 - [x] Wheel odom model
-- [ ] GPS model
+- [x] GPS model
 - [ ] Lidar model
 
 # Dependence

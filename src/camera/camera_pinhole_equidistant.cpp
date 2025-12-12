@@ -1,10 +1,10 @@
-#include "fisheye.h"
+#include "camera_pinhole_equidistant.h"
 #include "slam_basic_math.h"
 #include "slam_log_reporter.h"
 
 namespace sensor_model {
 
-bool Fisheye::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
+bool CameraPinholeEquidistant::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
     const float r = undistort_xy.norm();
     if (r < kZeroFloat) {
         distort_xy = undistort_xy;
@@ -23,7 +23,7 @@ bool Fisheye::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy
     return true;
 }
 
-bool Fisheye::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) {
+bool CameraPinholeEquidistant::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) {
     switch (options().kUndistortMethod) {
         case UndistortMethod::kFixedPointIteration:
         default:
@@ -32,13 +32,13 @@ bool Fisheye::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_
 }
 
 
-void Fisheye::SetDistortionParameter(const std::vector<float> &params) {
+void CameraPinholeEquidistant::SetDistortionParameter(const std::vector<float> &params) {
     for (uint32_t i = 0; i < 5; ++i) {
         k_[i] = params[i];
     }
 }
 
-bool Fisheye::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) {
+bool CameraPinholeEquidistant::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) {
     // Set initial value.
     undistort_xy = distort_xy;
 

@@ -1,17 +1,19 @@
-#ifndef _SENSOR_MODEL_PINHOLE_CAMERA_MODEL_H_
-#define _SENSOR_MODEL_PINHOLE_CAMERA_MODEL_H_
+#ifndef _SENSOR_MODEL_CAMERA_PINHOLE_RADTAN_MODEL_H_
+#define _SENSOR_MODEL_CAMERA_PINHOLE_RADTAN_MODEL_H_
 
-#include "camera_basic.h"
+#include "camera_pinhole.h"
 
 namespace sensor_model {
 
-class Pinhole: public CameraBasic {
+class CameraPinholeRadtan: public CameraPinhole {
 
 public:
-    Pinhole(): CameraBasic() {}
-    Pinhole(float fx, float fy, float cx, float cy): CameraBasic(fx, fy, cx, cy) {}
-    virtual ~Pinhole() = default;
-    Pinhole(const Pinhole &pinhole) = delete;
+    CameraPinholeRadtan(): CameraPinhole() {}
+    CameraPinholeRadtan(float fx, float fy, float cx, float cy): CameraPinhole(fx, fy, cx, cy) {}
+    CameraPinholeRadtan(float fx, float fy, float cx, float cy, int32_t image_rows, int32_t image_cols):
+        CameraPinhole(fx, fy, cx, cy, image_rows, image_cols) {}
+    virtual ~CameraPinholeRadtan() = default;
+    CameraPinholeRadtan(const CameraPinholeRadtan &pinhole) = delete;
 
 public:
     /*  Distortion model:
@@ -40,4 +42,4 @@ private:
 
 }  // namespace sensor_model
 
-#endif  // end of _SENSOR_MODEL_PINHOLE_CAMERA_MODEL_H_
+#endif  // end of _SENSOR_MODEL_CAMERA_PINHOLE_RADTAN_MODEL_H_

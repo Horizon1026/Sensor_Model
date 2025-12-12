@@ -1,13 +1,9 @@
 #include "basic_type.h"
-#include "slam_log_reporter.h"
-
-#include "fisheye.h"
-#include "pinhole.h"
-
-#include "visualizor_2d.h"
-
-#include "feature_point_harris_detector.h"
+#include "camera_model.h"
 #include "feature_point_detector.h"
+#include "feature_point_harris_detector.h"
+#include "slam_log_reporter.h"
+#include "visualizor_2d.h"
 
 using namespace slam_visualizor;
 using namespace feature_detector;
@@ -20,10 +16,10 @@ void DetectFeaturesInRawImage(const GrayImage &image, std::vector<Vec2> &pixel_u
     detector.DetectGoodFeatures(image, 20, pixel_uv);
 }
 
-void TestPinholeCameraModel() {
+void TestPinholeRadtanCameraModel() {
     ReportInfo(YELLOW ">> Test pinhole camera model undistortion." RESET_COLOR);
 
-    // Load parameters for pinhole camera.
+    // Load parameters for radtan camera.
     const std::string image_filepath = "../examples/pinhole_distorted.png";
     const float fx = 458.654f;
     const float fy = 457.296f;
@@ -44,8 +40,8 @@ void TestPinholeCameraModel() {
     DetectFeaturesInRawImage(raw_image, distort_features);
     undistort_features.reserve(distort_features.size());
 
-    // Initialize pinhole camera.
-    sensor_model::Pinhole camera;
+    // Initialize radtan camera.
+    sensor_model::CameraPinholeRadtan camera;
     camera.SetIntrinsicParameter(fx, fy, cx, cy);
     camera.SetDistortionParameter(std::vector<float> {k1, k2, k3, p1, p2});
 
@@ -73,15 +69,15 @@ void TestPinholeCameraModel() {
     ReportInfo("   Undistortion average residual is " << average_residual);
 
     // Show undistortion image.
-    Visualizor2D::ShowImageWithDetectedFeatures("Pinhole distorted image with detected features", raw_image, distort_features);
-    Visualizor2D::ShowImageWithDetectedFeatures("Pinhole undistorted image with detected features", corr_image, undistort_features);
+    Visualizor2D::ShowImageWithDetectedFeatures("Radtan distorted image with detected features", raw_image, distort_features);
+    Visualizor2D::ShowImageWithDetectedFeatures("Radtan undistorted image with detected features", corr_image, undistort_features);
     Visualizor2D::WaitKey(1);
 }
 
-void TestFisheyeCameraModel() {
-    ReportInfo(YELLOW ">> Test fisheye camera model undistortion." RESET_COLOR);
+void TestPinholeEquidistantCameraModel() {
+    ReportInfo(YELLOW ">> Test equidistant camera model undistortion." RESET_COLOR);
 
-    // Load parameters for fisheye camera.
+    // Load parameters for equidistant camera.
     const std::string image_filepath = "../examples/fisheye_distorted.bmp";
     const float fx = 348.52f;
     const float fy = 348.52f;
@@ -102,8 +98,8 @@ void TestFisheyeCameraModel() {
     DetectFeaturesInRawImage(raw_image, distort_features);
     undistort_features.reserve(distort_features.size());
 
-    // Initialize fisheye camera.
-    sensor_model::Fisheye camera;
+    // Initialize equidistant camera.
+    sensor_model::CameraPinholeEquidistant camera;
     camera.SetIntrinsicParameter(fx, fy, cx, cy);
     camera.SetDistortionParameter(std::vector<float> {k1, k2, k3, k4, k5});
 
@@ -131,16 +127,16 @@ void TestFisheyeCameraModel() {
     ReportInfo("   Undistortion average residual is " << average_residual);
 
     // Show undistortion image.
-    Visualizor2D::ShowImageWithDetectedFeatures("Fisheye distorted image with detected features", raw_image, distort_features);
-    Visualizor2D::ShowImageWithDetectedFeatures("Fisheye undistorted image with detected features", corr_image, undistort_features);
+    Visualizor2D::ShowImageWithDetectedFeatures("Equidistant distorted image with detected features", raw_image, distort_features);
+    Visualizor2D::ShowImageWithDetectedFeatures("Equidistant undistorted image with detected features", corr_image, undistort_features);
     Visualizor2D::WaitKey(1);
 }
 
 int main(int argc, char **argv) {
     ReportInfo(YELLOW ">> Test camera model." RESET_COLOR);
 
-    TestPinholeCameraModel();
-    TestFisheyeCameraModel();
+    TestPinholeRadtanCameraModel();
+    TestPinholeEquidistantCameraModel();
 
     Visualizor2D::WaitKey(0);
 

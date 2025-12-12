@@ -7,6 +7,12 @@ set( CMAKE_CXX_FLAGS "-std=c++17 -O3 -Wall" )
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 set( CMAKE_CXX_STANDARD 20 )
 
+# Add slam utility.
+set( SLAM_UTILITY_PATH ${PROJECT_SOURCE_DIR}/../Slam_Utility )
+if( NOT TARGET lib_stack_backward )
+    add_subdirectory( ${SLAM_UTILITY_PATH}/3rd_libraries/backward ${PROJECT_SOURCE_DIR}/build/lib_stack_backward )
+endif()
+
 # Add visualizor.
 set( VISUALIZOR_PATH ${PROJECT_SOURCE_DIR}/../Visualizor2D )
 if( NOT TARGET lib_2d_visualizor )
@@ -69,6 +75,7 @@ target_link_libraries( test_virtual_camera_model
     lib_image_painter
     lib_camera_model
     lib_virtual_camera_model
+    lib_stack_backward
 )
 
 # Create executable target to test imu model.
