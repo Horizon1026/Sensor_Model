@@ -54,7 +54,7 @@ private:
     MatImg virtual_camera_mask_;
     Mat maphex_row_;
     Mat maphex_col_;
-    Mat3 H_cc0_ = Mat3::Identity();
+    Mat3 H_virtual_to_real = Mat3::Identity();
 };
 
 }  // namespace sensor_model

@@ -25,7 +25,7 @@ bool VirtualCamera::GenerateMaphex(const Quat &q_rv) {
     }
 
     // Generate maphex.
-    H_cc0_ = q_rv.toRotationMatrix();
+    H_virtual_to_real = q_rv.toRotationMatrix();
     maphex_row_.setZero(virtual_camera_model_->image_rows(), virtual_camera_model_->image_cols());
     maphex_col_.setZero(virtual_camera_model_->image_rows(), virtual_camera_model_->image_cols());
     for (int32_t row = 0; row < virtual_camera_model_->image_rows(); ++row) {
@@ -72,7 +72,7 @@ bool VirtualCamera::RemapPixelUvFromVirtualCameraToRawCamera(const Vec2 &virtual
 
     Vec2 virtual_norm_xy = Vec2::Zero();
     virtual_camera_model_->LiftFromRawImagePlaneToUndistortedNormalizedPlane(virtual_distort_pixel_uv, virtual_norm_xy);
-    Vec3 real_undistort_norm_xy1 = H_cc0_ * Vec3(virtual_norm_xy.x(), virtual_norm_xy.y(), 1.0f);
+    Vec3 real_undistort_norm_xy1 = H_virtual_to_real * Vec3(virtual_norm_xy.x(), virtual_norm_xy.y(), 1.0f);
     RETURN_FALSE_IF(real_undistort_norm_xy1.z() < kZeroFloat);
     real_undistort_norm_xy1 /= real_undistort_norm_xy1.z();
     Vec2 real_distort_norm_xy = Vec2::Zero();
@@ -86,7 +86,7 @@ bool VirtualCamera::RemapPixelUvFromRawCameraToVirtualCamera(const Vec2 &real_di
 
     Vec2 real_undistort_norm_xy = Vec2::Zero();
     real_camera_model_->LiftFromRawImagePlaneToUndistortedNormalizedPlane(real_distort_pixel_uv, real_undistort_norm_xy);
-    Vec3 virtual_undistort_norm_xy1 = H_cc0_.transpose() * Vec3(real_undistort_norm_xy.x(), real_undistort_norm_xy.y(), 1.0f);
+    Vec3 virtual_undistort_norm_xy1 = H_virtual_to_real.transpose() * Vec3(real_undistort_norm_xy.x(), real_undistort_norm_xy.y(), 1.0f);
     RETURN_FALSE_IF(virtual_undistort_norm_xy1.z() < kZeroFloat);
     virtual_undistort_norm_xy1 / virtual_undistort_norm_xy1.z();
     Vec2 virtual_distort_norm_xy = Vec2::Zero();

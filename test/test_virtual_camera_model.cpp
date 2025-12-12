@@ -39,6 +39,7 @@ void TestVirtualCameraModel(const std::string &test_name, const GrayImage &raw_i
 
     // Draw range of virtual image in raw image.
     MatImg show_image_mat = MatImg(raw_image.rows(), raw_image.cols());
+    raw_image.ToMatImg(show_image_mat);
     GrayImage show_image(show_image_mat.data(), show_image_mat.rows(), show_image_mat.cols(), false);
     uint8_t mark_value = 0;
     Vec2 pixel_uv = Vec2::Zero();
@@ -58,6 +59,7 @@ void TestVirtualCameraModel(const std::string &test_name, const GrayImage &raw_i
     // Visualize result.
     Visualizor2D::ShowImage(std::string(test_name) + " - virtual image", virtual_image);
     Visualizor2D::ShowImage(std::string(test_name) + " - virtual mask", virtual_mask);
+    Visualizor2D::ShowImage(std::string(test_name) + " - virtual image in raw image", show_image);
 }
 
 int main(int argc, char **argv) {
@@ -65,31 +67,46 @@ int main(int argc, char **argv) {
 
     // Load parameters for fisheye camera.
     const std::string image_filepath = "../examples/fisheye_distorted.bmp";
-    const float fx = 348.52f;
-    const float fy = 348.52f;
-    const float cx = 640.19f;
-    const float cy = 358.56f;
-    const float k1 = 0.066258f;
-    const float k2 = 0.039769f;
-    const float k3 = -0.026906f;
-    const float k4 = 0.003342f;
-    const float k5 = 0.0f;
 
     // Load image, allocate memory.
     GrayImage raw_image;
     Visualizor2D::LoadImage(image_filepath, raw_image);
     Visualizor2D::ShowImage("raw image", raw_image);
 
-    // Initialize virtual camera to be default pinhold model with no distortion.
     VirtualCamera virtual_camera;
-    virtual_camera.real_camera_model() = std::make_unique<CameraPinholeEquidistant>(fx, fy, cx, cy);
-    virtual_camera.real_camera_model()->SetDistortionParameter(std::vector<float> {k1, k2, k3, k4, k5});
+
+    // Initialize virtual camera to be default pinhole model with no distortion.
+    const float cam1_fx = 348.52f;
+    const float cam1_fy = 348.52f;
+    const float cam1_cx = 640.19f;
+    const float cam1_cy = 358.56f;
+    const float cam1_k1 = 0.066258f;
+    const float cam1_k2 = 0.039769f;
+    const float cam1_k3 = -0.026906f;
+    const float cam1_k4 = 0.003342f;
+    const float cam1_k5 = 0.0f;
+    virtual_camera.real_camera_model() = std::make_unique<CameraPinholeEquidistant>(cam1_fx, cam1_fy, cam1_cx, cam1_cy);
+    virtual_camera.real_camera_model()->SetDistortionParameter(std::vector<float> {cam1_k1, cam1_k2, cam1_k3, cam1_k4, cam1_k5});
     TestVirtualCameraModel("pinhole-equidistant to virtual rectify", raw_image, virtual_camera);
 
     // Initialize virtual camera to be pinhole-equidistant camera model.
-    virtual_camera.virtual_camera_model() = std::make_unique<CameraPinholeEquidistant>(fx, fy, cx, cy);
-    virtual_camera.virtual_camera_model()->SetDistortionParameter(std::vector<float> {k1, k2, k3, k4, k5});
+    virtual_camera.virtual_camera_model() = std::make_unique<CameraPinholeEquidistant>(cam1_fx, cam1_fy, cam1_cx, cam1_cy);
+    virtual_camera.virtual_camera_model()->SetDistortionParameter(std::vector<float> {cam1_k1, cam1_k2, cam1_k3, cam1_k4, cam1_k5});
     TestVirtualCameraModel("pinhole-equidistant to pinhole-equidistant", raw_image, virtual_camera);
+
+    // Initialize virtual camera to be pinhole-equidistant camera model.
+    const float cam2_fx = 458.654f;
+    const float cam2_fy = 457.296f;
+    const float cam2_cx = 752.0f / 2.0f;
+    const float cam2_cy = 240.0f;
+    const float cam2_k1 = -0.28340811f;
+    const float cam2_k2 = 0.07395907f;
+    const float cam2_k3 = 0.0f;
+    const float cam2_p1 = 0.00019359f;
+    const float cam2_p2 = 1.76187114e-05f;
+    virtual_camera.virtual_camera_model() = std::make_unique<CameraPinholeRadtan>(cam2_fx, cam2_fy, cam2_cx, cam2_cy);
+    virtual_camera.virtual_camera_model()->SetDistortionParameter(std::vector<float> {cam2_k1, cam2_k2, cam2_k3, cam2_p1, cam2_p2});
+    TestVirtualCameraModel("pinhole-equidistant to pinhole-radtan", raw_image, virtual_camera);
 
     Visualizor2D::WaitKey(0);
     return 0;
