@@ -144,6 +144,11 @@ bool CameraPinhole::CorrectDistortedImage(const GrayImage &raw_image, GrayImage 
     return true;
 }
 
+void CameraPinhole::SetImageSize(int32_t image_rows, int32_t image_cols) {
+    image_rows_ = image_rows;
+    image_cols_ = image_cols;
+}
+
 void CameraPinhole::SetIntrinsicParameter(float fx, float fy, float cx, float cy) {
     fx_ = fx;
     fy_ = fy;

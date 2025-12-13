@@ -41,6 +41,8 @@ public:
     CameraPinhole(const CameraPinhole &camera_basic) = delete;
 
 public:
+    virtual std::string CameraModelName() const { return "Pinhole-Rectify"; }
+
     // Lift 2d point in normalized plane to other coordinate systems.
     void LiftFromNormalizedPlaneToUnitSphere(const Vec2 norm_xy, Vec3 &sphere_xyz);
     void LiftFromNormalizedPlaneToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv);
@@ -79,8 +81,10 @@ public:
     bool CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, float scale = 1.0f);
 
     // Set intrinsic and distortion parameters.
+    void SetImageSize(int32_t image_rows, int32_t image_cols);
     void SetIntrinsicParameter(float fx, float fy, float cx, float cy);
     virtual void SetDistortionParameter(const std::vector<float> &params) {};
+    virtual void GetDistortionParameter(std::vector<float> &params) const { params.clear(); }
 
     // Reference for member variables.
     Options &options() { return options_; }

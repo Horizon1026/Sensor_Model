@@ -38,6 +38,14 @@ void CameraPinholeEquidistant::SetDistortionParameter(const std::vector<float> &
     }
 }
 
+void CameraPinholeEquidistant::GetDistortionParameter(std::vector<float> &params) const {
+    params.clear();
+    params.reserve(5);
+    for (uint32_t i = 0; i < 5; ++i) {
+        params.emplace_back(k_[i]);
+    }
+}
+
 bool CameraPinholeEquidistant::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) {
     // Set initial value.
     undistort_xy = distort_xy;

@@ -37,6 +37,16 @@ void CameraPinholeRadtan::SetDistortionParameter(const std::vector<float> &param
     p_[1] = params[4];
 }
 
+void CameraPinholeRadtan::GetDistortionParameter(std::vector<float> &params) const {
+    params.reserve(5);
+    params.clear();
+    params.emplace_back(k_[0]);
+    params.emplace_back(k_[1]);
+    params.emplace_back(k_[2]);
+    params.emplace_back(p_[0]);
+    params.emplace_back(p_[1]);
+}
+
 bool CameraPinholeRadtan::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_xy) {
     // Set initial value.
     undistort_xy = distort_xy;
