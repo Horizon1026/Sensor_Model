@@ -4,7 +4,7 @@
 
 namespace sensor_model {
 
-bool CameraPinholeEquidistant::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
+bool CameraPinholeEquidistant::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) const {
     const float r = undistort_xy.norm();
     if (r < kZeroFloat) {
         distort_xy = undistort_xy;
@@ -23,7 +23,7 @@ bool CameraPinholeEquidistant::DistortOnNormalizedPlane(const Vec2 undistort_xy,
     return true;
 }
 
-bool CameraPinholeEquidistant::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) {
+bool CameraPinholeEquidistant::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) const {
     switch (options().kUndistortMethod) {
         case UndistortMethod::kFixedPointIteration:
         default:
@@ -46,7 +46,7 @@ void CameraPinholeEquidistant::GetDistortionParameter(std::vector<float> &params
     }
 }
 
-bool CameraPinholeEquidistant::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) {
+bool CameraPinholeEquidistant::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) const {
     // Set initial value.
     undistort_xy = distort_xy;
 

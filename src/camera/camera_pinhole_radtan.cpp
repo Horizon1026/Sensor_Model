@@ -3,7 +3,7 @@
 
 namespace sensor_model {
 
-bool CameraPinholeRadtan::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) {
+bool CameraPinholeRadtan::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) const {
     const float x = undistort_xy(0);
     const float y = undistort_xy(1);
     const float xy = x * y;
@@ -19,7 +19,7 @@ bool CameraPinholeRadtan::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2
     return true;
 }
 
-bool CameraPinholeRadtan::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) {
+bool CameraPinholeRadtan::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) const {
     switch (options().kUndistortMethod) {
         case UndistortMethod::kGradientDesent:
             return UndistortByGradienDesent(distort_xy, undistort_xy);
@@ -47,7 +47,7 @@ void CameraPinholeRadtan::GetDistortionParameter(std::vector<float> &params) con
     params.emplace_back(p_[1]);
 }
 
-bool CameraPinholeRadtan::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_xy) {
+bool CameraPinholeRadtan::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_xy) const {
     // Set initial value.
     undistort_xy = distort_xy;
 
@@ -98,7 +98,7 @@ bool CameraPinholeRadtan::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 
     return true;
 }
 
-bool CameraPinholeRadtan::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) {
+bool CameraPinholeRadtan::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) const {
     // Set initial value.
     undistort_xy = distort_xy;
 

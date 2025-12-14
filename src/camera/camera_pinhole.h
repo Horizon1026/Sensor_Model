@@ -44,41 +44,41 @@ public:
     virtual std::string CameraModelName() const { return "Pinhole-Rectify"; }
 
     // Lift 2d point in normalized plane to other coordinate systems.
-    void LiftFromNormalizedPlaneToUnitSphere(const Vec2 norm_xy, Vec3 &sphere_xyz);
-    void LiftFromNormalizedPlaneToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv);
-    void LiftFromNormalizedPlaneToBearingVector(const Vec2 norm_xy, Vec3 &bearing_vector);
+    void LiftFromNormalizedPlaneToUnitSphere(const Vec2 norm_xy, Vec3 &sphere_xyz) const;
+    void LiftFromNormalizedPlaneToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv) const;
+    void LiftFromNormalizedPlaneToBearingVector(const Vec2 norm_xy, Vec3 &bearing_vector) const;
 
     // Lift 3d point in unit sphere to other coordinate systems.
-    void LiftFromUnitSphereToNormalizedPlane(const Vec3 sphere_xyz, Vec2 &norm_xy);
-    void LiftFromUnitSphereToBearingVector(const Vec3 sphere_xyz, Vec3 &bearing_vector);
-    void LiftFromUnitSphereToImagePlane(const Vec3 sphere_xyz, Vec2 &pixel_uv);
+    void LiftFromUnitSphereToNormalizedPlane(const Vec3 sphere_xyz, Vec2 &norm_xy) const;
+    void LiftFromUnitSphereToBearingVector(const Vec3 sphere_xyz, Vec3 &bearing_vector) const;
+    void LiftFromUnitSphereToImagePlane(const Vec3 sphere_xyz, Vec2 &pixel_uv) const;
 
     // Lift 3d point in bearing vector to other coordinate systems.
-    void LiftFromBearingVectorToNormalizedPlane(const Vec3 bearing_vector, Vec2 &norm_xy);
-    void LiftFromBearingVectorToUnitSphere(const Vec3 bearing_vector, Vec3 &sphere_xyz);
-    void LiftFromBearingVectorToImagePlane(const Vec3 bearing_vector, Vec2 &pixel_uv);
+    void LiftFromBearingVectorToNormalizedPlane(const Vec3 bearing_vector, Vec2 &norm_xy) const;
+    void LiftFromBearingVectorToUnitSphere(const Vec3 bearing_vector, Vec3 &sphere_xyz) const;
+    void LiftFromBearingVectorToImagePlane(const Vec3 bearing_vector, Vec2 &pixel_uv) const;
 
     // Lift 2d point in image plane to other coordinate systems.
-    void LiftFromImagePlaneToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy);
-    void LiftFromImagePlaneToBearingVector(const Vec2 pixel_uv, Vec3 &bearing_vector);
-    void LiftFromImagePlaneToUnitSphere(const Vec2 pixel_uv, Vec3 &sphere_xyz);
+    void LiftFromImagePlaneToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) const;
+    void LiftFromImagePlaneToBearingVector(const Vec2 pixel_uv, Vec3 &bearing_vector) const;
+    void LiftFromImagePlaneToUnitSphere(const Vec2 pixel_uv, Vec3 &sphere_xyz) const;
 
     // Lift 2d point in raw image plane to undistorted normalized plane.
-    bool LiftFromRawImagePlaneToUndistortedNormalizedPlane(const Vec2 pixel_uv, Vec2 &undistort_xy);
+    bool LiftFromRawImagePlaneToUndistortedNormalizedPlane(const Vec2 pixel_uv, Vec2 &undistort_xy) const;
 
     // Lift 3d point in camera frame to normalized plane.
-    void LiftFromCameraFrameToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy);
+    void LiftFromCameraFrameToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) const;
 
     // Do distortion and undistortion on normalized plane.
-    virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy);
-    virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy);
+    virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) const;
+    virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) const;
 
     // Do distortion and undistortion on image plane.
-    bool DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv);
-    bool UndistortOnImagePlane(const Vec2 distort_uv, Vec2 &undistort_uv);
+    bool DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv) const;
+    bool UndistortOnImagePlane(const Vec2 distort_uv, Vec2 &undistort_uv) const;
 
     // Undistort image.
-    bool CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, float scale = 1.0f);
+    bool CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, float scale = 1.0f) const;
 
     // Set intrinsic and distortion parameters.
     void SetImageSize(int32_t image_rows, int32_t image_cols);

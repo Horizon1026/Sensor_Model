@@ -20,8 +20,8 @@ public:
 
     /*  Kannala-Brandt(equidistant) model.
         r(theta) = k0 * theta + k1 * theta3 + k2 * theta5 + k3 * theta7 + k4 * theta9 + ... */
-    virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) override;
-    virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) override;
+    virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) const override;
+    virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) const override;
 
     virtual void SetDistortionParameter(const std::vector<float> &params) override;
     virtual void GetDistortionParameter(std::vector<float> &params) const override;
@@ -33,7 +33,7 @@ public:
 
 private:
     // Different method to do undistortion.
-    bool UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy);
+    bool UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) const;
 
 private:
     // Distortion model parameters.
