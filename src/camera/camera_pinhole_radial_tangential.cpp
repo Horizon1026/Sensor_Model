@@ -1,9 +1,9 @@
-#include "camera_pinhole_radtan.h"
+#include "camera_pinhole_radial_tangential.h"
 #include "slam_basic_math.h"
 
 namespace sensor_model {
 
-bool CameraPinholeRadtan::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) const {
+bool CameraPinholeRadialTangential::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) const {
     const float x = undistort_xy(0);
     const float y = undistort_xy(1);
     const float xy = x * y;
@@ -19,7 +19,7 @@ bool CameraPinholeRadtan::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2
     return true;
 }
 
-bool CameraPinholeRadtan::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) const {
+bool CameraPinholeRadialTangential::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) const {
     switch (options().kUndistortMethod) {
         case UndistortMethod::kGradientDesent:
             return UndistortByGradienDesent(distort_xy, undistort_xy);
@@ -29,7 +29,7 @@ bool CameraPinholeRadtan::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2
     }
 }
 
-void CameraPinholeRadtan::SetDistortionParameter(const std::vector<float> &params) {
+void CameraPinholeRadialTangential::SetDistortionParameter(const std::vector<float> &params) {
     k_[0] = params[0];
     k_[1] = params[1];
     k_[2] = params[2];
@@ -37,7 +37,7 @@ void CameraPinholeRadtan::SetDistortionParameter(const std::vector<float> &param
     p_[1] = params[4];
 }
 
-void CameraPinholeRadtan::GetDistortionParameter(std::vector<float> &params) const {
+void CameraPinholeRadialTangential::GetDistortionParameter(std::vector<float> &params) const {
     params.reserve(5);
     params.clear();
     params.emplace_back(k_[0]);
@@ -47,7 +47,7 @@ void CameraPinholeRadtan::GetDistortionParameter(std::vector<float> &params) con
     params.emplace_back(p_[1]);
 }
 
-bool CameraPinholeRadtan::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_xy) const {
+bool CameraPinholeRadialTangential::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_xy) const {
     // Set initial value.
     undistort_xy = distort_xy;
 
@@ -98,7 +98,7 @@ bool CameraPinholeRadtan::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 
     return true;
 }
 
-bool CameraPinholeRadtan::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) const {
+bool CameraPinholeRadialTangential::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) const {
     // Set initial value.
     undistort_xy = distort_xy;
 

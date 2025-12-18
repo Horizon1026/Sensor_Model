@@ -10,6 +10,7 @@ struct LidarMeasurement {
     float time_stamp_s = 0.0f;
     std::vector<float> time_stamp_s_of_points;
     std::vector<Vec3> raw_points;
+    std::vector<float> intensity_of_points;
     std::vector<Vec3> undistorted_points;
 };
 

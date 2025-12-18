@@ -5,6 +5,7 @@
 
 namespace sensor_model {
 
+/* Class CameraPinholeEquidistant Declaration. */
 class CameraPinholeEquidistant: public CameraPinhole {
 
 public:
@@ -18,8 +19,8 @@ public:
 public:
     virtual std::string CameraModelName() const override { return "Pinhole-Equidistant"; }
 
-    /*  Kannala-Brandt(equidistant) model.
-        r(theta) = k0 * theta + k1 * theta3 + k2 * theta5 + k3 * theta7 + k4 * theta9 + ... */
+    /*  Equidistant model.
+        r(theta) = theta * (1 + k1 * theta2 + k2 * theta4 + k3 * theta6 + k4 * theta8 + k5 * theta10) */
     virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) const override;
     virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) const override;
 

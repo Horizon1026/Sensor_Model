@@ -1,10 +1,10 @@
-#include "camera_pinhole_equidistant.h"
+#include "camera_pinhole_kannala_brandt.h"
 #include "slam_basic_math.h"
 #include "slam_log_reporter.h"
 
 namespace sensor_model {
 
-bool CameraPinholeEquidistant::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) const {
+bool CameraPinholeKannalaBrandt::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) const {
     const float r = undistort_xy.norm();
     if (r < kZeroFloat) {
         distort_xy = undistort_xy;
@@ -12,17 +12,17 @@ bool CameraPinholeEquidistant::DistortOnNormalizedPlane(const Vec2 undistort_xy,
     }
     const float theta = std::atan(r);
     const float theta2 = theta * theta;
-    const float theta4 = theta2 * theta2;
-    const float theta6 = theta4 * theta2;
-    const float theta8 = theta6 * theta2;
-    const float theta10 = theta8 * theta2;
-    const float theta_d = theta * (1 + k_[0] * theta2 + k_[1] * theta4 + k_[2] * theta6 + k_[3] * theta8 + k_[4] * theta10);
+    const float theta3 = theta2 * theta;
+    const float theta4 = theta3 * theta;
+    const float theta5 = theta4 * theta;
+    const float theta6 = theta5 * theta;
+    const float theta_d = theta * k_[0] + theta2 * k_[1] + theta3 * k_[2] + theta4 * k_[3] + theta5 * k_[4] + theta6 * k_[5];
 
     distort_xy = theta_d * undistort_xy / r;
     return true;
 }
 
-bool CameraPinholeEquidistant::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) const {
+bool CameraPinholeKannalaBrandt::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) const {
     switch (options().kUndistortMethod) {
         case UndistortMethod::kFixedPointIteration:
         default:
@@ -31,13 +31,13 @@ bool CameraPinholeEquidistant::UndistortOnNormalizedPlane(const Vec2 distort_xy,
 }
 
 
-void CameraPinholeEquidistant::SetDistortionParameter(const std::vector<float> &params) {
+void CameraPinholeKannalaBrandt::SetDistortionParameter(const std::vector<float> &params) {
     for (uint32_t i = 0; i < 5; ++i) {
         k_[i] = params[i];
     }
 }
 
-void CameraPinholeEquidistant::GetDistortionParameter(std::vector<float> &params) const {
+void CameraPinholeKannalaBrandt::GetDistortionParameter(std::vector<float> &params) const {
     params.clear();
     params.reserve(5);
     for (uint32_t i = 0; i < 5; ++i) {
@@ -45,7 +45,7 @@ void CameraPinholeEquidistant::GetDistortionParameter(std::vector<float> &params
     }
 }
 
-bool CameraPinholeEquidistant::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) const {
+bool CameraPinholeKannalaBrandt::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) const {
     // Set initial value.
     undistort_xy = distort_xy;
 

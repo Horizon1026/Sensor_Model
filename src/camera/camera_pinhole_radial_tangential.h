@@ -5,20 +5,21 @@
 
 namespace sensor_model {
 
-class CameraPinholeRadtan: public CameraPinhole {
+/* Class CameraPinholeRadialTangential Declaration. */
+class CameraPinholeRadialTangential: public CameraPinhole {
 
 public:
-    CameraPinholeRadtan(): CameraPinhole() {}
-    CameraPinholeRadtan(float fx, float fy, float cx, float cy): CameraPinhole(fx, fy, cx, cy) {}
-    CameraPinholeRadtan(float fx, float fy, float cx, float cy, int32_t image_rows, int32_t image_cols):
+    CameraPinholeRadialTangential(): CameraPinhole() {}
+    CameraPinholeRadialTangential(float fx, float fy, float cx, float cy): CameraPinhole(fx, fy, cx, cy) {}
+    CameraPinholeRadialTangential(float fx, float fy, float cx, float cy, int32_t image_rows, int32_t image_cols):
         CameraPinhole(fx, fy, cx, cy, image_rows, image_cols) {}
-    virtual ~CameraPinholeRadtan() = default;
-    CameraPinholeRadtan(const CameraPinholeRadtan &pinhole) = delete;
+    virtual ~CameraPinholeRadialTangential() = default;
+    CameraPinholeRadialTangential(const CameraPinholeRadialTangential &pinhole) = delete;
 
 public:
-    virtual std::string CameraModelName() const override { return "Pinhole-Radtan"; }
+    virtual std::string CameraModelName() const override { return "Pinhole-RadialTangential"; }
 
-    /*  Distortion model:
+    /*  Radial-Tangential model:
         x_distort = (1 + k1 * r2 + k2 * r4 + k3 * r6) * x + 2 * p1 * x * y + p2 * (r2 + 2 * x * x)
         y_distort = (1 + k1 * r2 + k2 * r4 + k3 * r6) * y + p1 * (r2 + 2 * y * y) + 2 * p2 * x * y */
     virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) const override;

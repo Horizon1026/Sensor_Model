@@ -41,7 +41,7 @@ void TestPinholeRadtanCameraModel() {
     undistort_features.reserve(distort_features.size());
 
     // Initialize radtan camera.
-    sensor_model::CameraPinholeRadtan camera;
+    sensor_model::CameraPinholeRadialTangential camera;
     camera.SetIntrinsicParameter(fx, fy, cx, cy);
     camera.SetDistortionParameter(std::vector<float> {k1, k2, k3, p1, p2});
 

@@ -22,8 +22,7 @@ void TestVirtualCameraModel(const std::string &test_name, const GrayImage &raw_i
     }
 
     // Report parameters of virtual camera.
-    ReportInfo("Image rows is " << virtual_camera.GetVirtualCameraImageRows());
-    ReportInfo("Image cols is " << virtual_camera.GetVirtualCameraImageCols());
+    ReportInfo("Image rows x cols is " << virtual_camera.GetVirtualCameraImageRows() << " x " << virtual_camera.GetVirtualCameraImageCols());
     ReportInfo("Fov(H * V) is " << LogVec(virtual_camera.GetVirtualCameraFov()) << " deg.");
 
     // Remap virtual camera image.
@@ -104,7 +103,7 @@ int main(int argc, char **argv) {
     const float cam2_k3 = 0.0f;
     const float cam2_p1 = 0.00019359f;
     const float cam2_p2 = 1.76187114e-05f;
-    virtual_camera.virtual_camera_model() = std::make_unique<CameraPinholeRadtan>(cam2_fx, cam2_fy, cam2_cx, cam2_cy);
+    virtual_camera.virtual_camera_model() = std::make_unique<CameraPinholeRadialTangential>(cam2_fx, cam2_fy, cam2_cx, cam2_cy);
     virtual_camera.virtual_camera_model()->SetDistortionParameter(std::vector<float> {cam2_k1, cam2_k2, cam2_k3, cam2_p1, cam2_p2});
     TestVirtualCameraModel("pinhole-equidistant to pinhole-radtan", raw_image, virtual_camera);
 
