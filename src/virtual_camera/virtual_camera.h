@@ -26,8 +26,10 @@ public:
     bool GenerateMaphex();
     bool GenerateMaphex(const Quat &q_rv);
     bool RemapVirtualCameraImage(const GrayImage &raw_image);
-    bool RemapPixelUvFromVirtualCameraToRawCamera(const Vec2 &virtual_pixel_uv, Vec2 &raw_distort_pixel_uv);
-    bool RemapPixelUvFromRawCameraToVirtualCamera(const Vec2 &raw_distort_pixel_uv, Vec2 &virtual_pixel_uv);
+    bool RemapPixelUvFromVirtualCameraToRealCamera(const Vec2 &virtual_pixel_uv, Vec2 &real_distort_pixel_uv);
+    bool RemapPixelUvFromRealCameraToVirtualCamera(const Vec2 &real_distort_pixel_uv, Vec2 &virtual_pixel_uv);
+    bool RemapUndistortedNormXyFromVirtualCameraToRealCamera(const Vec2 &virtual_undistorted_norm_xy, Vec2 &real_undistorted_norm_xy);
+    bool RemapUndistortedNormXyFromRealCameraToVirtualCamera(const Vec2 &real_undistorted_norm_xy, Vec2 &virtual_undistorted_norm_xy);
 
     Vec2 GetVirtualCameraFov() const;
     int32_t GetVirtualCameraImageRows() const;
@@ -54,7 +56,8 @@ private:
     MatImg virtual_camera_mask_;
     Mat maphex_row_;
     Mat maphex_col_;
-    Mat3 H_virtual_to_real = Mat3::Identity();
+    Mat3 H_virtual_to_real_ = Mat3::Identity();
+    Mat3 H_real_to_virtual_ = Mat3::Identity();
 };
 
 }  // namespace sensor_model

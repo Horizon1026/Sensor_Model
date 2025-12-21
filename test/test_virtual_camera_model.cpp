@@ -43,15 +43,15 @@ void TestVirtualCameraModel(const std::string &test_name, const GrayImage &raw_i
     uint8_t mark_value = 0;
     Vec2 pixel_uv = Vec2::Zero();
     for (int32_t row = 0; row < virtual_camera.GetVirtualCameraImageRows(); ++row) {
-        virtual_camera.RemapPixelUvFromVirtualCameraToRawCamera(Vec2(0, row), pixel_uv);
+        virtual_camera.RemapPixelUvFromVirtualCameraToRealCamera(Vec2(0, row), pixel_uv);
         ImagePainter::DrawSolidCircle(show_image, pixel_uv.x(), pixel_uv.y(), 2, mark_value);
-        virtual_camera.RemapPixelUvFromVirtualCameraToRawCamera(Vec2(virtual_camera.GetVirtualCameraImageCols(), row), pixel_uv);
+        virtual_camera.RemapPixelUvFromVirtualCameraToRealCamera(Vec2(virtual_camera.GetVirtualCameraImageCols(), row), pixel_uv);
         ImagePainter::DrawSolidCircle(show_image, pixel_uv.x(), pixel_uv.y(), 2, mark_value);
     }
     for (int32_t col = 0; col < virtual_camera.GetVirtualCameraImageCols(); ++col) {
-        virtual_camera.RemapPixelUvFromVirtualCameraToRawCamera(Vec2(col, 0), pixel_uv);
+        virtual_camera.RemapPixelUvFromVirtualCameraToRealCamera(Vec2(col, 0), pixel_uv);
         ImagePainter::DrawSolidCircle(show_image, pixel_uv.x(), pixel_uv.y(), 2, mark_value);
-        virtual_camera.RemapPixelUvFromVirtualCameraToRawCamera(Vec2(col, virtual_camera.GetVirtualCameraImageRows()), pixel_uv);
+        virtual_camera.RemapPixelUvFromVirtualCameraToRealCamera(Vec2(col, virtual_camera.GetVirtualCameraImageRows()), pixel_uv);
         ImagePainter::DrawSolidCircle(show_image, pixel_uv.x(), pixel_uv.y(), 2, mark_value);
     }
 

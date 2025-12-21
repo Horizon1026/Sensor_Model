@@ -25,14 +25,15 @@ bool VirtualCamera::GenerateMaphex(const Quat &q_rv) {
     }
 
     // Generate maphex.
-    H_virtual_to_real = q_rv.toRotationMatrix();
+    H_virtual_to_real_ = q_rv.toRotationMatrix();
+    H_real_to_virtual_ = q_rv.inverse().toRotationMatrix();
     maphex_row_.setZero(virtual_camera_model_->image_rows(), virtual_camera_model_->image_cols());
     maphex_col_.setZero(virtual_camera_model_->image_rows(), virtual_camera_model_->image_cols());
     for (int32_t row = 0; row < virtual_camera_model_->image_rows(); ++row) {
         for (int32_t col = 0; col < virtual_camera_model_->image_cols(); ++col) {
             const Vec2 virtual_distort_pixel_uv = Vec2(col, row);
             Vec2 real_distort_pixel_uv = Vec2::Zero();
-            if (!RemapPixelUvFromVirtualCameraToRawCamera(virtual_distort_pixel_uv, real_distort_pixel_uv)) {
+            if (!RemapPixelUvFromVirtualCameraToRealCamera(virtual_distort_pixel_uv, real_distort_pixel_uv)) {
                 maphex_col_(row, col) = -1;
                 maphex_row_(row, col) = -1;
                 continue;
@@ -67,12 +68,12 @@ bool VirtualCamera::RemapVirtualCameraImage(const GrayImage &raw_image) {
     return true;
 }
 
-bool VirtualCamera::RemapPixelUvFromVirtualCameraToRawCamera(const Vec2 &virtual_distort_pixel_uv, Vec2 &real_distort_pixel_uv) {
+bool VirtualCamera::RemapPixelUvFromVirtualCameraToRealCamera(const Vec2 &virtual_distort_pixel_uv, Vec2 &real_distort_pixel_uv) {
     RETURN_FALSE_IF(real_camera_model_ == nullptr || virtual_camera_model_ == nullptr);
 
     Vec2 virtual_norm_xy = Vec2::Zero();
     virtual_camera_model_->LiftFromRawImagePlaneToUndistortedNormalizedPlane(virtual_distort_pixel_uv, virtual_norm_xy);
-    Vec3 real_undistort_norm_xy1 = H_virtual_to_real * Vec3(virtual_norm_xy.x(), virtual_norm_xy.y(), 1.0f);
+    Vec3 real_undistort_norm_xy1 = H_virtual_to_real_ * Vec3(virtual_norm_xy.x(), virtual_norm_xy.y(), 1.0f);
     RETURN_FALSE_IF(real_undistort_norm_xy1.z() < kZeroFloat);
     real_undistort_norm_xy1 /= real_undistort_norm_xy1.z();
     Vec2 real_distort_norm_xy = Vec2::Zero();
@@ -81,17 +82,35 @@ bool VirtualCamera::RemapPixelUvFromVirtualCameraToRawCamera(const Vec2 &virtual
     return true;
 }
 
-bool VirtualCamera::RemapPixelUvFromRawCameraToVirtualCamera(const Vec2 &real_distort_pixel_uv, Vec2 &virtual_distort_pixel_uv) {
+bool VirtualCamera::RemapPixelUvFromRealCameraToVirtualCamera(const Vec2 &real_distort_pixel_uv, Vec2 &virtual_distort_pixel_uv) {
     RETURN_FALSE_IF(real_camera_model_ == nullptr || virtual_camera_model_ == nullptr);
 
     Vec2 real_undistort_norm_xy = Vec2::Zero();
     real_camera_model_->LiftFromRawImagePlaneToUndistortedNormalizedPlane(real_distort_pixel_uv, real_undistort_norm_xy);
-    Vec3 virtual_undistort_norm_xy1 = H_virtual_to_real.transpose() * Vec3(real_undistort_norm_xy.x(), real_undistort_norm_xy.y(), 1.0f);
+    Vec3 virtual_undistort_norm_xy1 = H_real_to_virtual_ * Vec3(real_undistort_norm_xy.x(), real_undistort_norm_xy.y(), 1.0f);
     RETURN_FALSE_IF(virtual_undistort_norm_xy1.z() < kZeroFloat);
     virtual_undistort_norm_xy1 / virtual_undistort_norm_xy1.z();
     Vec2 virtual_distort_norm_xy = Vec2::Zero();
     virtual_camera_model_->DistortOnNormalizedPlane(virtual_undistort_norm_xy1.head<2>(), virtual_distort_norm_xy);
     virtual_camera_model_->LiftFromImagePlaneToNormalizedPlane(virtual_distort_norm_xy, virtual_distort_pixel_uv);
+    return true;
+}
+
+bool VirtualCamera::RemapUndistortedNormXyFromVirtualCameraToRealCamera(const Vec2 &virtual_undistorted_norm_xy, Vec2 &real_undistorted_norm_xy) {
+    RETURN_FALSE_IF(real_camera_model_ == nullptr || virtual_camera_model_ == nullptr);
+
+    const Vec3 real_undistorted_norm_xy1 = H_virtual_to_real_ * Vec3(virtual_undistorted_norm_xy.x(), virtual_undistorted_norm_xy.y(), 1.0f);
+    RETURN_FALSE_IF(real_undistorted_norm_xy1.z() < kZeroFloat);
+    real_undistorted_norm_xy = real_undistorted_norm_xy1.head<2>() / real_undistorted_norm_xy1.z();
+    return true;
+}
+
+bool VirtualCamera::RemapUndistortedNormXyFromRealCameraToVirtualCamera(const Vec2 &real_undistorted_norm_xy, Vec2 &virtual_undistorted_norm_xy) {
+    RETURN_FALSE_IF(real_camera_model_ == nullptr || virtual_camera_model_ == nullptr);
+
+    const Vec3 virtual_undistorted_norm_xy1 = H_real_to_virtual_ * Vec3(real_undistorted_norm_xy.x(), real_undistorted_norm_xy.y(), 1.0f);
+    RETURN_FALSE_IF(virtual_undistorted_norm_xy1.z() < kZeroFloat);
+    virtual_undistorted_norm_xy = virtual_undistorted_norm_xy1.head<2>() / virtual_undistorted_norm_xy1.z();
     return true;
 }
 
