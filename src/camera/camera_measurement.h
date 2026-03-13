@@ -8,7 +8,7 @@ namespace sensor_model {
 
 /* Measurement of camera. */
 struct CameraMeasurement {
-    MatImg image;
+    GrayImage image;
     float time_stamp_s = 0.0f;
 };
 
