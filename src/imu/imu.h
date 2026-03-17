@@ -19,6 +19,7 @@ public:
         float kGyroNoiseSigma = 1e-6f;
         float kAccelRandomWalkSigma = 1e-6f;
         float kGyroRandomWalkSigma = 1e-6f;
+        float kGravityRandomWalkNoise = 1e-6f;
     };
 
 public:

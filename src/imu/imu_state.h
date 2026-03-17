@@ -21,6 +21,7 @@ enum ImuIndex : uint8_t {
     kNoiseGyro = 3,
     kRandomWalkAccel = 6,
     kRandomWalkGyro = 9,
+    kRandomWalkGravity = 12,
 
     kMidValueNoiseAccel0 = 0,
     kMidValueNoiseGyro0 = 3,
