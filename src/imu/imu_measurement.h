@@ -10,7 +10,7 @@ namespace sensor_model {
 struct ImuMeasurement {
     Vec3 accel = Vec3::Zero();
     Vec3 gyro = Vec3::Zero();
-    float time_stamp_s = -1.0f;
+    double time_stamp_s = 0.0;
 };
 
 }  // namespace sensor_model

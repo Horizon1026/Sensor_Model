@@ -36,7 +36,7 @@ class ImuState {
 
 public:
     ImuState() = default;
-    ImuState(const float time_stamp_s, const Vec3 &p_wi, const Quat &q_wi, const Vec3 &v_wi, const Vec3 &ba = Vec3::Zero(), const Vec3 &bg = Vec3::Zero(),
+    ImuState(const double time_stamp_s, const Vec3 &p_wi, const Quat &q_wi, const Vec3 &v_wi, const Vec3 &ba = Vec3::Zero(), const Vec3 &bg = Vec3::Zero(),
              const Vec3 &g_w = Vec3(0, 0, 9.8f), const Vec3 &gyro_scale = Vec3::Ones(), const Vec3 &w_i = Vec3::Zero(), const Vec3 &a_wi = Vec3::Zero()) {
         Clear();
         time_stamp_s_ = time_stamp_s;
@@ -53,7 +53,7 @@ public:
     virtual ~ImuState() = default;
 
     void Clear() {
-        time_stamp_s_ = 0.0f;
+        time_stamp_s_ = 0.0;
         // Clear states.
         p_wi_ = Vec3::Zero();
         q_wi_ = Quat::Identity();
@@ -69,7 +69,7 @@ public:
     }
 
     // Reference for Member Variables.
-    float &time_stamp_s() { return time_stamp_s_; }
+    double &time_stamp_s() { return time_stamp_s_; }
     Vec3 &p_wi() { return p_wi_; }
     Quat &q_wi() { return q_wi_; }
     Vec3 &v_wi() { return v_wi_; }
@@ -81,7 +81,7 @@ public:
     Vec3 &a_wi() { return a_wi_; }
     Mat24 &covariance() { return cov_matrix_; }
     // Const Reference for Member Variables.
-    const float &time_stamp_s() const { return time_stamp_s_; }
+    const double &time_stamp_s() const { return time_stamp_s_; }
     const Vec3 &p_wi() const { return p_wi_; }
     const Quat &q_wi() const { return q_wi_; }
     const Vec3 &v_wi() const { return v_wi_; }
@@ -94,7 +94,7 @@ public:
     const Mat24 &covariance() const { return cov_matrix_; }
 
 private:
-    float time_stamp_s_ = 0.0f;
+    double time_stamp_s_ = 0.0f;
     // Nominal state.
     Vec3 p_wi_ = Vec3::Zero();
     Quat q_wi_ = Quat::Identity();

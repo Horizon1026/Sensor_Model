@@ -69,12 +69,12 @@ void ImuPreintegrateBlock<Scalar>::SimpleInformation() const {
 template <typename Scalar>
 bool ImuPreintegrateBlock<Scalar>::Propagate(const ImuMeasurement &measure_i, const ImuMeasurement &measure_j) {
     // Check integrate time.
-    const double dt = measure_j.time_stamp_s - measure_i.time_stamp_s;
+    const Scalar dt = measure_j.time_stamp_s - measure_i.time_stamp_s;
     if (dt < 0) {
         return false;
     }
-    const double half_dt = 0.5 * dt;
-    const double dt2 = dt * dt;
+    const Scalar half_dt = 0.5 * dt;
+    const Scalar dt2 = dt * dt;
     integrate_time_s_ += dt;
 
     // Compute delta rotation.

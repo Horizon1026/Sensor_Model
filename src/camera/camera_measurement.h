@@ -9,7 +9,7 @@ namespace sensor_model {
 /* Measurement of camera. */
 struct CameraMeasurement {
     GrayImage image;
-    float time_stamp_s = 0.0f;
+    double time_stamp_s = 0.0;
 };
 
 }  // namespace sensor_model

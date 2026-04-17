@@ -7,7 +7,7 @@ namespace sensor_model {
 
 /* Measurement of Wheel Odom. */
 struct WheelOdomMeasurement {
-    float time_stamp_s = 0.0f;
+    double time_stamp_s = 0.0;
 
     // Velocity of wheel encoder. (Unit : count / s)
     bool is_wheel_velocity_valid = false;

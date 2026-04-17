@@ -20,7 +20,7 @@ bool Imu::PropagateNominalState(const ImuMeasurement &meas_prev, const ImuMeasur
         return false;
     }
 
-    const float dt = meas_next.time_stamp_s - meas_prev.time_stamp_s;
+    const float dt = static_cast<float>(meas_next.time_stamp_s - meas_prev.time_stamp_s);
     const Vec3 &bias_a = state_prev.ba();
     const Vec3 &bias_g = state_prev.bg();
     const Vec3 &gravity = state_prev.g_w();
@@ -53,7 +53,7 @@ bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_prev, cons
         return false;
     }
 
-    const float dt = meas_next.time_stamp_s - meas_prev.time_stamp_s;
+    const float dt = static_cast<float>(meas_next.time_stamp_s - meas_prev.time_stamp_s);
     const Mat3 dt_I3 = dt * Mat3::Identity();
     const Mat3 R_wi_prev = state_prev.q_wi().matrix();
 

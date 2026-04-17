@@ -7,7 +7,7 @@ namespace sensor_model {
 
 /* Measurement of GNSS. */
 struct GnssMeasurement {
-    float time_stamp_s = 0.0f;
+    double time_stamp_s = 0.0;
 
     // LLA observations.
     bool is_lla_valid = false;
