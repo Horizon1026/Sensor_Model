@@ -27,7 +27,7 @@ void LoadGnssMeasurements(const std::string &file_name, std::vector<TVec3<double
     std::string type;
     GnssMeasurement gnss_origin;
     data_in_first_line >> type >> gnss_origin.time_stamp_s >> gnss_origin.latitude_deg >> gnss_origin.longitude_deg >> gnss_origin.altitude_m >>
-        gnss_origin.yaw_ned_deg >> gnss_origin.is_lla_valid;
+        gnss_origin.yaw_enu_deg >> gnss_origin.is_lla_valid;
 
     Gnss gnss_model;
     const TVec3<double> first_position = gnss_model.ConvertLlaToEnu(gnss_origin, gnss_origin);
@@ -39,7 +39,7 @@ void LoadGnssMeasurements(const std::string &file_name, std::vector<TVec3<double
         std::istringstream data(one_line);
 
         GnssMeasurement gnss;
-        data >> type >> gnss.time_stamp_s >> gnss.latitude_deg >> gnss.longitude_deg >> gnss.altitude_m >> gnss.yaw_ned_deg >> gnss.is_yaw_valid;
+        data >> type >> gnss.time_stamp_s >> gnss.latitude_deg >> gnss.longitude_deg >> gnss.altitude_m >> gnss.yaw_enu_deg >> gnss.is_yaw_valid;
 
         const TVec3<double> enu_pos = gnss_model.ConvertLlaToEnu(gnss_origin, gnss);
         positions.emplace_back(enu_pos);

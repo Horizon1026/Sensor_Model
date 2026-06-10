@@ -17,7 +17,7 @@ struct GnssMeasurement {
 
     // Yaw defined in ENU frame.
     bool is_yaw_valid = false;
-    double yaw_ned_deg = 0.0;
+    double yaw_enu_deg = 0.0;
 
     // Velocity defined in ENU frame with unit : m/s.
     bool is_vel_valid = false;
