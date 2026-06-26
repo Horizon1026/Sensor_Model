@@ -14,11 +14,14 @@ public:
     /* Options of Lidar Model. */
     struct Options {
         float kPositionNoiseSigma = 1.0f;
+        float kRatioOfLowIntensityPointsToBeRemoved = 0.1f;
     };
 
 public:
     Lidar() = default;
     virtual ~Lidar() = default;
+
+    void RemoveLowIntensityPoints(LidarMeasurement &measure);
 
     // Reference for member variables.
     Options &options() { return options_; }
