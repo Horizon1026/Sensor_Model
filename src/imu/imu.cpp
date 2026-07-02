@@ -26,13 +26,13 @@ bool Imu::PropagateNominalState(const ImuMeasurement &meas_prev, const ImuMeasur
     const Vec3 &gravity = state_prev.g_w();
 
     // Propagate nominal attitude.
-    mid_gyro_i = 0.5f * (meas_prev.gyro + meas_next.gyro) - bias_g;
+    mid_gyro_i = 0.5f * (meas_prev.gyro_rps + meas_next.gyro_rps) - bias_g;
     Quat dq = Utility::DeltaQ(mid_gyro_i * dt);
     state_next.q_wi() = (state_prev.q_wi() * dq).normalized();
 
     // Propagate nominal velocity.
-    mid_accel_i = 0.5f * (meas_prev.accel + meas_next.accel) - bias_a;
-    const Vec3 mid_accel_w = 0.5f * (state_prev.q_wi() * (meas_prev.accel - bias_a) + state_next.q_wi() * (meas_next.accel - bias_a));
+    mid_accel_i = 0.5f * (meas_prev.accel_mps2 + meas_next.accel_mps2) - bias_a;
+    const Vec3 mid_accel_w = 0.5f * (state_prev.q_wi() * (meas_prev.accel_mps2 - bias_a) + state_next.q_wi() * (meas_next.accel_mps2 - bias_a));
     state_next.v_wi() = state_prev.v_wi() + (mid_accel_w - gravity) * dt;
 
     // Propagate nominal position.

@@ -78,12 +78,12 @@ bool ImuPreintegrateBlock<Scalar>::Propagate(const ImuMeasurement &measure_i, co
     integrate_time_s_ += dt;
 
     // Compute delta rotation.
-    const TVec3<Scalar> mid_gyro = 0.5 * (measure_i.gyro.cast<Scalar>() + measure_j.gyro.cast<Scalar>()) - bias_gyro_;
+    const TVec3<Scalar> mid_gyro = 0.5 * (measure_i.gyro_rps.cast<Scalar>() + measure_j.gyro_rps.cast<Scalar>()) - bias_gyro_;
     const TQuat<Scalar> dq(1.0, half_dt * mid_gyro.x(), half_dt * mid_gyro.y(), half_dt * mid_gyro.z());
     const TQuat<Scalar> new_q_ij = (q_ij_ * dq).normalized();
 
     // Compute delta position and velocity.
-    const TVec3<Scalar> mid_accel = 0.5 * (q_ij_ * (measure_i.accel.cast<Scalar>() - bias_accel_) + new_q_ij * (measure_j.accel.cast<Scalar>() - bias_accel_));
+    const TVec3<Scalar> mid_accel = 0.5 * (q_ij_ * (measure_i.accel_mps2.cast<Scalar>() - bias_accel_) + new_q_ij * (measure_j.accel_mps2.cast<Scalar>() - bias_accel_));
     const TVec3<Scalar> new_p_ij = p_ij_ + v_ij_ * dt + 0.5 * mid_accel * dt2;
     const TVec3<Scalar> new_v_ij = v_ij_ + mid_accel * dt;
 
@@ -91,8 +91,8 @@ bool ImuPreintegrateBlock<Scalar>::Propagate(const ImuMeasurement &measure_i, co
     const TMat3<Scalar> Ri = q_ij_.matrix();
     const TMat3<Scalar> Rj = new_q_ij.matrix();
     const TMat3<Scalar> Rw = Utility::SkewSymmetricMatrix(mid_gyro);
-    const TMat3<Scalar> Rai = Utility::SkewSymmetricMatrix(measure_i.accel.cast<Scalar>() - bias_accel_);
-    const TMat3<Scalar> Raj = Utility::SkewSymmetricMatrix(measure_j.accel.cast<Scalar>() - bias_accel_);
+    const TMat3<Scalar> Rai = Utility::SkewSymmetricMatrix(measure_i.accel_mps2.cast<Scalar>() - bias_accel_);
+    const TMat3<Scalar> Raj = Utility::SkewSymmetricMatrix(measure_j.accel_mps2.cast<Scalar>() - bias_accel_);
     const TMat3<Scalar> I3 = TMat3<Scalar>::Identity();
     const TMat3<Scalar> dt_I3 = I3 * dt;
 

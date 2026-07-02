@@ -1,4 +1,5 @@
 cd build/
+./test_magn_model
 ./test_camera_model
 ./test_virtual_camera_model
 ./test_imu_model ../examples/imu_pose.txt

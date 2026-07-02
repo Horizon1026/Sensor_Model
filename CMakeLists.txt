@@ -49,6 +49,9 @@ endif()
 if( NOT TARGET lib_lidar_model )
     add_subdirectory( ${SENSOR_MODEL_PATH}/src/lidar ${PROJECT_SOURCE_DIR}/build/lib_lidar_model )
 endif()
+if( NOT TARGET lib_magn_model )
+    add_subdirectory( ${SENSOR_MODEL_PATH}/src/magn ${PROJECT_SOURCE_DIR}/build/lib_magn_model )
+endif()
 
 # Add image painter.
 set( IMAGE_PAINTER_PATH ${PROJECT_SOURCE_DIR}/../Image_Painter )
@@ -111,4 +114,12 @@ add_executable( test_lidar_model
 target_link_libraries( test_lidar_model
     lib_lidar_model
     lib_3d_visualizor
+)
+
+# Create executable target to test magnetometer model.
+add_executable( test_magn_model
+    test/test_magn_model.cpp
+)
+target_link_libraries( test_magn_model
+    lib_magn_model
 )

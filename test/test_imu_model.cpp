@@ -33,8 +33,8 @@ bool LoadImuMeasurements(const std::string &imu_file, std::vector<ImuMeasurement
             acc.z();
 
         ImuMeasurement meas;
-        meas.accel = acc.cast<float>();
-        meas.gyro = gyr.cast<float>();
+        meas.accel_mps2 = acc.cast<float>();
+        meas.gyro_rps = gyr.cast<float>();
         meas.time_stamp_s = time_stamp_s;
         measurements.emplace_back(meas);
         position.emplace_back(pos.cast<float>());
