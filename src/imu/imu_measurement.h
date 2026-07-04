@@ -8,9 +8,9 @@ namespace sensor_model {
 
 /* Measurement of imu. */
 struct ImuMeasurement {
+    double time_stamp_s = 0.0;
     Vec3 accel_mps2 = Vec3::Zero();
     Vec3 gyro_rps = Vec3::Zero();
-    double time_stamp_s = 0.0;
 };
 
 }  // namespace sensor_model
