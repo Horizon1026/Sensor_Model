@@ -14,28 +14,27 @@ float Magnetometer::FormatDegree(const float abnormal_degree) {
     return abnormal_degree;
 }
 
-float Magnetometer::ConvertMagnToYaw(const MagnMeasurement &magn, const float roll_deg, const float pitch_deg) {
-    // Extract magnetic readings in body frame (x-forward, y-right, z-down, NED convention).
-    const float mx = magn.magn_mG.x();
-    const float my = magn.magn_mG.y();
-    const float mz = magn.magn_mG.z();
+float Magnetometer::ConvertMagnToYaw(const MagnMeasurement &magn, const Quat &q_im, const float euler_x_wi, const float euler_y_wi) {
+    // Rotate magnetometer reading from magn frame to IMU frame.
+    const Vec3 magn_in_imu = q_im * magn.magn_mG;
 
-    // Convert roll and pitch from degrees to radians.
-    const float roll = roll_deg * kDegToRad;
-    const float pitch = pitch_deg * kDegToRad;
+    const float mx = magn_in_imu.x();
+    const float my = magn_in_imu.y();
+    const float mz = magn_in_imu.z();
+
+    // Convert IMU Euler angles from degrees to radians.
+    const float roll = euler_x_wi * kDegToRad;
+    const float pitch = euler_y_wi * kDegToRad;
 
     const float cos_roll = std::cos(roll);
     const float sin_roll = std::sin(roll);
     const float cos_pitch = std::cos(pitch);
     const float sin_pitch = std::sin(pitch);
 
-    // Tilt compensation: project magnetic field from body frame onto the
+    // Tilt compensation: project magnetic field from IMU frame onto the
     // horizontal plane, removing the effect of roll and pitch.
     // Ref: Madgwick et al. "Estimation of IMU and MARG orientation using
     //       a gradient descent algorithm", 2011.
-    //
-    //   Hx = mx * cos(pitch) + my * sin(roll) * sin(pitch) + mz * cos(roll) * sin(pitch)
-    //   Hy = my * cos(roll) - mz * sin(roll)
     const float x_h = mx * cos_pitch +
                       my * sin_roll * sin_pitch +
                       mz * cos_roll * sin_pitch;
