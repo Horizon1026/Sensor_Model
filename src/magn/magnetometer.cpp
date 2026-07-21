@@ -14,7 +14,7 @@ float Magnetometer::FormatDegree(const float abnormal_degree) {
     return abnormal_degree;
 }
 
-float Magnetometer::ConvertMagnToYaw(const MagnMeasurement &magn, const Quat &q_im, const float euler_x_wi, const float euler_y_wi) {
+float Magnetometer::ConvertMagnToYaw(const MagnMeasurement &magn, const Quat &q_im, const Quat &q_wi) {
     // Rotate magnetometer reading from magn frame to IMU frame.
     const Vec3 magn_in_imu = q_im * magn.magn_mG;
 
@@ -23,8 +23,9 @@ float Magnetometer::ConvertMagnToYaw(const MagnMeasurement &magn, const Quat &q_
     const float mz = magn_in_imu.z();
 
     // Convert IMU Euler angles from degrees to radians.
-    const float roll = euler_x_wi * kDegToRad;
-    const float pitch = euler_y_wi * kDegToRad;
+    const Vec3 euler_wi_deg = Utility::QuaternionToEuler(q_wi);
+    const float roll = euler_wi_deg.x() * kDegToRad;
+    const float pitch = euler_wi_deg.y() * kDegToRad;
 
     const float cos_roll = std::cos(roll);
     const float sin_roll = std::sin(roll);

@@ -24,8 +24,7 @@ public:
     // Convert magnetometer measurement to yaw (heading) angle.
     float ConvertMagnToYaw(const MagnMeasurement &magn,
                            const Quat &q_im = Quat::Identity(),
-                           const float euler_x_wi = 0.0f,
-                           const float euler_y_wi = 0.0f);
+                           const Quat &q_wi = Quat::Identity());
 
     // Format angle to [-180, 180] degrees.
     float FormatDegree(const float abnormal_degree);
