@@ -55,7 +55,7 @@ float Magnetometer::ConvertMagnToYaw(const MagnMeasurement &magn, const Quat &q_
 
     // Convert to degrees and wrap to [-180, 180].
     float yaw_deg = yaw_rad * kRadToDeg;
-    return FormatDegree(yaw_deg);
+    return Utility::FormatDegree(yaw_deg);
 }
 
 }  // namespace sensor_model
