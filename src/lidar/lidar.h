@@ -22,6 +22,7 @@ public:
     virtual ~Lidar() = default;
 
     void RemoveLowIntensityPoints(LidarMeasurement &measure);
+    bool ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3> &points);
 
     // Reference for member variables.
     Options &options() { return options_; }
