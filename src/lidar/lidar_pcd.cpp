@@ -12,8 +12,6 @@
 
 namespace sensor_model {
 
-namespace {
-
 /*
  * Minimal LZF decompressor, compatible with the liblzf implementation bundled
  * by PCL. It is used to decode "binary_compressed" PCD point data.
@@ -90,9 +88,9 @@ uint32_t LzfDecompress(const uint8_t *in, uint32_t in_len, uint8_t *out, uint32_
 /* Field information parsed from the PCD header. */
 struct PcdField {
     std::string name;
-    uint32_t size = 1;  // Bytes per element.
-    char type = 'F';    // 'I' (int), 'U' (uint), 'F' (float).
-    uint32_t count = 1; // Number of elements.
+    uint32_t size = 1;   // Bytes per element.
+    char type = 'F';     // 'I' (int), 'U' (uint), 'F' (float).
+    uint32_t count = 1;  // Number of elements.
 };
 
 /* Metadata of a PCD header. */
@@ -285,8 +283,6 @@ float ReadBinaryFieldValue(const uint8_t *ptr, const PcdField &field) {
     return 0.0f;
 }
 
-}  // namespace
-
 bool Lidar::ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3> &points) {
     points.clear();
 
@@ -377,29 +373,46 @@ bool Lidar::ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3
         }
     } else if (header.data_type == "binary" || header.data_type == "binary_compressed") {
         // Data layout after the header line:
-        //   binary:            [raw point records]
-        //   binary_compressed: [compressed_size u32][uncompressed_size u32][lzf stream]
+        //   binary:            [raw point records], one record per point (point-major).
+        //   binary_compressed: one or more [compressed_size u32][uncompressed_size u32][lzf data]
+        //                      blocks. Standard PCL emits one block per field, while some other
+        //                      tools emit a single block for all fields. In both cases the
+        //                      decompressed content is field-major: all values of field 0, then
+        //                      all values of field 1, and so on.
         const uint8_t *base = buffer.data() + data_offset;
         uint64_t available_bytes = buffer.size() - data_offset;
+        std::vector<uint8_t> uncompressed;
         if (header.data_type == "binary_compressed") {
-            if (data_offset + 8 > buffer.size()) {
-                ReportError("Truncated compressed data in pcd file: " << pcd_file);
-                return false;
-            }
-            uint32_t compressed_size = 0;
-            uint32_t uncompressed_size = 0;
-            std::memcpy(&compressed_size, buffer.data() + data_offset, 4);
-            std::memcpy(&uncompressed_size, buffer.data() + data_offset + 4, 4);
-            if (data_offset + 8 + compressed_size > buffer.size()) {
-                ReportError("Truncated compressed data in pcd file: " << pcd_file);
-                return false;
-            }
-            std::vector<uint8_t> uncompressed(uncompressed_size);
-            const uint32_t written = LzfDecompress(buffer.data() + data_offset + 8, compressed_size,
-                                                   uncompressed.data(), uncompressed_size);
-            if (written != uncompressed_size) {
-                ReportError("Failed to decompress pcd file: " << pcd_file);
-                return false;
+            // Decompress every block in order and concatenate them into one field-major buffer.
+            size_t pos = data_offset;
+            while (pos < buffer.size()) {
+                if (pos + 8 > buffer.size()) {
+                    // Only a trailing newline / whitespace is acceptable, nothing else.
+                    size_t k = pos;
+                    for (; k < buffer.size() && std::isspace(buffer[k]); ++k) {
+                    }
+                    if (k < buffer.size()) {
+                        ReportError("Truncated compressed data in pcd file: " << pcd_file);
+                        return false;
+                    }
+                    break;
+                }
+                uint32_t compressed_size = 0;
+                uint32_t uncompressed_size = 0;
+                std::memcpy(&compressed_size, buffer.data() + pos, 4);
+                std::memcpy(&uncompressed_size, buffer.data() + pos + 4, 4);
+                if (pos + 8 + compressed_size > buffer.size()) {
+                    ReportError("Truncated compressed data in pcd file: " << pcd_file);
+                    return false;
+                }
+                const size_t old_size = uncompressed.size();
+                uncompressed.resize(old_size + uncompressed_size);
+                const uint32_t written = LzfDecompress(buffer.data() + pos + 8, compressed_size, uncompressed.data() + old_size, uncompressed_size);
+                if (written != uncompressed_size) {
+                    ReportError("Failed to decompress pcd file: " << pcd_file);
+                    return false;
+                }
+                pos += 8 + compressed_size;
             }
             base = uncompressed.data();
             available_bytes = uncompressed.size();
@@ -411,12 +424,34 @@ bool Lidar::ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3
             return false;
         }
 
-        for (uint32_t i = 0; i < header.points; ++i) {
-            const uint8_t *record = base + static_cast<uint64_t>(i) * point_step;
-            const float x = ReadBinaryFieldValue(record + field_offsets[x_index], header.fields[x_index]);
-            const float y = ReadBinaryFieldValue(record + field_offsets[y_index], header.fields[y_index]);
-            const float z = ReadBinaryFieldValue(record + field_offsets[z_index], header.fields[z_index]);
-            points.emplace_back(x, y, z);
+        if (header.data_type == "binary_compressed") {
+            // Field-major layout: each field occupies a contiguous block of
+            // `points * count * size` bytes, so a point's x/y/z live in the
+            // matching slot of their field blocks instead of one record.
+            std::vector<uint64_t> field_major_offsets(header.fields.size(), 0);
+            uint64_t field_block_bytes = 0;
+            for (size_t i = 0; i < header.fields.size(); ++i) {
+                field_major_offsets[i] = field_block_bytes;
+                field_block_bytes += static_cast<uint64_t>(header.points) * header.fields[i].count * header.fields[i].size;
+            }
+            for (uint32_t i = 0; i < header.points; ++i) {
+                const uint64_t x_off = field_major_offsets[x_index] + static_cast<uint64_t>(i) * header.fields[x_index].count * header.fields[x_index].size;
+                const uint64_t y_off = field_major_offsets[y_index] + static_cast<uint64_t>(i) * header.fields[y_index].count * header.fields[y_index].size;
+                const uint64_t z_off = field_major_offsets[z_index] + static_cast<uint64_t>(i) * header.fields[z_index].count * header.fields[z_index].size;
+                const float x = ReadBinaryFieldValue(base + x_off, header.fields[x_index]);
+                const float y = ReadBinaryFieldValue(base + y_off, header.fields[y_index]);
+                const float z = ReadBinaryFieldValue(base + z_off, header.fields[z_index]);
+                points.emplace_back(x, y, z);
+            }
+        } else {
+            // Point-major layout: one contiguous record per point.
+            for (uint32_t i = 0; i < header.points; ++i) {
+                const uint8_t *record = base + static_cast<uint64_t>(i) * point_step;
+                const float x = ReadBinaryFieldValue(record + field_offsets[x_index], header.fields[x_index]);
+                const float y = ReadBinaryFieldValue(record + field_offsets[y_index], header.fields[y_index]);
+                const float z = ReadBinaryFieldValue(record + field_offsets[z_index], header.fields[z_index]);
+                points.emplace_back(x, y, z);
+            }
         }
     } else {
         ReportError("Unsupported pcd data type: " << header.data_type);
