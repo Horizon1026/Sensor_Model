@@ -52,6 +52,9 @@ endif()
 if( NOT TARGET lib_magn_model )
     add_subdirectory( ${SENSOR_MODEL_PATH}/src/magn ${PROJECT_SOURCE_DIR}/build/lib_magn_model )
 endif()
+if( NOT TARGET lib_baro_model )
+    add_subdirectory( ${SENSOR_MODEL_PATH}/src/baro ${PROJECT_SOURCE_DIR}/build/lib_baro_model )
+endif()
 
 # Add image painter.
 set( IMAGE_PAINTER_PATH ${PROJECT_SOURCE_DIR}/../Image_Painter )
@@ -122,4 +125,12 @@ add_executable( test_magn_model
 )
 target_link_libraries( test_magn_model
     lib_magn_model
+)
+
+# Create executable target to test barometer model.
+add_executable( test_baro_model
+    test/test_baro_model.cpp
+)
+target_link_libraries( test_baro_model
+    lib_baro_model
 )

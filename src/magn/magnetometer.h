@@ -2,9 +2,8 @@
 #define _SENSOR_MODEL_MAGNETOMETER_MODEL_H_
 
 #include "basic_type.h"
-#include "slam_basic_math.h"
-
 #include "magn_measurement.h"
+#include "slam_basic_math.h"
 
 namespace sensor_model {
 
@@ -22,9 +21,7 @@ public:
     virtual ~Magnetometer() = default;
 
     // Convert magnetometer measurement to yaw (heading) angle.
-    float ConvertMagnToYaw(const MagnMeasurement &magn,
-                           const Quat &q_im = Quat::Identity(),
-                           const Quat &q_wi = Quat::Identity());
+    float ConvertMagnToYaw(const MagnMeasurement &magn, const Quat &q_im = Quat::Identity(), const Quat &q_wi = Quat::Identity());
 
     // Format angle to [-180, 180] degrees.
     float FormatDegree(const float abnormal_degree);

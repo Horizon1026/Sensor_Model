@@ -36,15 +36,12 @@ float Magnetometer::ConvertMagnToYaw(const MagnMeasurement &magn, const Quat &q_
     // horizontal plane, removing the effect of roll and pitch.
     // Ref: Madgwick et al. "Estimation of IMU and MARG orientation using
     //       a gradient descent algorithm", 2011.
-    const float x_h = mx * cos_pitch +
-                      my * sin_roll * sin_pitch +
-                      mz * cos_roll * sin_pitch;
+    const float x_h = mx * cos_pitch + my * sin_roll * sin_pitch + mz * cos_roll * sin_pitch;
     const float y_h = my * cos_roll - mz * sin_roll;
 
     // Degenerate case: negligible horizontal magnetic field (e.g. at magnetic poles).
     if (std::abs(x_h) < kZeroFloat && std::abs(y_h) < kZeroFloat) {
-        ReportWarn("[Magnetometer] Negligible horizontal magnetic field, "
-                   << "unable to compute heading. Returning 0.0.");
+        ReportWarn("[Magnetometer] Negligible horizontal magnetic field, " << "unable to compute heading. Returning 0.0.");
         return 0.0f;
     }
 
