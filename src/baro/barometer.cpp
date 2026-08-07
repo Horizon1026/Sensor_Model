@@ -5,15 +5,33 @@
 namespace sensor_model {
 
 namespace {
-    constexpr float kPressureOfSeaLevel = 101.325f;
-}
+    // ISA standard atmosphere constants of the troposphere.
+    constexpr float kPressureOfSeaLevel = 101.325f;                                           // kPa.
+    constexpr float kTemperatureOfSeaLevel = 288.15f;                                         // K, i.e. 15 degC.
+    constexpr float kTemperatureLapseRate = 0.0065f;                                          // K/m.
+    constexpr float kScaleHeightOfSeaLevel = kTemperatureOfSeaLevel / kTemperatureLapseRate;  // m.
+    constexpr float kBaroExponent = 1.0f / 5.255f;                                            // R * L / (g * M).
+}  // namespace
 
 float Barometer::ConvertBaroToAltitude(const BaroMeasurement &measure) {
     const float ratio = measure.pressure_Kpa / kPressureOfSeaLevel;
     if (ratio <= 0) {
         return 0.0f;
     }
-    return static_cast<float>(44330.0 * (1.0 - std::pow(static_cast<double>(ratio), 1.0 / 5.255)));
+    return kScaleHeightOfSeaLevel * (1.0f - std::pow(ratio, kBaroExponent));
+}
+
+float Barometer::ConvertBaroWithTemperatureToAltitude(const BaroMeasurement &measure) {
+    const float ratio = measure.pressure_Kpa / kPressureOfSeaLevel;
+    if (ratio <= 0) {
+        return 0.0f;
+    }
+
+    // The standard barometric formula bakes the fixed ISA sea-level temperature into its scale height T / L.
+    const float temperature_K = measure.temperature_degC + 273.15f;
+    const float scale_height = temperature_K / kTemperatureLapseRate;
+
+    return scale_height * (1.0f - std::pow(ratio, kBaroExponent));
 }
 
 }  // namespace sensor_model

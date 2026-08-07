@@ -8,7 +8,7 @@ namespace sensor_model {
 /* Measurement of barometer. */
 struct BaroMeasurement {
     double time_stamp_s = 0.0;
-    float temperature_C = 0.0f;
+    float temperature_degC = 0.0f;
     float pressure_Kpa = 0.0f;
 };
 

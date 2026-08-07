@@ -22,6 +22,8 @@ public:
 
     // Convert measure of baro to altitude.
     float ConvertBaroToAltitude(const BaroMeasurement &measure);
+    // Convert measure of baro to altitude with temperature compensation.
+    float ConvertBaroWithTemperatureToAltitude(const BaroMeasurement &measure);
 
     // Reference for member variables.
     Options &options() { return options_; }
