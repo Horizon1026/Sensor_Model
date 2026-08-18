@@ -23,6 +23,7 @@ public:
 
     void RemoveLowIntensityPoints(LidarMeasurement &measure);
     bool ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3> &points);
+    float ComputeRatioOfZeroIntensityPoints(const LidarMeasurement &measure);
 
     // Reference for member variables.
     Options &options() { return options_; }

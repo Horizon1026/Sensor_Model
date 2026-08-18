@@ -57,4 +57,19 @@ void Lidar::RemoveLowIntensityPoints(LidarMeasurement &measure) {
     }
 }
 
+float Lidar::ComputeRatioOfZeroIntensityPoints(const LidarMeasurement &measure) {
+    float ratio = 0.0;
+    if (measure.intensity_of_points.empty()) {
+        return ratio;
+    }
+
+    int32_t cnt = 0;
+    for (const float &intensity: measure.intensity_of_points) {
+        if (intensity == 0) {
+            ++cnt;
+        }
+    }
+    return static_cast<float>(cnt) / static_cast<float>(measure.intensity_of_points.size());
+}
+
 }  // namespace sensor_model
