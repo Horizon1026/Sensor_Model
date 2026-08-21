@@ -6,24 +6,31 @@ The model of sensors for slam, for example, imu, camera, and so on.
     - [x] Pinhole
         - [x] Radtan
         - [x] Equidistant
+        - [x] Kannala-Brandt
     - [ ] Omni
         - [ ] Radtan
         - [ ] Equidistant
+- [x] Virtual camera model
 - [x] Imu model
 - [x] Wheel odom model
 - [x] GPS model
-- [ ] Lidar model
+- [x] Lidar model
+- [x] Magn model
+- [x] Baro model
 
 # Dependence
 
 ### Project repositories
 - Slam_Utility
 - Feature_Detector
+- Image_Painter（only for test）
 - Visualizor2D（only for test）
+- Visualizor3D（only for test）
 
 ### Third-party repositories
 - Eigen3 (>= 3.3.7)（`sudo apt install libeigen3-dev`）
 - dw (`sudo apt install libdw-dev`)
+- glfw (`sudo apt install libglfw3-dev`)
 
 # Compile and Run
 - 第三方仓库的话需要自行 apt-get install 安装
