@@ -1,11 +1,11 @@
+#include "wheel_odom.h"
+
 #include "basic_type.h"
 #include "slam_log_reporter.h"
 #include "slam_operations.h"
 
 #include "fstream"
 #include "iostream"
-
-#include "wheel_odom.h"
 
 using namespace slam_utility;
 using namespace sensor_model;

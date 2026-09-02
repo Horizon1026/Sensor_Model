@@ -1,9 +1,9 @@
+#include "baro_measurement.h"
+#include "barometer.h"
+
 #include "basic_type.h"
 #include "slam_basic_math.h"
 #include "slam_log_reporter.h"
-
-#include "baro_measurement.h"
-#include "barometer.h"
 
 #include "cmath"
 

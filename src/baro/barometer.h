@@ -2,6 +2,7 @@
 #define _SENSOR_MODEL_BAROMETER_MODEL_H_
 
 #include "baro_measurement.h"
+
 #include "basic_type.h"
 #include "slam_basic_math.h"
 

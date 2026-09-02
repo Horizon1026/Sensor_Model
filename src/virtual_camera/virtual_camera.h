@@ -1,8 +1,10 @@
 #ifndef _SENSOR_MODEL_VIRTUAL_CAMERA_H_
 #define _SENSOR_MODEL_VIRTUAL_CAMERA_H_
 
-#include "basic_type.h"
 #include "camera_model.h"
+
+#include "basic_type.h"
+
 #include "memory"
 
 namespace sensor_model {

@@ -1,4 +1,5 @@
 #include "virtual_camera.h"
+
 #include "slam_basic_math.h"
 #include "slam_log_reporter.h"
 #include "slam_operations.h"

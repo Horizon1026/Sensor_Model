@@ -1,10 +1,10 @@
 #ifndef _SENSOR_MODEL_WHEEL_ODOM_BASIC_H_
 #define _SENSOR_MODEL_WHEEL_ODOM_BASIC_H_
 
+#include "wheel_odom_measurement.h"
+
 #include "basic_type.h"
 #include "slam_basic_math.h"
-
-#include "wheel_odom_measurement.h"
 
 namespace sensor_model {
 

@@ -1,12 +1,12 @@
-#include "basic_type.h"
 #include "camera_model.h"
+#include "virtual_camera.h"
+
+#include "basic_type.h"
 #include "image_painter.h"
 #include "slam_basic_math.h"
 #include "slam_log_reporter.h"
 #include "slam_operations.h"
-#include "virtual_camera.h"
 #include "visualizor_2d.h"
-
 #include "enable_stack_backward.h"
 
 using namespace slam_visualizor;

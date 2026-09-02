@@ -2,6 +2,7 @@
 #include "imu_measurement.h"
 #include "imu_preintegrate.h"
 #include "imu_state.h"
+
 #include "slam_log_reporter.h"
 
 #include "fstream"

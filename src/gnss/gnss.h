@@ -1,10 +1,10 @@
 #ifndef _SENSOR_MODEL_GNSS_MODEL_H_
 #define _SENSOR_MODEL_GNSS_MODEL_H_
 
+#include "gnss_measurement.h"
+
 #include "basic_type.h"
 #include "slam_basic_math.h"
-
-#include "gnss_measurement.h"
 
 namespace sensor_model {
 

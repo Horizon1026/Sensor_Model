@@ -1,8 +1,9 @@
 #ifndef _SENSOR_MODEL_LIDAR_MODEL_H_
 #define _SENSOR_MODEL_LIDAR_MODEL_H_
 
-#include "basic_type.h"
 #include "lidar_measurement.h"
+
+#include "basic_type.h"
 #include "slam_basic_math.h"
 
 namespace sensor_model {

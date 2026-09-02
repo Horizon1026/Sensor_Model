@@ -1,10 +1,11 @@
 #ifndef _SENSOR_MODEL_IMU_BASIC_H_
 #define _SENSOR_MODEL_IMU_BASIC_H_
 
-#include "basic_type.h"
 #include "imu_measurement.h"
 #include "imu_preintegrate.h"
 #include "imu_state.h"
+
+#include "basic_type.h"
 #include "slam_basic_math.h"
 
 namespace sensor_model {

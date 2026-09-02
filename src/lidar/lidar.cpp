@@ -1,4 +1,5 @@
 #include "lidar.h"
+
 #include "slam_operations.h"
 
 namespace sensor_model {

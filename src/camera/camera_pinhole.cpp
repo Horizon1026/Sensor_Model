@@ -1,4 +1,5 @@
 #include "camera_pinhole.h"
+
 #include "slam_basic_math.h"
 #include "slam_operations.h"
 

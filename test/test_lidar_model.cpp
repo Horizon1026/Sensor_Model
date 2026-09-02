@@ -1,13 +1,12 @@
+#include "lidar.h"
+
 #include "basic_type.h"
 #include "slam_log_reporter.h"
+#include "visualizor_3d.h"
 
 #include "cctype"
 #include "fstream"
 #include "iostream"
-
-#include "lidar.h"
-
-#include "visualizor_3d.h"
 
 using namespace slam_utility;
 using namespace sensor_model;

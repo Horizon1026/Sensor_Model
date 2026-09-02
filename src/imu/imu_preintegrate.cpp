@@ -1,4 +1,5 @@
 #include "imu_preintegrate.h"
+
 #include "slam_log_reporter.h"
 
 namespace sensor_model {

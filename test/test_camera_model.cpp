@@ -1,5 +1,6 @@
-#include "basic_type.h"
 #include "camera_model.h"
+
+#include "basic_type.h"
 #include "feature_point_detector.h"
 #include "feature_point_harris_detector.h"
 #include "slam_log_reporter.h"
