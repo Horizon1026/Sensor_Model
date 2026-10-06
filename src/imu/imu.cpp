@@ -2,7 +2,34 @@
 
 #include "slam_log_reporter.h"
 
+#include <cmath>
+
 namespace sensor_model {
+
+void Imu::DiscretizeImuProcessFunction(const Mat &Fc, const Mat &Gc_sqrt_Qc, const float dt, Mat &Ft, Mat &sqrt_Qt_t) const {
+    // Covariance integral reference: C. F. Van Loan, "Computing Integrals Involving the Matrix Exponential", IEEE TAC, 23(3):395-404, 1978,
+    // doi:10.1109/TAC.1978.1101743. This implementation evaluates that integral using a cubic Taylor transition and four-point Gauss-Legendre quadrature.
+    const Mat Fc_dt = Fc * dt;
+    const Mat Fc_dt_sq = Fc_dt * Fc_dt;
+    const Mat Fc_dt_cube = Fc_dt_sq * Fc_dt;
+    Ft = Mat::Identity(Fc.rows(), Fc.cols()) + Fc_dt + 0.5f * Fc_dt_sq + (1.0f / 6.0f) * Fc_dt_cube;
+    const Mat Fc_dt_Gc_sqrt_Qc = Fc_dt * Gc_sqrt_Qc;
+    const Mat Fc_dt_sq_Gc_sqrt_Qc = Fc_dt_sq * Gc_sqrt_Qc;
+    const Mat Fc_dt_cube_Gc_sqrt_Qc = Fc_dt_cube * Gc_sqrt_Qc;
+    // Exact forms on [0, 1].
+    // nodes = {(1-a)/2, (1-b)/2, (1+b)/2, (1+a)/2}, a = sqrt((3+2*sqrt(6/5))/7), b = sqrt((3-2*sqrt(6/5))/7).
+    // weights = {(18-sqrt(30))/72, (18+sqrt(30))/72, (18+sqrt(30))/72, (18-sqrt(30))/72}.
+    constexpr float nodes[] = {0.0694318442f, 0.3300094782f, 0.6699905218f, 0.9305681558f};
+    constexpr float weights[] = {0.1739274226f, 0.3260725774f, 0.3260725774f, 0.1739274226f};
+    sqrt_Qt_t.resize(4 * Gc_sqrt_Qc.cols(), Fc.rows());
+    for (int i = 0; i < 4; ++i) {
+        const float u = nodes[i];
+        sqrt_Qt_t.middleRows(i * Gc_sqrt_Qc.cols(), Gc_sqrt_Qc.cols()) =
+            (std::sqrt(dt * weights[i]) *
+             (Gc_sqrt_Qc + u * Fc_dt_Gc_sqrt_Qc + (0.5f * u * u) * Fc_dt_sq_Gc_sqrt_Qc + (u * u * u / 6.0f) * Fc_dt_cube_Gc_sqrt_Qc))
+                .transpose();
+    }
+}
 
 bool Imu::PropagateNominalState(const ImuMeasurement &meas_prev, const ImuMeasurement &meas_next, const ImuState &state_prev, ImuState &state_next) {
     if (meas_prev.time_stamp_s > meas_next.time_stamp_s) {

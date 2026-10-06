@@ -38,6 +38,8 @@ public:
     bool PropagateResidualStateCovariance(const ImuMeasurement &meas_prev, const ImuMeasurement &meas_next, const Vec3 &mid_accel, const Vec3 &mid_gyro,
                                           const ImuState &state_prev, const Mat15 &cov_prev, Mat15 &cov_next);
 
+    void DiscretizeImuProcessFunction(const Mat &Fc, const Mat &Gc_sqrt_Qc, const float dt, Mat &Ft, Mat &sqrt_Qt_t) const;
+
     // Reference for member variables.
     Options &options() { return options_; }
     Vec12 &noise_sigma() { return noise_sigma_; }
