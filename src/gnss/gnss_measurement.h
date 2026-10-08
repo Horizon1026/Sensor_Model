@@ -5,9 +5,20 @@
 
 namespace sensor_model {
 
+enum class GnssFixedType : uint8_t {
+    kInvalid = 0,
+    kSingle = 1,
+    kPseudorangeDifferential = 2,
+    kRtkFixedSolution = 3,
+    kRtkFloatSolution = 4,
+    kInsPositioning = 5,
+    kInputFixedPosition = 6,
+};
+
 /* Measurement of GNSS. */
 struct GnssMeasurement {
     double time_stamp_s = 0.0;
+    GnssFixedType fixed_type = GnssFixedType::kInvalid;
 
     // LLA observations.
     bool is_lla_valid = false;
