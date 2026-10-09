@@ -7,12 +7,14 @@ namespace sensor_model {
 
 enum class GnssFixedType : uint8_t {
     kInvalid = 0,
-    kSingle = 1,
-    kPseudorangeDifferential = 2,
-    kRtkFixedSolution = 3,
-    kRtkFloatSolution = 4,
-    kInsPositioning = 5,
-    kInputFixedPosition = 6,
+    kSinglePointPositioning = 1,
+    kDifferentialPositioning = 2,
+    kGpsPpsMode = 3,
+    kRtkIntFixed = 4,
+    kRtkFloat = 5,
+    kDeadReckoningMode = 6,
+    kManualInputMode = 7,
+    kSimulatorMode = 8,
 };
 
 /* Measurement of GNSS. */
