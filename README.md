@@ -7,8 +7,8 @@ The model of sensors for slam, for example, imu, camera, and so on.
         - [x] Radtan
         - [x] Equidistant
         - [x] Kannala-Brandt
-    - [ ] Omni
-        - [ ] Radtan
+    - [x] Omni
+        - [x] Radtan
         - [ ] Equidistant
 - [x] Virtual camera model
 - [x] Imu model
