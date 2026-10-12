@@ -90,10 +90,10 @@ bool VirtualCamera::RemapPixelUvFromRealCameraToVirtualCamera(const Vec2 &real_d
     real_camera_model_->LiftFromRawImagePlaneToUndistortedNormalizedPlane(real_distort_pixel_uv, real_undistort_norm_xy);
     Vec3 virtual_undistort_norm_xy1 = H_real_to_virtual_ * Vec3(real_undistort_norm_xy.x(), real_undistort_norm_xy.y(), 1.0f);
     RETURN_FALSE_IF(virtual_undistort_norm_xy1.z() < kZeroFloat);
-    virtual_undistort_norm_xy1 / virtual_undistort_norm_xy1.z();
+    virtual_undistort_norm_xy1 /= virtual_undistort_norm_xy1.z();
     Vec2 virtual_distort_norm_xy = Vec2::Zero();
     virtual_camera_model_->DistortOnNormalizedPlane(virtual_undistort_norm_xy1.head<2>(), virtual_distort_norm_xy);
-    virtual_camera_model_->LiftFromImagePlaneToNormalizedPlane(virtual_distort_norm_xy, virtual_distort_pixel_uv);
+    virtual_camera_model_->LiftFromNormalizedPlaneToImagePlane(virtual_distort_norm_xy, virtual_distort_pixel_uv);
     return true;
 }
 
