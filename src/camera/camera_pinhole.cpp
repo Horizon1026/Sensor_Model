@@ -11,10 +11,7 @@ void CameraPinhole::LiftFromNormalizedPlaneToUnitSphere(const Vec2 norm_xy, Vec3
     sphere_xyz.head<2>() = norm_xy * yita;
     sphere_xyz.z() = yita - 1.0f;
 }
-void CameraPinhole::LiftFromNormalizedPlaneToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv) const {
-    pixel_uv(0) = fx_ * norm_xy(0) + cx_;
-    pixel_uv(1) = fy_ * norm_xy(1) + cy_;
-}
+
 void CameraPinhole::LiftFromNormalizedPlaneToBearingVector(const Vec2 norm_xy, Vec3 &bearing_vector) const {
     bearing_vector.head<2>() = norm_xy;
     bearing_vector.z() = 1.0f;
@@ -26,46 +23,16 @@ void CameraPinhole::LiftFromUnitSphereToNormalizedPlane(const Vec3 sphere_xyz, V
     const float yita = sphere_xyz.z() + 1.0f;
     norm_xy = sphere_xyz.head<2>() / yita;
 }
-void CameraPinhole::LiftFromUnitSphereToBearingVector(const Vec3 sphere_xyz, Vec3 &bearing_vector) const {
-    Vec2 norm_xy = Vec2::Zero();
-    LiftFromUnitSphereToNormalizedPlane(sphere_xyz, norm_xy);
-    LiftFromNormalizedPlaneToBearingVector(norm_xy, bearing_vector);
-}
-void CameraPinhole::LiftFromUnitSphereToImagePlane(const Vec3 sphere_xyz, Vec2 &pixel_uv) const {
-    Vec2 norm_xy = Vec2::Zero();
-    LiftFromUnitSphereToNormalizedPlane(sphere_xyz, norm_xy);
-    LiftFromNormalizedPlaneToImagePlane(norm_xy, pixel_uv);
-}
 
 // Lift 3d point in bearing vector to other coordinate systems.
 void CameraPinhole::LiftFromBearingVectorToNormalizedPlane(const Vec3 bearing_vector, Vec2 &norm_xy) const {
     norm_xy = bearing_vector.head<2>() / bearing_vector.z();
 }
-void CameraPinhole::LiftFromBearingVectorToUnitSphere(const Vec3 bearing_vector, Vec3 &sphere_xyz) const {
-    Vec2 norm_xy = Vec2::Zero();
-    LiftFromBearingVectorToNormalizedPlane(bearing_vector, norm_xy);
-    LiftFromNormalizedPlaneToUnitSphere(norm_xy, sphere_xyz);
-}
-void CameraPinhole::LiftFromBearingVectorToImagePlane(const Vec3 bearing_vector, Vec2 &pixel_uv) const {
-    Vec2 norm_xy = Vec2::Zero();
-    LiftFromBearingVectorToNormalizedPlane(bearing_vector, norm_xy);
-    LiftFromNormalizedPlaneToImagePlane(norm_xy, pixel_uv);
-}
 
 // Lift 2d point in image plane back on normalized plane.
 void CameraPinhole::LiftFromImagePlaneToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) const {
-    norm_xy(0) = (pixel_uv(0) - cx_) / fx_;
-    norm_xy(1) = (pixel_uv(1) - cy_) / fy_;
-}
-void CameraPinhole::LiftFromImagePlaneToBearingVector(const Vec2 pixel_uv, Vec3 &bearing_vector) const {
-    Vec2 norm_xy = Vec2::Zero();
-    LiftFromImagePlaneToNormalizedPlane(pixel_uv, norm_xy);
-    LiftFromNormalizedPlaneToBearingVector(norm_xy, bearing_vector);
-}
-void CameraPinhole::LiftFromImagePlaneToUnitSphere(const Vec2 pixel_uv, Vec3 &sphere_xyz) const {
-    Vec2 norm_xy = Vec2::Zero();
-    LiftFromImagePlaneToNormalizedPlane(pixel_uv, norm_xy);
-    LiftFromNormalizedPlaneToUnitSphere(norm_xy, sphere_xyz);
+    norm_xy(0) = (pixel_uv(0) - cx()) / fx();
+    norm_xy(1) = (pixel_uv(1) - cy()) / fy();
 }
 
 // Lift 3d point in camera frame on normalized plane.
@@ -128,7 +95,7 @@ bool CameraPinhole::CorrectDistortedImage(const GrayImage &raw_image, GrayImage 
     for (int32_t u = 0; u < cols; ++u) {
         for (int32_t v = 0; v < rows; ++v) {
             Vec2 undistort_uv = Vec2(u, v);
-            const Vec2 mid_uv = Vec2(cx_, cy_);
+            const Vec2 mid_uv = Vec2(cx(), cy());
             undistort_uv = scale * (undistort_uv - mid_uv) + mid_uv;
 
             DistortOnImagePlane(undistort_uv, distort_uv);
@@ -145,16 +112,8 @@ bool CameraPinhole::CorrectDistortedImage(const GrayImage &raw_image, GrayImage 
     return true;
 }
 
-void CameraPinhole::SetImageSize(int32_t image_rows, int32_t image_cols) {
-    image_rows_ = image_rows;
-    image_cols_ = image_cols;
-}
-
 void CameraPinhole::SetIntrinsicParameter(float fx, float fy, float cx, float cy) {
-    fx_ = fx;
-    fy_ = fy;
-    cx_ = cx;
-    cy_ = cy;
+    SetCommonIntrinsicParameter(fx, fy, cx, cy);
 }
 
 }  // namespace sensor_model

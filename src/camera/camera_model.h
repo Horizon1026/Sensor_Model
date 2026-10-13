@@ -1,6 +1,7 @@
 #ifndef _SENSOR_MODEL_CAMERA_MODEL_H_
 #define _SENSOR_MODEL_CAMERA_MODEL_H_
 
+#include "basic_camera_model.h"
 #include "camera_omni.h"
 #include "camera_omni_radial_tangential.h"
 

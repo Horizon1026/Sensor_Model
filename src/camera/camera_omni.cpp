@@ -12,8 +12,7 @@ namespace sensor_model {
 CameraOmni::CameraOmni(float fx, float fy, float cx, float cy, float xi): CameraOmni(fx, fy, cx, cy, xi, 0, 0) {}
 
 CameraOmni::CameraOmni(float fx, float fy, float cx, float cy, float xi, int32_t image_rows, int32_t image_cols):
-    fx_(fx), fy_(fy), cx_(cx), cy_(cy), image_rows_(image_rows > 0 ? image_rows : static_cast<int32_t>(cy * 2.0f)),
-    image_cols_(image_cols > 0 ? image_cols : static_cast<int32_t>(cx * 2.0f)) {
+    BasicCameraModel(fx, fy, cx, cy, image_rows, image_cols) {
     SetIntrinsicParameter(fx, fy, cx, cy, xi);
 }
 
@@ -33,60 +32,27 @@ void CameraOmni::LiftFromNormalizedPlaneToUnitSphere(const Vec2 norm_xy, Vec3 &s
         sphere_xyz.setConstant(std::numeric_limits<float>::quiet_NaN());
     }
 }
-void CameraOmni::LiftFromNormalizedPlaneToImagePlane(const Vec2 norm_xy, Vec2 &pixel_uv) const {
-    pixel_uv(0) = fx_ * norm_xy(0) + cx_;
-    pixel_uv(1) = fy_ * norm_xy(1) + cy_;
-}
+
 void CameraOmni::LiftFromNormalizedPlaneToBearingVector(const Vec2 norm_xy, Vec3 &bearing_vector) const {
     LiftFromNormalizedPlaneToUnitSphere(norm_xy, bearing_vector);
 }
 
 // Lift 3d point in unit sphere to other coordinate systems.
 void CameraOmni::LiftFromUnitSphereToNormalizedPlane(const Vec3 sphere_xyz, Vec2 &norm_xy) const { LiftFromCameraFrameToNormalizedPlane(sphere_xyz, norm_xy); }
-void CameraOmni::LiftFromUnitSphereToBearingVector(const Vec3 sphere_xyz, Vec3 &bearing_vector) const {
-    Vec2 norm_xy;
-    LiftFromUnitSphereToNormalizedPlane(sphere_xyz, norm_xy);
-    LiftFromNormalizedPlaneToBearingVector(norm_xy, bearing_vector);
-}
-void CameraOmni::LiftFromUnitSphereToImagePlane(const Vec3 sphere_xyz, Vec2 &pixel_uv) const {
-    Vec2 norm_xy = Vec2::Zero();
-    LiftFromUnitSphereToNormalizedPlane(sphere_xyz, norm_xy);
-    LiftFromNormalizedPlaneToImagePlane(norm_xy, pixel_uv);
-}
 
 // Lift 3d point in bearing vector to other coordinate systems.
 void CameraOmni::LiftFromBearingVectorToNormalizedPlane(const Vec3 bearing_vector, Vec2 &norm_xy) const {
     LiftFromCameraFrameToNormalizedPlane(bearing_vector, norm_xy);
 }
-void CameraOmni::LiftFromBearingVectorToUnitSphere(const Vec3 bearing_vector, Vec3 &sphere_xyz) const {
-    Vec2 norm_xy = Vec2::Zero();
-    LiftFromBearingVectorToNormalizedPlane(bearing_vector, norm_xy);
-    LiftFromNormalizedPlaneToUnitSphere(norm_xy, sphere_xyz);
-}
-void CameraOmni::LiftFromBearingVectorToImagePlane(const Vec3 bearing_vector, Vec2 &pixel_uv) const {
-    Vec2 norm_xy = Vec2::Zero();
-    LiftFromBearingVectorToNormalizedPlane(bearing_vector, norm_xy);
-    LiftFromNormalizedPlaneToImagePlane(norm_xy, pixel_uv);
-}
 
 // Lift 2d point in image plane back on normalized plane.
 void CameraOmni::LiftFromImagePlaneToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) const {
-    if (!pixel_uv.allFinite() || !std::isfinite(fx_) || !std::isfinite(fy_) || fx_ == 0.0f || fy_ == 0.0f) {
+    if (!pixel_uv.allFinite() || !std::isfinite(fx()) || !std::isfinite(fy()) || fx() == 0.0f || fy() == 0.0f) {
         norm_xy.setConstant(std::numeric_limits<float>::quiet_NaN());
         return;
     }
-    norm_xy(0) = (pixel_uv(0) - cx_) / fx_;
-    norm_xy(1) = (pixel_uv(1) - cy_) / fy_;
-}
-void CameraOmni::LiftFromImagePlaneToBearingVector(const Vec2 pixel_uv, Vec3 &bearing_vector) const {
-    Vec2 norm_xy = Vec2::Zero();
-    LiftFromImagePlaneToNormalizedPlane(pixel_uv, norm_xy);
-    LiftFromNormalizedPlaneToBearingVector(norm_xy, bearing_vector);
-}
-void CameraOmni::LiftFromImagePlaneToUnitSphere(const Vec2 pixel_uv, Vec3 &sphere_xyz) const {
-    Vec2 norm_xy = Vec2::Zero();
-    LiftFromImagePlaneToNormalizedPlane(pixel_uv, norm_xy);
-    LiftFromNormalizedPlaneToUnitSphere(norm_xy, sphere_xyz);
+    norm_xy(0) = (pixel_uv(0) - cx()) / fx();
+    norm_xy(1) = (pixel_uv(1) - cy()) / fy();
 }
 
 // Lift 3d point in camera frame on normalized plane.
@@ -150,8 +116,8 @@ bool CameraOmni::CorrectDistortedImage(const GrayImage &raw_image, GrayImage &co
     RETURN_FALSE_IF(raw_image.cols() != corrected_image.cols() || raw_image.rows() != corrected_image.rows());
 
     RETURN_FALSE_IF(raw_image.data() == corrected_image.data());
-    RETURN_FALSE_IF(!std::isfinite(scale) || !std::isfinite(fx_) || !std::isfinite(fy_) || !std::isfinite(cx_) || !std::isfinite(cy_) || fx_ == 0.0f ||
-                    fy_ == 0.0f);
+    RETURN_FALSE_IF(!std::isfinite(scale) || !std::isfinite(fx()) || !std::isfinite(fy()) || !std::isfinite(cx()) || !std::isfinite(cy()) || fx() == 0.0f ||
+                    fy() == 0.0f);
 
     const int32_t rows = corrected_image.rows();
     const int32_t cols = corrected_image.cols();
@@ -161,7 +127,7 @@ bool CameraOmni::CorrectDistortedImage(const GrayImage &raw_image, GrayImage &co
     for (int32_t u = 0; u < cols; ++u) {
         for (int32_t v = 0; v < rows; ++v) {
             Vec2 undistort_uv = Vec2(u, v);
-            const Vec2 mid_uv = Vec2(cx_, cy_);
+            const Vec2 mid_uv = Vec2(cx(), cy());
             undistort_uv = scale * (undistort_uv - mid_uv) + mid_uv;
 
             Vec3 bearing;
@@ -183,20 +149,12 @@ bool CameraOmni::CorrectDistortedImage(const GrayImage &raw_image, GrayImage &co
     return true;
 }
 
-void CameraOmni::SetImageSize(int32_t image_rows, int32_t image_cols) {
-    image_rows_ = image_rows;
-    image_cols_ = image_cols;
-}
-
 void CameraOmni::SetIntrinsicParameter(float fx, float fy, float cx, float cy, float xi) {
     if (!std::isfinite(xi) || xi < 0.0f) {
         throw std::invalid_argument("CameraOmni xi must be finite and nonnegative");
     }
     xi_ = xi;
-    fx_ = fx;
-    fy_ = fy;
-    cx_ = cx;
-    cy_ = cy;
+    SetCommonIntrinsicParameter(fx, fy, cx, cy);
 }
 
 }  // namespace sensor_model
