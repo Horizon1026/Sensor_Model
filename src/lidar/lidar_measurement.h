@@ -8,6 +8,7 @@ namespace sensor_model {
 /* Measurement of Lidar. */
 struct LidarMeasurement {
     double time_stamp_s = 0.0;
+    int32_t direction_id = 0;
     std::vector<double> time_stamp_s_of_points;
     std::vector<Vec3> raw_points;
     std::vector<float> intensity_of_points;
