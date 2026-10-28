@@ -33,7 +33,7 @@ bool CameraPinholeKannalaBrandt::UndistortOnNormalizedPlane(const Vec2 distort_x
 
 
 void CameraPinholeKannalaBrandt::SetDistortionParameter(const std::vector<float> &params) {
-    for (uint32_t i = 0; i < 5; ++i) {
+    for (uint32_t i = 0; i < 6; ++i) {
         k_[i] = params[i];
     }
 }
@@ -41,7 +41,7 @@ void CameraPinholeKannalaBrandt::SetDistortionParameter(const std::vector<float>
 void CameraPinholeKannalaBrandt::GetDistortionParameter(std::vector<float> &params) const {
     params.clear();
     params.reserve(5);
-    for (uint32_t i = 0; i < 5; ++i) {
+    for (uint32_t i = 0; i < 6; ++i) {
         params.emplace_back(k_[i]);
     }
 }
