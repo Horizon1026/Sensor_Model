@@ -27,6 +27,7 @@ public:
     float ComputeRatioOfZeroIntensityPoints(const LidarMeasurement &measure);
     void DownsampleLidarScan(const std::vector<Vec3> &all_raw_p_l, const uint32_t max_num_of_downsampled_points, std::vector<Vec3> &all_downsampled_p_l,
                              const float radius = 40.0f, const float voxel_step = 1.0f);
+    void ElevationCompensation(const std::vector<Vec3> &all_raw_p_l, const float elevation_rad, std::vector<Vec3> &all_p_l);
 
     // Reference for member variables.
     Options &options() { return options_; }

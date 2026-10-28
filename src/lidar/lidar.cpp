@@ -207,4 +207,23 @@ void Lidar::DownsampleLidarScan(const std::vector<Vec3> &all_raw_p_l, const uint
     }
 }
 
+void Lidar::ElevationCompensation(const std::vector<Vec3> &all_raw_p_l, const float elevation_rad, std::vector<Vec3> &all_p_l) {
+    const float c = std::cos(elevation_rad);
+    const float s = std::sin(elevation_rad);
+    all_p_l.resize(all_raw_p_l.size());
+    for (uint32_t i = 0; i < all_raw_p_l.size(); ++i) {
+        // Copy the point so input and output may refer to the same vector.
+        const Vec3 p = all_raw_p_l[i];
+        const float r = std::hypot(p.x(), p.y());
+        if (r < kZeroFloat) {
+            // Azimuth is undefined near the Z axis.
+            all_p_l[i] = p;
+            continue;
+        }
+        const float horizontal = r * c - p.z() * s;
+        const float z = p.z() * c + r * s;
+        all_p_l[i] = Vec3(p.x() * (horizontal / r), p.y() * (horizontal / r), z);
+    }
+}
+
 }  // namespace sensor_model
