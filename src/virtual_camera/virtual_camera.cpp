@@ -7,7 +7,7 @@
 namespace sensor_model {
 
 namespace {
-bool RotateNormalizedPoint(const BasicCameraModel &source, const BasicCameraModel &target,
+bool RotateNormalizedPoint(const BasicCameraModel<float> &source, const BasicCameraModel<float> &target,
                            const Mat3 &rotation, const Vec2 &source_xy, Vec2 &target_xy) {
     Vec3 source_ray;
     source.LiftFromNormalizedPlaneToBearingVector(source_xy, source_ray);
@@ -30,7 +30,7 @@ bool RotateNormalizedPoint(const BasicCameraModel &source, const BasicCameraMode
 bool VirtualCamera::CreateDefaultVirtualCameraModel() {
     RETURN_FALSE_IF(options_.kDefaultVirtualCameraImageRows <= 0);
     RETURN_FALSE_IF(options_.kDefaultVirtualCameraImageCols <= 0);
-    virtual_camera_model_ = std::make_unique<CameraPinhole>(options_.kDefaultVirtualCameraFocalLength, options_.kDefaultVirtualCameraFocalLength,
+    virtual_camera_model_ = std::make_unique<CameraPinhole<float>>(options_.kDefaultVirtualCameraFocalLength, options_.kDefaultVirtualCameraFocalLength,
                                                             options_.kDefaultVirtualCameraImageCols * 0.5f, options_.kDefaultVirtualCameraImageRows * 0.5f);
     return true;
 }

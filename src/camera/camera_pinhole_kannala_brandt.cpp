@@ -5,40 +5,48 @@
 
 namespace sensor_model {
 
-bool CameraPinholeKannalaBrandt::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) const {
-    const float r = undistort_xy.norm();
+/* Specialized Template Class Declaration. */
+template class CameraPinholeKannalaBrandt<float>;
+template class CameraPinholeKannalaBrandt<double>;
+
+template <typename Scalar>
+bool CameraPinholeKannalaBrandt<Scalar>::DistortOnNormalizedPlane(const TVec2<Scalar> undistort_xy, TVec2<Scalar> &distort_xy) const {
+    const Scalar r = undistort_xy.norm();
     if (r < kZeroFloat) {
         distort_xy = undistort_xy;
         return true;
     }
-    const float theta = std::atan(r);
-    const float theta2 = theta * theta;
-    const float theta3 = theta2 * theta;
-    const float theta4 = theta3 * theta;
-    const float theta5 = theta4 * theta;
-    const float theta6 = theta5 * theta;
-    const float theta_d = theta * k_[0] + theta2 * k_[1] + theta3 * k_[2] + theta4 * k_[3] + theta5 * k_[4] + theta6 * k_[5];
+    const Scalar theta = std::atan(r);
+    const Scalar theta2 = theta * theta;
+    const Scalar theta3 = theta2 * theta;
+    const Scalar theta4 = theta3 * theta;
+    const Scalar theta5 = theta4 * theta;
+    const Scalar theta6 = theta5 * theta;
+    const Scalar theta_d = theta * k_[0] + theta2 * k_[1] + theta3 * k_[2] + theta4 * k_[3] + theta5 * k_[4] + theta6 * k_[5];
 
     distort_xy = theta_d * undistort_xy / r;
     return true;
 }
 
-bool CameraPinholeKannalaBrandt::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) const {
-    switch (options().kUndistortMethod) {
-        case UndistortMethod::kFixedPointIteration:
+template <typename Scalar>
+bool CameraPinholeKannalaBrandt<Scalar>::UndistortOnNormalizedPlane(const TVec2<Scalar> distort_xy, TVec2<Scalar> &undistort_xy) const {
+    switch (this->options().kUndistortMethod) {
+        case BasicCameraModel<Scalar>::UndistortMethod::kFixedPointIteration:
         default:
             return UndistortByFixePointIteration(distort_xy, undistort_xy);
     }
 }
 
 
-void CameraPinholeKannalaBrandt::SetDistortionParameter(const std::vector<float> &params) {
+template <typename Scalar>
+void CameraPinholeKannalaBrandt<Scalar>::SetDistortionParameter(const std::vector<Scalar> &params) {
     for (uint32_t i = 0; i < 6; ++i) {
         k_[i] = params[i];
     }
 }
 
-void CameraPinholeKannalaBrandt::GetDistortionParameter(std::vector<float> &params) const {
+template <typename Scalar>
+void CameraPinholeKannalaBrandt<Scalar>::GetDistortionParameter(std::vector<Scalar> &params) const {
     params.clear();
     params.reserve(5);
     for (uint32_t i = 0; i < 6; ++i) {
@@ -46,24 +54,25 @@ void CameraPinholeKannalaBrandt::GetDistortionParameter(std::vector<float> &para
     }
 }
 
-bool CameraPinholeKannalaBrandt::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) const {
+template <typename Scalar>
+bool CameraPinholeKannalaBrandt<Scalar>::UndistortByFixePointIteration(const TVec2<Scalar> &distort_xy, TVec2<Scalar> &undistort_xy) const {
     // Set initial value.
     undistort_xy = distort_xy;
 
     // Iterate to solve it;
-    for (uint32_t iter = 0; iter < options().kMaxIterationForUndistortion; ++iter) {
+    for (uint32_t iter = 0; iter < this->options().kMaxIterationForUndistortion; ++iter) {
         // Compute f(x) = residual.
-        Vec2 predict_distort_xy;
+        TVec2<Scalar> predict_distort_xy;
         DistortOnNormalizedPlane(undistort_xy, predict_distort_xy);
-        const Vec2 f = distort_xy - predict_distort_xy;
+        const TVec2<Scalar> f = distort_xy - predict_distort_xy;
 
         // Compute g(x) = x + k * f(x)
-        const float k = 1.f;
-        const Vec2 g = undistort_xy + k * f;
+        const Scalar k = 1;
+        const TVec2<Scalar> g = undistort_xy + k * f;
 
         // Solve step.
-        const Vec2 delta = g - undistort_xy;
-        const float step_len = delta.squaredNorm();
+        const TVec2<Scalar> delta = g - undistort_xy;
+        const Scalar step_len = delta.squaredNorm();
 
         // Update undistort_xy.
         if (std::isnan(step_len) || std::isinf(step_len)) {
@@ -72,7 +81,7 @@ bool CameraPinholeKannalaBrandt::UndistortByFixePointIteration(const Vec2 &disto
         undistort_xy = g;
 
         // Check if converged.
-        if (std::sqrt(step_len) < options().kMaxIterateStepLengthForUndistortion) {
+        if (std::sqrt(step_len) < this->options().kMaxIterateStepLengthForUndistortion) {
             break;
         }
     }

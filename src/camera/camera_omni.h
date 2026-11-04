@@ -10,11 +10,12 @@ namespace sensor_model {
 // Unit-sphere coordinates and bearing vectors both represent physical rays.
 // For xi > 1 only the injective branch z / ||p_c|| > -1 / xi is used.
 // Invalid lifts return NaNs; bool operations return false on invalid input.
-class CameraOmni: public BasicCameraModel {
+template <typename Scalar = float>
+class CameraOmni: public BasicCameraModel<Scalar> {
 public:
     CameraOmni() = default;
-    CameraOmni(float fx, float fy, float cx, float cy, float xi = 0.0f);
-    CameraOmni(float fx, float fy, float cx, float cy, float xi, int32_t image_rows, int32_t image_cols);
+    CameraOmni(Scalar fx, Scalar fy, Scalar cx, Scalar cy, Scalar xi = 0);
+    CameraOmni(Scalar fx, Scalar fy, Scalar cx, Scalar cy, Scalar xi, int32_t image_rows, int32_t image_cols);
     virtual ~CameraOmni() = default;
     CameraOmni(const CameraOmni &) = delete;
 
@@ -22,28 +23,28 @@ public:
     virtual std::string CameraModelName() const override { return "Omni-Rectify"; }
 
     // Projection and lens operations use the common interface in BasicCameraModel.
-    virtual void LiftFromNormalizedPlaneToUnitSphere(const Vec2 norm_xy, Vec3 &sphere_xyz) const override;
-    virtual void LiftFromNormalizedPlaneToBearingVector(const Vec2 norm_xy, Vec3 &bearing_vector) const override;
-    virtual void LiftFromUnitSphereToNormalizedPlane(const Vec3 sphere_xyz, Vec2 &norm_xy) const override;
-    virtual void LiftFromBearingVectorToNormalizedPlane(const Vec3 bearing_vector, Vec2 &norm_xy) const override;
-    virtual void LiftFromImagePlaneToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) const override;
-    virtual bool LiftFromRawImagePlaneToUndistortedNormalizedPlane(const Vec2 pixel_uv, Vec2 &undistort_xy) const override;
-    virtual void LiftFromCameraFrameToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) const override;
-    virtual bool DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) const override;
-    virtual bool UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) const override;
-    virtual bool DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv) const override;
-    virtual bool UndistortOnImagePlane(const Vec2 distort_uv, Vec2 &undistort_uv) const override;
+    virtual void LiftFromNormalizedPlaneToUnitSphere(const TVec2<Scalar> norm_xy, TVec3<Scalar> &sphere_xyz) const override;
+    virtual void LiftFromNormalizedPlaneToBearingVector(const TVec2<Scalar> norm_xy, TVec3<Scalar> &bearing_vector) const override;
+    virtual void LiftFromUnitSphereToNormalizedPlane(const TVec3<Scalar> sphere_xyz, TVec2<Scalar> &norm_xy) const override;
+    virtual void LiftFromBearingVectorToNormalizedPlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &norm_xy) const override;
+    virtual void LiftFromImagePlaneToNormalizedPlane(const TVec2<Scalar> pixel_uv, TVec2<Scalar> &norm_xy) const override;
+    virtual bool LiftFromRawImagePlaneToUndistortedNormalizedPlane(const TVec2<Scalar> pixel_uv, TVec2<Scalar> &undistort_xy) const override;
+    virtual void LiftFromCameraFrameToNormalizedPlane(const TVec3<Scalar> p_c, TVec2<Scalar> &norm_xy) const override;
+    virtual bool DistortOnNormalizedPlane(const TVec2<Scalar> undistort_xy, TVec2<Scalar> &distort_xy) const override;
+    virtual bool UndistortOnNormalizedPlane(const TVec2<Scalar> distort_xy, TVec2<Scalar> &undistort_xy) const override;
+    virtual bool DistortOnImagePlane(const TVec2<Scalar> undistort_uv, TVec2<Scalar> &distort_uv) const override;
+    virtual bool UndistortOnImagePlane(const TVec2<Scalar> distort_uv, TVec2<Scalar> &undistort_uv) const override;
     // Removes lens distortion while retaining the omni projection and xi.
     // Input/output buffers must be distinct and have the same dimensions.
-    virtual bool CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, float scale = 1.0f) const override;
+    virtual bool CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, Scalar scale = 1) const override;
     // xi must be finite and nonnegative, otherwise throws std::invalid_argument.
-    void SetIntrinsicParameter(float fx, float fy, float cx, float cy, float xi);
+    void SetIntrinsicParameter(Scalar fx, Scalar fy, Scalar cx, Scalar cy, Scalar xi);
 
     // Const reference for member variables.
-    const float &xi() const { return xi_; }
+    const Scalar &xi() const { return xi_; }
 
 private:
-    float xi_ = 0.0f;
+    Scalar xi_ = 0;
 };
 
 }  // namespace sensor_model

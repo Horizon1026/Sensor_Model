@@ -4,33 +4,40 @@
 
 namespace sensor_model {
 
-bool CameraPinholeRadialTangential::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) const {
-    const float x = undistort_xy(0);
-    const float y = undistort_xy(1);
-    const float xy = x * y;
-    const float x2 = x * x;
-    const float y2 = y * y;
-    const float r2 = x2 + y2;
-    const float r4 = r2 * r2;
-    const float r6 = r4 * r2;
-    const float temp = 1.0f + k_[0] * r2 + k_[1] * r4 + k_[2] * r6;
-    distort_xy(0) = x * temp + 2.0f * p_[0] * xy + p_[1] * (r2 + 2.0f * x2);
-    distort_xy(1) = y * temp + 2.0f * p_[1] * xy + p_[0] * (r2 + 2.0f * y2);
+/* Specialized Template Class Declaration. */
+template class CameraPinholeRadialTangential<float>;
+template class CameraPinholeRadialTangential<double>;
+
+template <typename Scalar>
+bool CameraPinholeRadialTangential<Scalar>::DistortOnNormalizedPlane(const TVec2<Scalar> undistort_xy, TVec2<Scalar> &distort_xy) const {
+    const Scalar x = undistort_xy(0);
+    const Scalar y = undistort_xy(1);
+    const Scalar xy = x * y;
+    const Scalar x2 = x * x;
+    const Scalar y2 = y * y;
+    const Scalar r2 = x2 + y2;
+    const Scalar r4 = r2 * r2;
+    const Scalar r6 = r4 * r2;
+    const Scalar temp = 1 + k_[0] * r2 + k_[1] * r4 + k_[2] * r6;
+    distort_xy(0) = x * temp + 2 * p_[0] * xy + p_[1] * (r2 + 2 * x2);
+    distort_xy(1) = y * temp + 2 * p_[1] * xy + p_[0] * (r2 + 2 * y2);
 
     return true;
 }
 
-bool CameraPinholeRadialTangential::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) const {
-    switch (options().kUndistortMethod) {
-        case UndistortMethod::kGradientDesent:
+template <typename Scalar>
+bool CameraPinholeRadialTangential<Scalar>::UndistortOnNormalizedPlane(const TVec2<Scalar> distort_xy, TVec2<Scalar> &undistort_xy) const {
+    switch (this->options().kUndistortMethod) {
+        case BasicCameraModel<Scalar>::UndistortMethod::kGradientDesent:
             return UndistortByGradienDesent(distort_xy, undistort_xy);
-        case UndistortMethod::kFixedPointIteration:
+        case BasicCameraModel<Scalar>::UndistortMethod::kFixedPointIteration:
         default:
             return UndistortByFixePointIteration(distort_xy, undistort_xy);
     }
 }
 
-void CameraPinholeRadialTangential::SetDistortionParameter(const std::vector<float> &params) {
+template <typename Scalar>
+void CameraPinholeRadialTangential<Scalar>::SetDistortionParameter(const std::vector<Scalar> &params) {
     k_[0] = params[0];
     k_[1] = params[1];
     k_[2] = params[2];
@@ -38,7 +45,8 @@ void CameraPinholeRadialTangential::SetDistortionParameter(const std::vector<flo
     p_[1] = params[4];
 }
 
-void CameraPinholeRadialTangential::GetDistortionParameter(std::vector<float> &params) const {
+template <typename Scalar>
+void CameraPinholeRadialTangential<Scalar>::GetDistortionParameter(std::vector<Scalar> &params) const {
     params.reserve(5);
     params.clear();
     params.emplace_back(k_[0]);
@@ -48,41 +56,42 @@ void CameraPinholeRadialTangential::GetDistortionParameter(std::vector<float> &p
     params.emplace_back(p_[1]);
 }
 
-bool CameraPinholeRadialTangential::UndistortByGradienDesent(const Vec2 &distort_xy, Vec2 &undistort_xy) const {
+template <typename Scalar>
+bool CameraPinholeRadialTangential<Scalar>::UndistortByGradienDesent(const TVec2<Scalar> &distort_xy, TVec2<Scalar> &undistort_xy) const {
     // Set initial value.
     undistort_xy = distort_xy;
 
     // Iterate to solve it;
-    for (uint32_t iter = 0; iter < options().kMaxIterationForUndistortion; ++iter) {
+    for (uint32_t iter = 0; iter < this->options().kMaxIterationForUndistortion; ++iter) {
         // Compute temp value.
-        float &x = undistort_xy.x();
-        float &y = undistort_xy.y();
-        const float xy = x * y;
-        const float x2 = x * x;
-        const float y2 = y * y;
-        const float r2 = x2 + y2;
-        const float r4 = r2 * r2;
-        const float r6 = r4 * r2;
-        const float temp_xy = 1.0f + k_[0] * r2 + k_[1] * r4 + k_[2] * r6;
-        const float temp_x = 2.0f * k_[0] * x + 4.0f * k_[1] * r2 * x + 6.0f * k_[2] * r4 * x;
-        const float temp_y = 2.0f * k_[0] * y + 4.0f * k_[1] * r2 * y + 6.0f * k_[2] * r4 * y;
+        Scalar &x = undistort_xy.x();
+        Scalar &y = undistort_xy.y();
+        const Scalar xy = x * y;
+        const Scalar x2 = x * x;
+        const Scalar y2 = y * y;
+        const Scalar r2 = x2 + y2;
+        const Scalar r4 = r2 * r2;
+        const Scalar r6 = r4 * r2;
+        const Scalar temp_xy = 1 + k_[0] * r2 + k_[1] * r4 + k_[2] * r6;
+        const Scalar temp_x = 2 * k_[0] * x + 4 * k_[1] * r2 * x + 6 * k_[2] * r4 * x;
+        const Scalar temp_y = 2 * k_[0] * y + 4 * k_[1] * r2 * y + 6 * k_[2] * r4 * y;
 
         // Compute residual.
-        const Vec2 residual =
-            distort_xy - Vec2(x * temp_xy + 2.0f * p_[0] * xy + p_[1] * (r2 + 2.0f * x2), y * temp_xy + 2.0f * p_[1] * xy + p_[0] * (r2 + 2.0f * y2));
+        const TVec2<Scalar> residual =
+            distort_xy - TVec2<Scalar>(x * temp_xy + 2 * p_[0] * xy + p_[1] * (r2 + 2 * x2), y * temp_xy + 2 * p_[1] * xy + p_[0] * (r2 + 2 * y2));
 
         // Compute jacobian, d_r / d_distort
-        Mat2 jacobian;
-        jacobian << temp_xy + x * temp_x + 2.0f * p_[0] * y + p_[1] * 6.0f * x, x * temp_y + 2.0f * p_[0] * x + 2.0f * p_[1] * y,
-            y * temp_x + 2.0f * p_[0] * x + 2.0f * p_[1] * y, temp_xy + y * temp_y + p_[0] * 6.0f * y + 2.0f * p_[1] * x;
+        TMat2<Scalar> jacobian;
+        jacobian << temp_xy + x * temp_x + 2 * p_[0] * y + p_[1] * 6 * x, x * temp_y + 2 * p_[0] * x + 2 * p_[1] * y,
+            y * temp_x + 2 * p_[0] * x + 2 * p_[1] * y, temp_xy + y * temp_y + p_[0] * 6 * y + 2 * p_[1] * x;
 
         if (std::fabs(jacobian.determinant()) < kZeroFloat) {
             return false;
         }
 
         // Solve step.
-        const Vec2 delta = jacobian.ldlt().solve(residual);
-        const float step_len = delta.squaredNorm();
+        const TVec2<Scalar> delta = jacobian.ldlt().solve(residual);
+        const Scalar step_len = delta.squaredNorm();
 
         // Update undistort_xy.
         if (std::isnan(step_len) || std::isinf(step_len)) {
@@ -91,7 +100,7 @@ bool CameraPinholeRadialTangential::UndistortByGradienDesent(const Vec2 &distort
         undistort_xy += delta;
 
         // Check if converged.
-        if (std::sqrt(step_len) < options().kMaxIterateStepLengthForUndistortion) {
+        if (std::sqrt(step_len) < this->options().kMaxIterateStepLengthForUndistortion) {
             break;
         }
     }
@@ -99,34 +108,35 @@ bool CameraPinholeRadialTangential::UndistortByGradienDesent(const Vec2 &distort
     return true;
 }
 
-bool CameraPinholeRadialTangential::UndistortByFixePointIteration(const Vec2 &distort_xy, Vec2 &undistort_xy) const {
+template <typename Scalar>
+bool CameraPinholeRadialTangential<Scalar>::UndistortByFixePointIteration(const TVec2<Scalar> &distort_xy, TVec2<Scalar> &undistort_xy) const {
     // Set initial value.
     undistort_xy = distort_xy;
 
     // Iterate to solve it;
-    for (uint32_t iter = 0; iter < options().kMaxIterationForUndistortion; ++iter) {
+    for (uint32_t iter = 0; iter < this->options().kMaxIterationForUndistortion; ++iter) {
         // Compute temp value.
-        float &x = undistort_xy.x();
-        float &y = undistort_xy.y();
-        const float xy = x * y;
-        const float x2 = x * x;
-        const float y2 = y * y;
-        const float r2 = x2 + y2;
-        const float r4 = r2 * r2;
-        const float r6 = r4 * r2;
-        const float temp_xy = 1.0f + k_[0] * r2 + k_[1] * r4 + k_[2] * r6;
+        Scalar &x = undistort_xy.x();
+        Scalar &y = undistort_xy.y();
+        const Scalar xy = x * y;
+        const Scalar x2 = x * x;
+        const Scalar y2 = y * y;
+        const Scalar r2 = x2 + y2;
+        const Scalar r4 = r2 * r2;
+        const Scalar r6 = r4 * r2;
+        const Scalar temp_xy = 1 + k_[0] * r2 + k_[1] * r4 + k_[2] * r6;
 
         // Compute f(x) = residual.
-        const Vec2 f =
-            distort_xy - Vec2(x * temp_xy + 2.0f * p_[0] * xy + p_[1] * (r2 + 2.0f * x2), y * temp_xy + 2.0f * p_[1] * xy + p_[0] * (r2 + 2.0f * y2));
+        const TVec2<Scalar> f =
+            distort_xy - TVec2<Scalar>(x * temp_xy + 2 * p_[0] * xy + p_[1] * (r2 + 2 * x2), y * temp_xy + 2 * p_[1] * xy + p_[0] * (r2 + 2 * y2));
 
         // Compute g(x) = x + k * f(x)
-        const float k = 1.f;
-        const Vec2 g = undistort_xy + k * f;
+        const Scalar k = 1;
+        const TVec2<Scalar> g = undistort_xy + k * f;
 
         // Solve step.
-        const Vec2 delta = g - undistort_xy;
-        const float step_len = delta.squaredNorm();
+        const TVec2<Scalar> delta = g - undistort_xy;
+        const Scalar step_len = delta.squaredNorm();
 
         // Update undistort_xy.
         if (std::isnan(step_len) || std::isinf(step_len)) {
@@ -135,7 +145,7 @@ bool CameraPinholeRadialTangential::UndistortByFixePointIteration(const Vec2 &di
         undistort_xy = g;
 
         // Check if converged.
-        if (std::sqrt(step_len) < options().kMaxIterateStepLengthForUndistortion) {
+        if (std::sqrt(step_len) < this->options().kMaxIterateStepLengthForUndistortion) {
             break;
         }
     }

@@ -84,12 +84,12 @@ int main(int argc, char **argv) {
     const float cam1_k3 = -0.026906f;
     const float cam1_k4 = 0.003342f;
     const float cam1_k5 = 0.0f;
-    virtual_camera.real_camera_model() = std::make_unique<CameraPinholeEquidistant>(cam1_fx, cam1_fy, cam1_cx, cam1_cy);
+    virtual_camera.real_camera_model() = std::make_unique<CameraPinholeEquidistant<float>>(cam1_fx, cam1_fy, cam1_cx, cam1_cy);
     virtual_camera.real_camera_model()->SetDistortionParameter(std::vector<float> {cam1_k1, cam1_k2, cam1_k3, cam1_k4, cam1_k5});
     TestVirtualCameraModel("pinhole-equidistant to virtual rectify", raw_image, virtual_camera);
 
     // Initialize virtual camera to be pinhole-equidistant camera model.
-    virtual_camera.virtual_camera_model() = std::make_unique<CameraPinholeEquidistant>(cam1_fx, cam1_fy, cam1_cx, cam1_cy);
+    virtual_camera.virtual_camera_model() = std::make_unique<CameraPinholeEquidistant<float>>(cam1_fx, cam1_fy, cam1_cx, cam1_cy);
     virtual_camera.virtual_camera_model()->SetDistortionParameter(std::vector<float> {cam1_k1, cam1_k2, cam1_k3, cam1_k4, cam1_k5});
     TestVirtualCameraModel("pinhole-equidistant to pinhole-equidistant", raw_image, virtual_camera);
 
@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
     const float cam2_k3 = 0.0f;
     const float cam2_p1 = 0.00019359f;
     const float cam2_p2 = 1.76187114e-05f;
-    virtual_camera.virtual_camera_model() = std::make_unique<CameraPinholeRadialTangential>(cam2_fx, cam2_fy, cam2_cx, cam2_cy);
+    virtual_camera.virtual_camera_model() = std::make_unique<CameraPinholeRadialTangential<float>>(cam2_fx, cam2_fy, cam2_cx, cam2_cy);
     virtual_camera.virtual_camera_model()->SetDistortionParameter(std::vector<float> {cam2_k1, cam2_k2, cam2_k3, cam2_p1, cam2_p2});
     TestVirtualCameraModel("pinhole-equidistant to pinhole-radtan", raw_image, virtual_camera);
 

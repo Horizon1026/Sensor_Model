@@ -5,38 +5,48 @@
 
 namespace sensor_model {
 
+/* Specialized Template Class Declaration. */
+template class CameraPinhole<float>;
+template class CameraPinhole<double>;
+
 // Lift 2d point in normalized plane to other coordinate systems.
-void CameraPinhole::LiftFromNormalizedPlaneToUnitSphere(const Vec2 norm_xy, Vec3 &sphere_xyz) const {
-    const float yita = 2.0f / (1.0f + norm_xy.squaredNorm());
-    sphere_xyz.head<2>() = norm_xy * yita;
-    sphere_xyz.z() = yita - 1.0f;
+template <typename Scalar>
+void CameraPinhole<Scalar>::LiftFromNormalizedPlaneToUnitSphere(const TVec2<Scalar> norm_xy, TVec3<Scalar> &sphere_xyz) const {
+    const Scalar yita = 2 / (1 + norm_xy.squaredNorm());
+    sphere_xyz.template head<2>() = norm_xy * yita;
+    sphere_xyz.z() = yita - 1;
 }
 
-void CameraPinhole::LiftFromNormalizedPlaneToBearingVector(const Vec2 norm_xy, Vec3 &bearing_vector) const {
-    bearing_vector.head<2>() = norm_xy;
-    bearing_vector.z() = 1.0f;
+template <typename Scalar>
+void CameraPinhole<Scalar>::LiftFromNormalizedPlaneToBearingVector(const TVec2<Scalar> norm_xy, TVec3<Scalar> &bearing_vector) const {
+    bearing_vector.template head<2>() = norm_xy;
+    bearing_vector.z() = 1;
     bearing_vector.normalize();
 }
 
 // Lift 3d point in unit sphere to other coordinate systems.
-void CameraPinhole::LiftFromUnitSphereToNormalizedPlane(const Vec3 sphere_xyz, Vec2 &norm_xy) const {
-    const float yita = sphere_xyz.z() + 1.0f;
-    norm_xy = sphere_xyz.head<2>() / yita;
+template <typename Scalar>
+void CameraPinhole<Scalar>::LiftFromUnitSphereToNormalizedPlane(const TVec3<Scalar> sphere_xyz, TVec2<Scalar> &norm_xy) const {
+    const Scalar yita = sphere_xyz.z() + 1;
+    norm_xy = sphere_xyz.template head<2>() / yita;
 }
 
 // Lift 3d point in bearing vector to other coordinate systems.
-void CameraPinhole::LiftFromBearingVectorToNormalizedPlane(const Vec3 bearing_vector, Vec2 &norm_xy) const {
-    norm_xy = bearing_vector.head<2>() / bearing_vector.z();
+template <typename Scalar>
+void CameraPinhole<Scalar>::LiftFromBearingVectorToNormalizedPlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &norm_xy) const {
+    norm_xy = bearing_vector.template head<2>() / bearing_vector.z();
 }
 
 // Lift 2d point in image plane back on normalized plane.
-void CameraPinhole::LiftFromImagePlaneToNormalizedPlane(const Vec2 pixel_uv, Vec2 &norm_xy) const {
-    norm_xy(0) = (pixel_uv(0) - cx()) / fx();
-    norm_xy(1) = (pixel_uv(1) - cy()) / fy();
+template <typename Scalar>
+void CameraPinhole<Scalar>::LiftFromImagePlaneToNormalizedPlane(const TVec2<Scalar> pixel_uv, TVec2<Scalar> &norm_xy) const {
+    norm_xy(0) = (pixel_uv(0) - this->cx()) / this->fx();
+    norm_xy(1) = (pixel_uv(1) - this->cy()) / this->fy();
 }
 
 // Lift 3d point in camera frame on normalized plane.
-void CameraPinhole::LiftFromCameraFrameToNormalizedPlane(const Vec3 p_c, Vec2 &norm_xy) const {
+template <typename Scalar>
+void CameraPinhole<Scalar>::LiftFromCameraFrameToNormalizedPlane(const TVec3<Scalar> p_c, TVec2<Scalar> &norm_xy) const {
     if (p_c.z() < kZeroFloat) {
         norm_xy.setZero();
     } else {
@@ -46,62 +56,68 @@ void CameraPinhole::LiftFromCameraFrameToNormalizedPlane(const Vec3 p_c, Vec2 &n
 }
 
 // Distort on normalized plane.
-bool CameraPinhole::DistortOnNormalizedPlane(const Vec2 undistort_xy, Vec2 &distort_xy) const {
+template <typename Scalar>
+bool CameraPinhole<Scalar>::DistortOnNormalizedPlane(const TVec2<Scalar> undistort_xy, TVec2<Scalar> &distort_xy) const {
     // For camera basic, view it as rectify image, so no distortion.
     distort_xy = undistort_xy;
     return true;
 }
 
 // Undistort on normalized plane.
-bool CameraPinhole::UndistortOnNormalizedPlane(const Vec2 distort_xy, Vec2 &undistort_xy) const {
+template <typename Scalar>
+bool CameraPinhole<Scalar>::UndistortOnNormalizedPlane(const TVec2<Scalar> distort_xy, TVec2<Scalar> &undistort_xy) const {
     // For camera basic, view it as rectify image, so no undistortion.
     undistort_xy = distort_xy;
     return true;
 }
 
 // Lift 3d point in image plane on normalized plane, and do undistortion.
-bool CameraPinhole::LiftFromRawImagePlaneToUndistortedNormalizedPlane(const Vec2 pixel_uv, Vec2 &undistort_xy) const {
-    Vec2 distort_xy = Vec2::Zero();
+template <typename Scalar>
+bool CameraPinhole<Scalar>::LiftFromRawImagePlaneToUndistortedNormalizedPlane(const TVec2<Scalar> pixel_uv, TVec2<Scalar> &undistort_xy) const {
+    TVec2<Scalar> distort_xy = TVec2<Scalar>::Zero();
     LiftFromImagePlaneToNormalizedPlane(pixel_uv, distort_xy);
     return UndistortOnNormalizedPlane(distort_xy, undistort_xy);
 }
 
-bool CameraPinhole::DistortOnImagePlane(const Vec2 undistort_uv, Vec2 &distort_uv) const {
-    const Vec2 undistort_xy = Vec2((undistort_uv(0) - cx()) / fx(), (undistort_uv(1) - cy()) / fy());
-    Vec2 distort_xy = Vec2::Zero();
+template <typename Scalar>
+bool CameraPinhole<Scalar>::DistortOnImagePlane(const TVec2<Scalar> undistort_uv, TVec2<Scalar> &distort_uv) const {
+    const TVec2<Scalar> undistort_xy = TVec2<Scalar>((undistort_uv(0) - this->cx()) / this->fx(), (undistort_uv(1) - this->cy()) / this->fy());
+    TVec2<Scalar> distort_xy = TVec2<Scalar>::Zero();
     RETURN_FALSE_IF_FALSE(DistortOnNormalizedPlane(undistort_xy, distort_xy));
-    LiftFromNormalizedPlaneToImagePlane(distort_xy, distort_uv);
+    this->LiftFromNormalizedPlaneToImagePlane(distort_xy, distort_uv);
     return true;
 }
 
-bool CameraPinhole::UndistortOnImagePlane(const Vec2 distort_uv, Vec2 &undistort_uv) const {
-    const Vec2 distort_xy = Vec2((distort_uv(0) - cx()) / fx(), (distort_uv(1) - cy()) / fy());
-    Vec2 undistort_xy = Vec2::Zero();
+template <typename Scalar>
+bool CameraPinhole<Scalar>::UndistortOnImagePlane(const TVec2<Scalar> distort_uv, TVec2<Scalar> &undistort_uv) const {
+    const TVec2<Scalar> distort_xy = TVec2<Scalar>((distort_uv(0) - this->cx()) / this->fx(), (distort_uv(1) - this->cy()) / this->fy());
+    TVec2<Scalar> undistort_xy = TVec2<Scalar>::Zero();
     RETURN_FALSE_IF_FALSE(UndistortOnNormalizedPlane(distort_xy, undistort_xy));
-    LiftFromNormalizedPlaneToImagePlane(undistort_xy, undistort_uv);
+    this->LiftFromNormalizedPlaneToImagePlane(undistort_xy, undistort_uv);
     return true;
 }
 
 // Undistort image.
-bool CameraPinhole::CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, float scale) const {
+template <typename Scalar>
+bool CameraPinhole<Scalar>::CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, Scalar scale) const {
     RETURN_FALSE_IF(raw_image.data() == nullptr || corrected_image.data() == nullptr);
     RETURN_FALSE_IF(raw_image.cols() != corrected_image.cols() || raw_image.rows() != corrected_image.rows());
 
     const int32_t rows = corrected_image.rows();
     const int32_t cols = corrected_image.cols();
-    scale = std::max(1e0f, scale);
+    scale = std::max(static_cast<Scalar>(1e0), scale);
 
-    Vec2 distort_uv = Vec2::Zero();
+    TVec2<Scalar> distort_uv = TVec2<Scalar>::Zero();
     for (int32_t u = 0; u < cols; ++u) {
         for (int32_t v = 0; v < rows; ++v) {
-            Vec2 undistort_uv = Vec2(u, v);
-            const Vec2 mid_uv = Vec2(cx(), cy());
+            TVec2<Scalar> undistort_uv = TVec2<Scalar>(u, v);
+            const TVec2<Scalar> mid_uv = TVec2<Scalar>(this->cx(), this->cy());
             undistort_uv = scale * (undistort_uv - mid_uv) + mid_uv;
 
             DistortOnImagePlane(undistort_uv, distort_uv);
 
             float pixel_value = 0.0f;
-            if (raw_image.GetPixelValue(distort_uv.y(), distort_uv.x(), &pixel_value)) {
+            if (raw_image.GetPixelValue(static_cast<float>(distort_uv.y()), static_cast<float>(distort_uv.x()), &pixel_value)) {
                 corrected_image.SetPixelValue(v, u, static_cast<uint8_t>(pixel_value));
             } else {
                 corrected_image.SetPixelValue(v, u, 0);
@@ -112,8 +128,9 @@ bool CameraPinhole::CorrectDistortedImage(const GrayImage &raw_image, GrayImage 
     return true;
 }
 
-void CameraPinhole::SetIntrinsicParameter(float fx, float fy, float cx, float cy) {
-    SetCommonIntrinsicParameter(fx, fy, cx, cy);
+template <typename Scalar>
+void CameraPinhole<Scalar>::SetIntrinsicParameter(Scalar fx, Scalar fy, Scalar cx, Scalar cy) {
+    this->SetCommonIntrinsicParameter(fx, fy, cx, cy);
 }
 
 }  // namespace sensor_model
