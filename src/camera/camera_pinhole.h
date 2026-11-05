@@ -19,9 +19,7 @@ public:
     virtual std::string CameraModelName() const override { return "Pinhole-Rectify"; }
 
     // Projection and lens operations use the common interface in BasicCameraModel.
-    virtual void LiftFromNormalizedPlaneToUnitSphere(const TVec2<Scalar> norm_xy, TVec3<Scalar> &sphere_xyz) const override;
     virtual void LiftFromNormalizedPlaneToBearingVector(const TVec2<Scalar> norm_xy, TVec3<Scalar> &bearing_vector) const override;
-    virtual void LiftFromUnitSphereToNormalizedPlane(const TVec3<Scalar> sphere_xyz, TVec2<Scalar> &norm_xy) const override;
     virtual void LiftFromBearingVectorToNormalizedPlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &norm_xy) const override;
     virtual void LiftFromImagePlaneToNormalizedPlane(const TVec2<Scalar> pixel_uv, TVec2<Scalar> &norm_xy) const override;
     virtual bool LiftFromRawImagePlaneToUndistortedNormalizedPlane(const TVec2<Scalar> pixel_uv, TVec2<Scalar> &undistort_xy) const override;

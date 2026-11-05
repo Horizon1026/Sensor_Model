@@ -10,8 +10,8 @@
 
 namespace sensor_model {
 
-// Shared camera state and projection interface. Sphere conventions and valid
-// projection domains are defined by each concrete camera model.
+// Shared camera state and projection interface. Valid projection domains
+// are defined by each concrete camera model.
 template <typename Scalar = float>
 class BasicCameraModel {
 public:
@@ -34,24 +34,16 @@ public:
     virtual std::string CameraModelName() const = 0;
 
     // Lift 2d point in normalized plane to other coordinate systems.
-    virtual void LiftFromNormalizedPlaneToUnitSphere(const TVec2<Scalar> norm_xy, TVec3<Scalar> &sphere_xyz) const = 0;
     void LiftFromNormalizedPlaneToImagePlane(const TVec2<Scalar> norm_xy, TVec2<Scalar> &pixel_uv) const;
     virtual void LiftFromNormalizedPlaneToBearingVector(const TVec2<Scalar> norm_xy, TVec3<Scalar> &bearing_vector) const = 0;
 
-    // Lift 3d point in unit sphere to other coordinate systems.
-    virtual void LiftFromUnitSphereToNormalizedPlane(const TVec3<Scalar> sphere_xyz, TVec2<Scalar> &norm_xy) const = 0;
-    void LiftFromUnitSphereToBearingVector(const TVec3<Scalar> sphere_xyz, TVec3<Scalar> &bearing_vector) const;
-    void LiftFromUnitSphereToImagePlane(const TVec3<Scalar> sphere_xyz, TVec2<Scalar> &pixel_uv) const;
-
     // Lift 3d point in bearing vector to other coordinate systems.
     virtual void LiftFromBearingVectorToNormalizedPlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &norm_xy) const = 0;
-    void LiftFromBearingVectorToUnitSphere(const TVec3<Scalar> bearing_vector, TVec3<Scalar> &sphere_xyz) const;
     void LiftFromBearingVectorToImagePlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &pixel_uv) const;
 
     // Lift 2d point in image plane to other coordinate systems.
     virtual void LiftFromImagePlaneToNormalizedPlane(const TVec2<Scalar> pixel_uv, TVec2<Scalar> &norm_xy) const = 0;
     void LiftFromImagePlaneToBearingVector(const TVec2<Scalar> pixel_uv, TVec3<Scalar> &bearing_vector) const;
-    void LiftFromImagePlaneToUnitSphere(const TVec2<Scalar> pixel_uv, TVec3<Scalar> &sphere_xyz) const;
 
     // Lift 2d point in raw image plane to undistorted normalized plane.
     virtual bool LiftFromRawImagePlaneToUndistortedNormalizedPlane(const TVec2<Scalar> pixel_uv, TVec2<Scalar> &undistort_xy) const = 0;
@@ -69,6 +61,13 @@ public:
 
     // Undistort image. GrayImage interpolation uses float coordinates and pixel values.
     virtual bool CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, Scalar scale = 1) const = 0;
+
+    // For residual = predicted distorted pixel - observed pixel, holding the camera-frame ray fixed.
+    // Input is the predicted pixel at the current parameters, not the observed pixel.
+    // Projection columns: [fx, fy, cx, cy] (+ xi for omni); distortion columns follow GetDistortionParameter().
+    // Both outputs have two rows; no distortion gives zero columns. Outputs are valid only on success.
+    virtual bool JacobiansForDistortedImagePlaneResidual(const TVec2<Scalar> distorted_pixel_uv, TMat<Scalar> &jacobian_dr_dprojection,
+                                                         TMat<Scalar> &jacobian_dr_ddistortion) const;
 
     // Set intrinsic and distortion parameters.
     void SetImageSize(int32_t image_rows, int32_t image_cols);

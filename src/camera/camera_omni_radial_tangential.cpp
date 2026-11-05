@@ -3,6 +3,9 @@
 #include "cmath"
 #include "stdexcept"
 
+#include "algorithm"
+#include "limits"
+
 namespace sensor_model {
 
 /* Specialized Template Class Declaration. */
@@ -111,6 +114,46 @@ bool CameraOmniRadialTangential<Scalar>::UndistortIteratively(const TVec2<Scalar
     }
     TVec2<Scalar> predicted = TVec2<Scalar>::Zero();
     return DistortOnNormalizedPlane(undistort_xy, predicted) && (predicted - distort_xy).norm() <= tolerance;
+}
+
+template <typename Scalar>
+bool CameraOmniRadialTangential<Scalar>::JacobiansForDistortedImagePlaneResidual(const TVec2<Scalar> distorted_pixel_uv, TMat<Scalar> &jacobian_dr_dprojection,
+                                                                                 TMat<Scalar> &jacobian_dr_ddistortion) const {
+    if (!BasicCameraModel<Scalar>::JacobiansForDistortedImagePlaneResidual(distorted_pixel_uv, jacobian_dr_dprojection, jacobian_dr_ddistortion)) {
+        return false;
+    }
+    TVec2<Scalar> undistort_xy, distort_xy, predicted_xy;
+    const Scalar tolerance = this->options().kMaxIterateStepLengthForUndistortion;
+    if (!std::isfinite(tolerance) || tolerance <= 0 || !this->LiftFromRawImagePlaneToUndistortedNormalizedPlane(distorted_pixel_uv, undistort_xy) ||
+        !undistort_xy.allFinite()) {
+        return false;
+    }
+    this->LiftFromImagePlaneToNormalizedPlane(distorted_pixel_uv, distort_xy);
+    const Scalar allowed_error = std::max(tolerance, 8 * std::numeric_limits<Scalar>::epsilon() * (1 + distort_xy.norm()));
+    if (!DistortOnNormalizedPlane(undistort_xy, predicted_xy) || !predicted_xy.allFinite() || (predicted_xy - distort_xy).norm() > allowed_error) {
+        return false;
+    }
+    const Scalar x = undistort_xy.x(), y = undistort_xy.y();
+    const Scalar r2 = undistort_xy.squaredNorm(), r4 = r2 * r2, r6 = r4 * r2;
+    jacobian_dr_ddistortion.resize(2, 5);
+    jacobian_dr_ddistortion << this->fx() * x * r2, this->fx() * x * r4, this->fx() * x * r6, this->fx() * 2 * x * y, this->fx() * (r2 + 2 * x * x),
+        this->fy() * y * r2, this->fy() * y * r4, this->fy() * y * r6, this->fy() * (r2 + 2 * y * y), this->fy() * 2 * x * y;
+    TVec3<Scalar> bearing_vector;
+    this->LiftFromNormalizedPlaneToBearingVector(undistort_xy, bearing_vector);
+    const Scalar denominator = bearing_vector.z() + this->xi();
+    if (!bearing_vector.allFinite() || !(denominator > 0)) {
+        return false;
+    }
+    const Scalar radial = 1 + k_[0] * r2 + k_[1] * r4 + k_[2] * r6;
+    const Scalar derivative = 2 * k_[0] + 4 * k_[1] * r2 + 6 * k_[2] * r4;
+    const Scalar jxx = radial + x * x * derivative + 2 * p_[0] * y + 6 * p_[1] * x;
+    const Scalar jxy = x * y * derivative + 2 * p_[0] * x + 2 * p_[1] * y;
+    const Scalar jyy = radial + y * y * derivative + 6 * p_[0] * y + 2 * p_[1] * x;
+    jacobian_dr_dprojection.conservativeResize(2, 5);
+    // Chain d pixel / d norm_xy with d norm_xy / d xi at a fixed physical ray.
+    jacobian_dr_dprojection(0, 4) = -this->fx() * (jxx * x + jxy * y) / denominator;
+    jacobian_dr_dprojection(1, 4) = -this->fy() * (jxy * x + jyy * y) / denominator;
+    return jacobian_dr_dprojection.allFinite() && jacobian_dr_ddistortion.allFinite();
 }
 
 }  // namespace sensor_model

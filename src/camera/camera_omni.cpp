@@ -24,30 +24,21 @@ CameraOmni<Scalar>::CameraOmni(Scalar fx, Scalar fy, Scalar cx, Scalar cy, Scala
 
 // Lift 2d point in normalized plane to other coordinate systems.
 template <typename Scalar>
-void CameraOmni<Scalar>::LiftFromNormalizedPlaneToUnitSphere(const TVec2<Scalar> norm_xy, TVec3<Scalar> &sphere_xyz) const {
-    const double r2 = norm_xy.template cast<double>().squaredNorm();
-    const double xi = xi_;
-    const double radicand = 1.0 + (1.0 - xi * xi) * r2;
-    if (!norm_xy.allFinite() || radicand < 0.0) {
-        sphere_xyz.setConstant(std::numeric_limits<Scalar>::quiet_NaN());
+void CameraOmni<Scalar>::LiftFromNormalizedPlaneToBearingVector(const TVec2<Scalar> norm_xy, TVec3<Scalar> &bearing_vector) const {
+    const Scalar r2 = norm_xy.squaredNorm();
+    const Scalar xi = xi_;
+    const Scalar radicand = 1 + (1 - xi * xi) * r2;
+    if (!norm_xy.allFinite() || radicand < 0) {
+        bearing_vector.setConstant(std::numeric_limits<Scalar>::quiet_NaN());
         return;
     }
-    const double lambda = (xi + std::sqrt(radicand)) / (1.0 + r2);
-    sphere_xyz << lambda * norm_xy.x(), lambda * norm_xy.y(), lambda - xi;
+    const Scalar lambda = (xi + std::sqrt(radicand)) / (1 + r2);
+    bearing_vector << lambda * norm_xy.x(), lambda * norm_xy.y(), lambda - xi;
     // The boundary is singular for xi > 1 and is excluded from projection.
-    if (xi > 1.0 && radicand <= 0.0) {
-        sphere_xyz.setConstant(std::numeric_limits<Scalar>::quiet_NaN());
+    if (xi > 1 && radicand <= 0) {
+        bearing_vector.setConstant(std::numeric_limits<Scalar>::quiet_NaN());
     }
 }
-
-template <typename Scalar>
-void CameraOmni<Scalar>::LiftFromNormalizedPlaneToBearingVector(const TVec2<Scalar> norm_xy, TVec3<Scalar> &bearing_vector) const {
-    LiftFromNormalizedPlaneToUnitSphere(norm_xy, bearing_vector);
-}
-
-// Lift 3d point in unit sphere to other coordinate systems.
-template <typename Scalar>
-void CameraOmni<Scalar>::LiftFromUnitSphereToNormalizedPlane(const TVec3<Scalar> sphere_xyz, TVec2<Scalar> &norm_xy) const { LiftFromCameraFrameToNormalizedPlane(sphere_xyz, norm_xy); }
 
 // Lift 3d point in bearing vector to other coordinate systems.
 template <typename Scalar>
@@ -69,15 +60,15 @@ void CameraOmni<Scalar>::LiftFromImagePlaneToNormalizedPlane(const TVec2<Scalar>
 // Lift 3d point in camera frame on normalized plane.
 template <typename Scalar>
 void CameraOmni<Scalar>::LiftFromCameraFrameToNormalizedPlane(const TVec3<Scalar> p_c, TVec2<Scalar> &norm_xy) const {
-    const double length = p_c.template cast<double>().norm();
-    const double z = length > 0.0 ? p_c.z() / length : -1.0;
-    const double limit = xi_ <= 1 ? -static_cast<double>(xi_) : -1.0 / xi_;
-    if (!p_c.allFinite() || length == 0.0 || z <= limit) {
+    const Scalar length = p_c.norm();
+    const Scalar z = length > 0 ? p_c.z() / length : -1;
+    const Scalar limit = xi_ <= 1 ? -xi_ : -1 / xi_;
+    if (!p_c.allFinite() || length == 0 || z <= limit) {
         norm_xy.setConstant(std::numeric_limits<Scalar>::quiet_NaN());
         return;
     }
-    const double denominator = p_c.z() + xi_ * length;
-    norm_xy = (p_c.template head<2>().template cast<double>() / denominator).template cast<Scalar>();
+    const Scalar denominator = p_c.z() + xi_ * length;
+    norm_xy = p_c.template head<2>() / denominator;
 }
 
 // Distort on normalized plane.
@@ -134,8 +125,8 @@ bool CameraOmni<Scalar>::CorrectDistortedImage(const GrayImage &raw_image, GrayI
     RETURN_FALSE_IF(raw_image.cols() != corrected_image.cols() || raw_image.rows() != corrected_image.rows());
 
     RETURN_FALSE_IF(raw_image.data() == corrected_image.data());
-    RETURN_FALSE_IF(!std::isfinite(scale) || !std::isfinite(this->fx()) || !std::isfinite(this->fy()) || !std::isfinite(this->cx()) || !std::isfinite(this->cy()) || this->fx() == 0 ||
-                    this->fy() == 0);
+    RETURN_FALSE_IF(!std::isfinite(scale) || !std::isfinite(this->fx()) || !std::isfinite(this->fy()) || !std::isfinite(this->cx()) ||
+                    !std::isfinite(this->cy()) || this->fx() == 0 || this->fy() == 0);
 
     const int32_t rows = corrected_image.rows();
     const int32_t cols = corrected_image.cols();
@@ -174,6 +165,27 @@ void CameraOmni<Scalar>::SetIntrinsicParameter(Scalar fx, Scalar fy, Scalar cx, 
     }
     xi_ = xi;
     this->SetCommonIntrinsicParameter(fx, fy, cx, cy);
+}
+
+template <typename Scalar>
+bool CameraOmni<Scalar>::JacobiansForDistortedImagePlaneResidual(const TVec2<Scalar> distorted_pixel_uv, TMat<Scalar> &jacobian_dr_dprojection,
+                                                                 TMat<Scalar> &jacobian_dr_ddistortion) const {
+    if (!BasicCameraModel<Scalar>::JacobiansForDistortedImagePlaneResidual(distorted_pixel_uv, jacobian_dr_dprojection, jacobian_dr_ddistortion)) {
+        return false;
+    }
+    TVec2<Scalar> norm_xy;
+    LiftFromImagePlaneToNormalizedPlane(distorted_pixel_uv, norm_xy);
+    TVec3<Scalar> bearing_vector;
+    LiftFromNormalizedPlaneToBearingVector(norm_xy, bearing_vector);
+    const Scalar denominator = bearing_vector.z() + xi_;
+    if (!bearing_vector.allFinite() || !(denominator > 0)) {
+        return false;
+    }
+    jacobian_dr_dprojection.conservativeResize(2, 5);
+    // At a fixed physical ray, d norm_xy / d xi = -norm_xy / (bearing.z + xi).
+    jacobian_dr_dprojection(0, 4) = -this->fx() * norm_xy.x() / denominator;
+    jacobian_dr_dprojection(1, 4) = -this->fy() * norm_xy.y() / denominator;
+    return jacobian_dr_dprojection.allFinite();
 }
 
 }  // namespace sensor_model

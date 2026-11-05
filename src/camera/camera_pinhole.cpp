@@ -11,24 +11,10 @@ template class CameraPinhole<double>;
 
 // Lift 2d point in normalized plane to other coordinate systems.
 template <typename Scalar>
-void CameraPinhole<Scalar>::LiftFromNormalizedPlaneToUnitSphere(const TVec2<Scalar> norm_xy, TVec3<Scalar> &sphere_xyz) const {
-    const Scalar yita = 2 / (1 + norm_xy.squaredNorm());
-    sphere_xyz.template head<2>() = norm_xy * yita;
-    sphere_xyz.z() = yita - 1;
-}
-
-template <typename Scalar>
 void CameraPinhole<Scalar>::LiftFromNormalizedPlaneToBearingVector(const TVec2<Scalar> norm_xy, TVec3<Scalar> &bearing_vector) const {
     bearing_vector.template head<2>() = norm_xy;
     bearing_vector.z() = 1;
     bearing_vector.normalize();
-}
-
-// Lift 3d point in unit sphere to other coordinate systems.
-template <typename Scalar>
-void CameraPinhole<Scalar>::LiftFromUnitSphereToNormalizedPlane(const TVec3<Scalar> sphere_xyz, TVec2<Scalar> &norm_xy) const {
-    const Scalar yita = sphere_xyz.z() + 1;
-    norm_xy = sphere_xyz.template head<2>() / yita;
 }
 
 // Lift 3d point in bearing vector to other coordinate systems.

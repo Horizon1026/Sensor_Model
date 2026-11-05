@@ -7,7 +7,7 @@ namespace sensor_model {
 
 // Unified omnidirectional camera model (Mei):
 // normalized_xy = p_c.xy / (p_c.z + xi * ||p_c||).
-// Unit-sphere coordinates and bearing vectors both represent physical rays.
+// Bearing vectors represent physical unit rays.
 // For xi > 1 only the injective branch z / ||p_c|| > -1 / xi is used.
 // Invalid lifts return NaNs; bool operations return false on invalid input.
 template <typename Scalar = float>
@@ -23,9 +23,7 @@ public:
     virtual std::string CameraModelName() const override { return "Omni-Rectify"; }
 
     // Projection and lens operations use the common interface in BasicCameraModel.
-    virtual void LiftFromNormalizedPlaneToUnitSphere(const TVec2<Scalar> norm_xy, TVec3<Scalar> &sphere_xyz) const override;
     virtual void LiftFromNormalizedPlaneToBearingVector(const TVec2<Scalar> norm_xy, TVec3<Scalar> &bearing_vector) const override;
-    virtual void LiftFromUnitSphereToNormalizedPlane(const TVec3<Scalar> sphere_xyz, TVec2<Scalar> &norm_xy) const override;
     virtual void LiftFromBearingVectorToNormalizedPlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &norm_xy) const override;
     virtual void LiftFromImagePlaneToNormalizedPlane(const TVec2<Scalar> pixel_uv, TVec2<Scalar> &norm_xy) const override;
     virtual bool LiftFromRawImagePlaneToUndistortedNormalizedPlane(const TVec2<Scalar> pixel_uv, TVec2<Scalar> &undistort_xy) const override;
@@ -37,6 +35,9 @@ public:
     // Removes lens distortion while retaining the omni projection and xi.
     // Input/output buffers must be distinct and have the same dimensions.
     virtual bool CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, Scalar scale = 1) const override;
+    virtual bool JacobiansForDistortedImagePlaneResidual(const TVec2<Scalar> distorted_pixel_uv, TMat<Scalar> &jacobian_dr_dprojection,
+                                                         TMat<Scalar> &jacobian_dr_ddistortion) const override;
+
     // xi must be finite and nonnegative, otherwise throws std::invalid_argument.
     void SetIntrinsicParameter(Scalar fx, Scalar fy, Scalar cx, Scalar cy, Scalar xi);
 

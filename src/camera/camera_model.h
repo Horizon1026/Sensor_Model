@@ -3,11 +3,13 @@
 
 #include "basic_camera_model.h"
 #include "camera_omni.h"
+#include "camera_omni_equidistant.h"
+#include "camera_omni_kannala_brandt.h"
 #include "camera_omni_radial_tangential.h"
 
 #include "camera_pinhole.h"
 #include "camera_pinhole_equidistant.h"
-#include "camera_pinhole_radial_tangential.h"
 #include "camera_pinhole_kannala_brandt.h"
+#include "camera_pinhole_radial_tangential.h"
 
 #endif  // end of _SENSOR_MODEL_CAMERA_MODEL_H_

@@ -89,4 +89,40 @@ bool CameraPinholeEquidistant<Scalar>::UndistortByFixePointIteration(const TVec2
     return true;
 }
 
+template <typename Scalar>
+bool CameraPinholeEquidistant<Scalar>::JacobiansForDistortedImagePlaneResidual(const TVec2<Scalar> distorted_pixel_uv, TMat<Scalar> &jacobian_dr_dprojection,
+                                                                               TMat<Scalar> &jacobian_dr_ddistortion) const {
+    if (!BasicCameraModel<Scalar>::JacobiansForDistortedImagePlaneResidual(distorted_pixel_uv, jacobian_dr_dprojection, jacobian_dr_ddistortion)) {
+        return false;
+    }
+    TVec2<Scalar> undistort_xy, distort_xy, predicted_xy;
+    const Scalar tolerance = this->options().kMaxIterateStepLengthForUndistortion;
+    if (!std::isfinite(tolerance) || tolerance <= 0 || !this->LiftFromRawImagePlaneToUndistortedNormalizedPlane(distorted_pixel_uv, undistort_xy) ||
+        !undistort_xy.allFinite()) {
+        return false;
+    }
+    this->LiftFromImagePlaneToNormalizedPlane(distorted_pixel_uv, distort_xy);
+    const Scalar allowed_error = std::max(tolerance, 8 * std::numeric_limits<Scalar>::epsilon() * (1 + distort_xy.norm()));
+    if (!DistortOnNormalizedPlane(undistort_xy, predicted_xy) || !predicted_xy.allFinite() || (predicted_xy - distort_xy).norm() > allowed_error) {
+        return false;
+    }
+    jacobian_dr_ddistortion.setZero(2, 5);
+    const Scalar r = undistort_xy.norm();
+    // Match the small-radius identity branch in DistortOnNormalizedPlane.
+    if (r < kZeroFloat) {
+        return true;
+    }
+    if (r == kZeroFloat) {
+        return false;
+    }
+    const Scalar theta = std::atan(r);
+    Scalar power = theta * theta * theta;
+    for (uint32_t i = 0; i < 5; ++i) {
+        jacobian_dr_ddistortion(0, i) = this->fx() * undistort_xy.x() * power / r;
+        jacobian_dr_ddistortion(1, i) = this->fy() * undistort_xy.y() * power / r;
+        power *= theta * theta;
+    }
+    return jacobian_dr_ddistortion.allFinite();
+}
+
 }  // namespace sensor_model
