@@ -39,11 +39,11 @@ public:
 
     // Lift 3d point in bearing vector to other coordinate systems.
     virtual void LiftFromBearingVectorToNormalizedPlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &norm_xy) const = 0;
-    void LiftFromBearingVectorToImagePlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &pixel_uv) const;
+    virtual void LiftFromBearingVectorToImagePlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &pixel_uv) const;
 
     // Lift 2d point in image plane to other coordinate systems.
     virtual void LiftFromImagePlaneToNormalizedPlane(const TVec2<Scalar> pixel_uv, TVec2<Scalar> &norm_xy) const = 0;
-    void LiftFromImagePlaneToBearingVector(const TVec2<Scalar> pixel_uv, TVec3<Scalar> &bearing_vector) const;
+    virtual void LiftFromImagePlaneToBearingVector(const TVec2<Scalar> pixel_uv, TVec3<Scalar> &bearing_vector) const;
 
     // Lift 2d point in raw image plane to undistorted normalized plane.
     virtual bool LiftFromRawImagePlaneToUndistortedNormalizedPlane(const TVec2<Scalar> pixel_uv, TVec2<Scalar> &undistort_xy) const = 0;
@@ -69,6 +69,10 @@ public:
     // Both outputs have two rows; no distortion gives zero columns. Outputs are valid only on success.
     virtual bool JacobiansForDistortedImagePlaneResidual(const TVec3<Scalar> prediction_undistorted_bearing_xyz, TMat<Scalar> &jacobian_dr_dprojection,
                                                          TMat<Scalar> &jacobian_dr_ddistortion) const;
+
+    // Also differentiate with respect to the input camera-frame point, without unit-length normalization.
+    virtual bool JacobiansForDistortedImagePlaneResidual(const TVec3<Scalar> prediction_undistorted_bearing_xyz, TMat<Scalar> &jacobian_dr_dprojection,
+                                                         TMat<Scalar> &jacobian_dr_ddistortion, TMat<Scalar> &jacobian_dr_dp_c) const { return false; }
 
     // Set intrinsic and distortion parameters.
     void SetImageSize(int32_t image_rows, int32_t image_cols);

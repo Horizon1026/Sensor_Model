@@ -21,7 +21,7 @@ public:
     virtual std::string CameraModelName() const override { return "Omni-KannalaBrandt"; }
 
     /*  Kannala-Brandt model.
-        r(theta) = theta * k1 + theta^2 * k2 + theta^3 * k3 + theta^4 * k4 + theta^5 * k5 + ... */
+        r(theta) = theta * (1 + k1*theta^2 + k2*theta^4 + ... + k6*theta^12). */
     virtual bool DistortOnNormalizedPlane(const TVec2<Scalar> undistort_xy, TVec2<Scalar> &distort_xy) const override;
     virtual bool UndistortOnNormalizedPlane(const TVec2<Scalar> distort_xy, TVec2<Scalar> &undistort_xy) const override;
 
@@ -39,7 +39,7 @@ public:
 
 private:
     // Different method to do undistortion.
-    bool UndistortByFixePointIteration(const TVec2<Scalar> &distort_xy, TVec2<Scalar> &undistort_xy) const;
+    bool UndistortByNewtonIteration(const TVec2<Scalar> &distort_xy, TVec2<Scalar> &undistort_xy) const;
 
 private:
     // Distortion model parameters.

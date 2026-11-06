@@ -20,6 +20,9 @@ public:
 public:
     virtual std::string CameraModelName() const override { return "Pinhole-Equidistant"; }
 
+    virtual void LiftFromBearingVectorToImagePlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &pixel_uv) const override;
+    virtual void LiftFromImagePlaneToBearingVector(const TVec2<Scalar> pixel_uv, TVec3<Scalar> &bearing_vector) const override;
+
     /*  Equidistant model.
         r(theta) = theta * (1 + k1 * theta2 + k2 * theta4 + k3 * theta6 + k4 * theta8 + k5 * theta10) */
     virtual bool DistortOnNormalizedPlane(const TVec2<Scalar> undistort_xy, TVec2<Scalar> &distort_xy) const override;
@@ -27,6 +30,9 @@ public:
 
     virtual bool JacobiansForDistortedImagePlaneResidual(const TVec3<Scalar> prediction_undistorted_bearing_xyz, TMat<Scalar> &jacobian_dr_dprojection,
                                                          TMat<Scalar> &jacobian_dr_ddistortion) const override;
+
+    virtual bool JacobiansForDistortedImagePlaneResidual(const TVec3<Scalar> prediction_undistorted_bearing_xyz, TMat<Scalar> &jacobian_dr_dprojection,
+                                                         TMat<Scalar> &jacobian_dr_ddistortion, TMat<Scalar> &jacobian_dr_dp_c) const override;
 
     virtual void SetDistortionParameter(const std::vector<Scalar> &params) override;
     virtual void GetDistortionParameter(std::vector<Scalar> &params) const override;
@@ -37,8 +43,8 @@ public:
     const Scalar &k5() const { return k_[4]; }
 
 private:
-    // Different method to do undistortion.
-    bool UndistortByFixePointIteration(const TVec2<Scalar> &distort_xy, TVec2<Scalar> &undistort_xy) const;
+    void EvaluateDistortion(Scalar theta, Scalar &radius, Scalar &derivative) const;
+    bool UndistortAngle(Scalar radius, Scalar &theta) const;
 
 private:
     // Distortion model parameters.
