@@ -168,15 +168,15 @@ void CameraOmni<Scalar>::SetIntrinsicParameter(Scalar fx, Scalar fy, Scalar cx, 
 }
 
 template <typename Scalar>
-bool CameraOmni<Scalar>::JacobiansForDistortedImagePlaneResidual(const TVec2<Scalar> distorted_pixel_uv, TMat<Scalar> &jacobian_dr_dprojection,
+bool CameraOmni<Scalar>::JacobiansForDistortedImagePlaneResidual(const TVec3<Scalar> prediction_undistorted_bearing_xyz, TMat<Scalar> &jacobian_dr_dprojection,
                                                                  TMat<Scalar> &jacobian_dr_ddistortion) const {
-    if (!BasicCameraModel<Scalar>::JacobiansForDistortedImagePlaneResidual(distorted_pixel_uv, jacobian_dr_dprojection, jacobian_dr_ddistortion)) {
+    if (!BasicCameraModel<Scalar>::JacobiansForDistortedImagePlaneResidual(prediction_undistorted_bearing_xyz, jacobian_dr_dprojection,
+                                                                           jacobian_dr_ddistortion)) {
         return false;
     }
+    const TVec3<Scalar> bearing_vector = prediction_undistorted_bearing_xyz / prediction_undistorted_bearing_xyz.stableNorm();
     TVec2<Scalar> norm_xy;
-    LiftFromImagePlaneToNormalizedPlane(distorted_pixel_uv, norm_xy);
-    TVec3<Scalar> bearing_vector;
-    LiftFromNormalizedPlaneToBearingVector(norm_xy, bearing_vector);
+    LiftFromCameraFrameToNormalizedPlane(bearing_vector, norm_xy);
     const Scalar denominator = bearing_vector.z() + xi_;
     if (!bearing_vector.allFinite() || !(denominator > 0)) {
         return false;

@@ -63,10 +63,11 @@ public:
     virtual bool CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, Scalar scale = 1) const = 0;
 
     // For residual = predicted distorted pixel - observed pixel, holding the camera-frame ray fixed.
-    // Input is the predicted pixel at the current parameters, not the observed pixel.
+    // Input is a finite, nonzero camera-frame ray in the projection domain; unit length is not required.
+    // Positive scaling does not change the outputs. Derivatives use forward projection, without undistortion.
     // Projection columns: [fx, fy, cx, cy] (+ xi for omni); distortion columns follow GetDistortionParameter().
     // Both outputs have two rows; no distortion gives zero columns. Outputs are valid only on success.
-    virtual bool JacobiansForDistortedImagePlaneResidual(const TVec2<Scalar> distorted_pixel_uv, TMat<Scalar> &jacobian_dr_dprojection,
+    virtual bool JacobiansForDistortedImagePlaneResidual(const TVec3<Scalar> prediction_undistorted_bearing_xyz, TMat<Scalar> &jacobian_dr_dprojection,
                                                          TMat<Scalar> &jacobian_dr_ddistortion) const;
 
     // Set intrinsic and distortion parameters.

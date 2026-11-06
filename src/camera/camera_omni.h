@@ -35,7 +35,7 @@ public:
     // Removes lens distortion while retaining the omni projection and xi.
     // Input/output buffers must be distinct and have the same dimensions.
     virtual bool CorrectDistortedImage(const GrayImage &raw_image, GrayImage &corrected_image, Scalar scale = 1) const override;
-    virtual bool JacobiansForDistortedImagePlaneResidual(const TVec2<Scalar> distorted_pixel_uv, TMat<Scalar> &jacobian_dr_dprojection,
+    virtual bool JacobiansForDistortedImagePlaneResidual(const TVec3<Scalar> prediction_undistorted_bearing_xyz, TMat<Scalar> &jacobian_dr_dprojection,
                                                          TMat<Scalar> &jacobian_dr_ddistortion) const override;
 
     // xi must be finite and nonnegative, otherwise throws std::invalid_argument.

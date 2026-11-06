@@ -98,22 +98,16 @@ bool CameraOmniKannalaBrandt<Scalar>::UndistortByFixePointIteration(const TVec2<
 }
 
 template <typename Scalar>
-bool CameraOmniKannalaBrandt<Scalar>::JacobiansForDistortedImagePlaneResidual(const TVec2<Scalar> distorted_pixel_uv, TMat<Scalar> &jacobian_dr_dprojection,
+bool CameraOmniKannalaBrandt<Scalar>::JacobiansForDistortedImagePlaneResidual(const TVec3<Scalar> prediction_undistorted_bearing_xyz,
+                                                                              TMat<Scalar> &jacobian_dr_dprojection,
                                                                               TMat<Scalar> &jacobian_dr_ddistortion) const {
-    if (!BasicCameraModel<Scalar>::JacobiansForDistortedImagePlaneResidual(distorted_pixel_uv, jacobian_dr_dprojection, jacobian_dr_ddistortion)) {
+    if (!BasicCameraModel<Scalar>::JacobiansForDistortedImagePlaneResidual(prediction_undistorted_bearing_xyz, jacobian_dr_dprojection,
+                                                                           jacobian_dr_ddistortion)) {
         return false;
     }
-    TVec2<Scalar> undistort_xy, distort_xy, predicted_xy;
-    const Scalar tolerance = this->options().kMaxIterateStepLengthForUndistortion;
-    if (!std::isfinite(tolerance) || tolerance <= 0 || !this->LiftFromRawImagePlaneToUndistortedNormalizedPlane(distorted_pixel_uv, undistort_xy) ||
-        !undistort_xy.allFinite()) {
-        return false;
-    }
-    this->LiftFromImagePlaneToNormalizedPlane(distorted_pixel_uv, distort_xy);
-    const Scalar allowed_error = std::max(tolerance, 8 * std::numeric_limits<Scalar>::epsilon() * (1 + distort_xy.norm()));
-    if (!DistortOnNormalizedPlane(undistort_xy, predicted_xy) || !predicted_xy.allFinite() || (predicted_xy - distort_xy).norm() > allowed_error) {
-        return false;
-    }
+    const TVec3<Scalar> bearing_vector = prediction_undistorted_bearing_xyz / prediction_undistorted_bearing_xyz.stableNorm();
+    TVec2<Scalar> undistort_xy;
+    this->LiftFromCameraFrameToNormalizedPlane(bearing_vector, undistort_xy);
     jacobian_dr_ddistortion.setZero(2, 6);
     const Scalar r = undistort_xy.norm();
     // Match the small-radius identity branch in DistortOnNormalizedPlane.
@@ -132,8 +126,6 @@ bool CameraOmniKannalaBrandt<Scalar>::JacobiansForDistortedImagePlaneResidual(co
         const Scalar theta2 = theta * theta, theta3 = theta2 * theta, theta4 = theta2 * theta2, theta5 = theta4 * theta;
         radial_derivative = (k_[0] + 2 * k_[1] * theta + 3 * k_[2] * theta2 + 4 * k_[3] * theta3 + 5 * k_[4] * theta4 + 6 * k_[5] * theta5) / (1 + r * r);
     }
-    TVec3<Scalar> bearing_vector;
-    this->LiftFromNormalizedPlaneToBearingVector(undistort_xy, bearing_vector);
     const Scalar denominator = bearing_vector.z() + this->xi();
     if (!bearing_vector.allFinite() || !(denominator > 0)) {
         return false;

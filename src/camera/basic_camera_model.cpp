@@ -48,14 +48,16 @@ void BasicCameraModel<Scalar>::SetCommonIntrinsicParameter(Scalar fx, Scalar fy,
 }
 
 template <typename Scalar>
-bool BasicCameraModel<Scalar>::JacobiansForDistortedImagePlaneResidual(const TVec2<Scalar> distorted_pixel_uv, TMat<Scalar> &jacobian_dr_dprojection,
-                                                                       TMat<Scalar> &jacobian_dr_ddistortion) const {
-    if (!distorted_pixel_uv.allFinite() || !std::isfinite(fx_) || !std::isfinite(fy_) || !std::isfinite(cx_) || !std::isfinite(cy_) || fx_ == 0 || fy_ == 0) {
+bool BasicCameraModel<Scalar>::JacobiansForDistortedImagePlaneResidual(const TVec3<Scalar> prediction_undistorted_bearing_xyz,
+                                                                       TMat<Scalar> &jacobian_dr_dprojection, TMat<Scalar> &jacobian_dr_ddistortion) const {
+    if (!prediction_undistorted_bearing_xyz.allFinite() || prediction_undistorted_bearing_xyz.stableNorm() == 0 || !std::isfinite(fx_) || !std::isfinite(fy_) ||
+        !std::isfinite(cx_) || !std::isfinite(cy_) || fx_ == 0 || fy_ == 0) {
         return false;
     }
-    TVec2<Scalar> distort_xy;
-    LiftFromImagePlaneToNormalizedPlane(distorted_pixel_uv, distort_xy);
-    if (!distort_xy.allFinite()) {
+    const TVec3<Scalar> bearing = prediction_undistorted_bearing_xyz / prediction_undistorted_bearing_xyz.stableNorm();
+    TVec2<Scalar> undistort_xy, distort_xy;
+    LiftFromCameraFrameToNormalizedPlane(bearing, undistort_xy);
+    if (!undistort_xy.allFinite() || !DistortOnNormalizedPlane(undistort_xy, distort_xy) || !distort_xy.allFinite()) {
         return false;
     }
     jacobian_dr_dprojection.resize(2, 4);

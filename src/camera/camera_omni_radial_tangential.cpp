@@ -117,29 +117,21 @@ bool CameraOmniRadialTangential<Scalar>::UndistortIteratively(const TVec2<Scalar
 }
 
 template <typename Scalar>
-bool CameraOmniRadialTangential<Scalar>::JacobiansForDistortedImagePlaneResidual(const TVec2<Scalar> distorted_pixel_uv, TMat<Scalar> &jacobian_dr_dprojection,
+bool CameraOmniRadialTangential<Scalar>::JacobiansForDistortedImagePlaneResidual(const TVec3<Scalar> prediction_undistorted_bearing_xyz,
+                                                                                 TMat<Scalar> &jacobian_dr_dprojection,
                                                                                  TMat<Scalar> &jacobian_dr_ddistortion) const {
-    if (!BasicCameraModel<Scalar>::JacobiansForDistortedImagePlaneResidual(distorted_pixel_uv, jacobian_dr_dprojection, jacobian_dr_ddistortion)) {
+    if (!BasicCameraModel<Scalar>::JacobiansForDistortedImagePlaneResidual(prediction_undistorted_bearing_xyz, jacobian_dr_dprojection,
+                                                                           jacobian_dr_ddistortion)) {
         return false;
     }
-    TVec2<Scalar> undistort_xy, distort_xy, predicted_xy;
-    const Scalar tolerance = this->options().kMaxIterateStepLengthForUndistortion;
-    if (!std::isfinite(tolerance) || tolerance <= 0 || !this->LiftFromRawImagePlaneToUndistortedNormalizedPlane(distorted_pixel_uv, undistort_xy) ||
-        !undistort_xy.allFinite()) {
-        return false;
-    }
-    this->LiftFromImagePlaneToNormalizedPlane(distorted_pixel_uv, distort_xy);
-    const Scalar allowed_error = std::max(tolerance, 8 * std::numeric_limits<Scalar>::epsilon() * (1 + distort_xy.norm()));
-    if (!DistortOnNormalizedPlane(undistort_xy, predicted_xy) || !predicted_xy.allFinite() || (predicted_xy - distort_xy).norm() > allowed_error) {
-        return false;
-    }
+    const TVec3<Scalar> bearing_vector = prediction_undistorted_bearing_xyz / prediction_undistorted_bearing_xyz.stableNorm();
+    TVec2<Scalar> undistort_xy;
+    this->LiftFromCameraFrameToNormalizedPlane(bearing_vector, undistort_xy);
     const Scalar x = undistort_xy.x(), y = undistort_xy.y();
     const Scalar r2 = undistort_xy.squaredNorm(), r4 = r2 * r2, r6 = r4 * r2;
     jacobian_dr_ddistortion.resize(2, 5);
     jacobian_dr_ddistortion << this->fx() * x * r2, this->fx() * x * r4, this->fx() * x * r6, this->fx() * 2 * x * y, this->fx() * (r2 + 2 * x * x),
         this->fy() * y * r2, this->fy() * y * r4, this->fy() * y * r6, this->fy() * (r2 + 2 * y * y), this->fy() * 2 * x * y;
-    TVec3<Scalar> bearing_vector;
-    this->LiftFromNormalizedPlaneToBearingVector(undistort_xy, bearing_vector);
     const Scalar denominator = bearing_vector.z() + this->xi();
     if (!bearing_vector.allFinite() || !(denominator > 0)) {
         return false;
