@@ -55,6 +55,9 @@ endif()
 if( NOT TARGET lib_baro_model )
     add_subdirectory( ${SENSOR_MODEL_PATH}/src/baro ${PROJECT_SOURCE_DIR}/build/lib_baro_model )
 endif()
+if( NOT TARGET lib_tof_model )
+    add_subdirectory( ${SENSOR_MODEL_PATH}/src/tof ${PROJECT_SOURCE_DIR}/build/lib_tof_model )
+endif()
 
 # Add image painter.
 set( IMAGE_PAINTER_PATH ${PROJECT_SOURCE_DIR}/../Image_Painter )
