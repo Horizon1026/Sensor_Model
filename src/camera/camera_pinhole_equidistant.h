@@ -23,6 +23,9 @@ public:
     virtual void LiftFromBearingVectorToImagePlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &pixel_uv) const override;
     virtual void LiftFromImagePlaneToBearingVector(const TVec2<Scalar> pixel_uv, TVec3<Scalar> &bearing_vector) const override;
 
+    virtual bool LiftFromRawImagePlaneToBearingVector(const TVec2<Scalar> pixel_uv, TVec3<Scalar> &bearing_vector) const override;
+    virtual bool LiftFromBearingVectorToRawImagePlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &pixel_uv) const override;
+
     /*  Equidistant model.
         r(theta) = theta * (1 + k1 * theta2 + k2 * theta4 + k3 * theta6 + k4 * theta8 + k5 * theta10) */
     virtual bool DistortOnNormalizedPlane(const TVec2<Scalar> undistort_xy, TVec2<Scalar> &distort_xy) const override;

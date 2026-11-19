@@ -30,8 +30,9 @@ public:
     bool RemapVirtualCameraImage(const GrayImage &raw_image);
     bool RemapPixelUvFromVirtualCameraToRealCamera(const Vec2 &virtual_pixel_uv, Vec2 &real_distort_pixel_uv);
     bool RemapPixelUvFromRealCameraToVirtualCamera(const Vec2 &real_distort_pixel_uv, Vec2 &virtual_pixel_uv);
-    bool RemapUndistortedNormXyFromVirtualCameraToRealCamera(const Vec2 &virtual_undistorted_norm_xy, Vec2 &real_undistorted_norm_xy);
-    bool RemapUndistortedNormXyFromRealCameraToVirtualCamera(const Vec2 &real_undistorted_norm_xy, Vec2 &virtual_undistorted_norm_xy);
+    // Rotate physical rays without projecting onto a normalized plane; ray length is preserved.
+    void RemapBearingVectorFromVirtualCameraToRealCamera(const Vec3 &virtual_bearing_xyz, Vec3 &real_bearing_xyz) const;
+    void RemapBearingVectorFromRealCameraToVirtualCamera(const Vec3 &real_bearing_xyz, Vec3 &virtual_bearing_xyz) const;
 
     Vec2 GetVirtualCameraFov() const;
     int32_t GetVirtualCameraImageRows() const;
@@ -49,10 +50,6 @@ public:
     const std::unique_ptr<BasicCameraModel<float>> &real_camera_model() const { return real_camera_model_; }
     const MatImg &virtual_camera_image() const { return virtual_camera_image_; }
     const MatImg &virtual_camera_mask() const { return virtual_camera_mask_; }
-
-private:
-    static bool RotateNormalizedPoint(const BasicCameraModel<float> &source, const BasicCameraModel<float> &target, const Mat3 &rotation, const Vec2 &source_xy,
-                                      Vec2 &target_xy);
 
 private:
     Options options_;

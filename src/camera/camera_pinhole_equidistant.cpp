@@ -57,6 +57,19 @@ void CameraPinholeEquidistant<Scalar>::LiftFromImagePlaneToBearingVector(const T
 }
 
 template <typename Scalar>
+bool CameraPinholeEquidistant<Scalar>::LiftFromRawImagePlaneToBearingVector(const TVec2<Scalar> pixel_uv, TVec3<Scalar> &bearing_vector) const {
+    LiftFromImagePlaneToBearingVector(pixel_uv, bearing_vector);
+    return bearing_vector.allFinite();
+}
+
+template <typename Scalar>
+bool CameraPinholeEquidistant<Scalar>::LiftFromBearingVectorToRawImagePlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &pixel_uv) const {
+    // This model's direct spherical projection already includes lens distortion.
+    LiftFromBearingVectorToImagePlane(bearing_vector, pixel_uv);
+    return pixel_uv.allFinite();
+}
+
+template <typename Scalar>
 bool CameraPinholeEquidistant<Scalar>::DistortOnNormalizedPlane(const TVec2<Scalar> undistort_xy, TVec2<Scalar> &distort_xy) const {
     const Scalar radius = undistort_xy.norm();
     if (radius < kZeroFloat) {
@@ -149,7 +162,7 @@ template <typename Scalar>
 bool CameraPinholeEquidistant<Scalar>::JacobiansForDistortedImagePlaneResidual(const TVec3<Scalar> prediction_undistorted_bearing_xyz,
                                                                                TMat<Scalar> &jacobian_dr_dprojection,
                                                                                TMat<Scalar> &jacobian_dr_ddistortion) const {
-    TMat<Scalar> jacobian_dr_dp_c;
+    TMat<Scalar> jacobian_dr_dp_c = TMat<Scalar>::Zero(2, 3);
     return JacobiansForDistortedImagePlaneResidual(prediction_undistorted_bearing_xyz, jacobian_dr_dprojection, jacobian_dr_ddistortion, jacobian_dr_dp_c);
 }
 

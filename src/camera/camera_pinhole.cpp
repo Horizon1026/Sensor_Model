@@ -3,6 +3,8 @@
 #include "slam_basic_math.h"
 #include "slam_operations.h"
 
+#include "limits"
+
 namespace sensor_model {
 
 /* Specialized Template Class Declaration. */
@@ -20,6 +22,10 @@ void CameraPinhole<Scalar>::LiftFromNormalizedPlaneToBearingVector(const TVec2<S
 // Lift 3d point in bearing vector to other coordinate systems.
 template <typename Scalar>
 void CameraPinhole<Scalar>::LiftFromBearingVectorToNormalizedPlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &norm_xy) const {
+    if (bearing_vector.z() <= 0) {
+        norm_xy.setConstant(std::numeric_limits<Scalar>::quiet_NaN());
+        return;
+    }
     norm_xy = bearing_vector.template head<2>() / bearing_vector.z();
 }
 

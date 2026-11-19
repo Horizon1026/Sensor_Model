@@ -45,6 +45,10 @@ public:
     virtual void LiftFromImagePlaneToNormalizedPlane(const TVec2<Scalar> pixel_uv, TVec2<Scalar> &norm_xy) const = 0;
     virtual void LiftFromImagePlaneToBearingVector(const TVec2<Scalar> pixel_uv, TVec3<Scalar> &bearing_vector) const;
 
+    // Raw (distorted) pixels and physical camera-frame rays. No pinhole-plane assumption is required by callers.
+    virtual bool LiftFromRawImagePlaneToBearingVector(const TVec2<Scalar> pixel_uv, TVec3<Scalar> &bearing_vector) const;
+    virtual bool LiftFromBearingVectorToRawImagePlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &pixel_uv) const;
+
     // Lift 2d point in raw image plane to undistorted normalized plane.
     virtual bool LiftFromRawImagePlaneToUndistortedNormalizedPlane(const TVec2<Scalar> pixel_uv, TVec2<Scalar> &undistort_xy) const = 0;
 

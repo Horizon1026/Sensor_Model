@@ -6,24 +6,6 @@
 
 namespace sensor_model {
 
-bool VirtualCamera::RotateNormalizedPoint(const BasicCameraModel<float> &source, const BasicCameraModel<float> &target, const Mat3 &rotation,
-                                          const Vec2 &source_xy, Vec2 &target_xy) {
-    Vec3 source_ray;
-    source.LiftFromNormalizedPlaneToBearingVector(source_xy, source_ray);
-    const Vec3 target_ray = rotation * source_ray;
-    if (!target_ray.allFinite() || target_ray.squaredNorm() == 0.0f) {
-        return false;
-    }
-    target.LiftFromCameraFrameToNormalizedPlane(target_ray, target_xy);
-    if (!target_xy.allFinite()) {
-        return false;
-    }
-    // Pinhole returns zero for invisible rays; ensure projection preserves direction.
-    Vec3 recovered_ray;
-    target.LiftFromNormalizedPlaneToBearingVector(target_xy, recovered_ray);
-    return recovered_ray.allFinite() && recovered_ray.dot(target_ray) > 0.0f;
-}
-
 bool VirtualCamera::CreateDefaultVirtualCameraModel() {
     RETURN_FALSE_IF(options_.kDefaultVirtualCameraImageRows <= 0);
     RETURN_FALSE_IF(options_.kDefaultVirtualCameraImageCols <= 0);
@@ -37,16 +19,17 @@ bool VirtualCamera::GenerateMaphex() { return GenerateMaphex(options_.kQrv); }
 
 bool VirtualCamera::GenerateMaphex(const Quat &q_rv) {
     RETURN_FALSE_IF(real_camera_model_ == nullptr);
+    const Quat rotation = q_rv.normalized();
 
     // Auto generate virtual camera model if not configured.
     if (virtual_camera_model_ == nullptr) {
         RETURN_FALSE_IF(!CreateDefaultVirtualCameraModel());
-        options_.kQrv = q_rv.normalized();
     }
 
     // Generate maphex.
-    H_virtual_to_real_ = q_rv.toRotationMatrix();
-    H_real_to_virtual_ = q_rv.inverse().toRotationMatrix();
+    options_.kQrv = rotation;
+    H_virtual_to_real_ = rotation.toRotationMatrix();
+    H_real_to_virtual_ = H_virtual_to_real_.transpose();
     maphex_row_.setZero(virtual_camera_model_->image_rows(), virtual_camera_model_->image_cols());
     maphex_col_.setZero(virtual_camera_model_->image_rows(), virtual_camera_model_->image_cols());
     for (int32_t row = 0; row < virtual_camera_model_->image_rows(); ++row) {
@@ -91,33 +74,29 @@ bool VirtualCamera::RemapVirtualCameraImage(const GrayImage &raw_image) {
 bool VirtualCamera::RemapPixelUvFromVirtualCameraToRealCamera(const Vec2 &virtual_distort_pixel_uv, Vec2 &real_distort_pixel_uv) {
     RETURN_FALSE_IF(real_camera_model_ == nullptr || virtual_camera_model_ == nullptr);
 
-    Vec2 virtual_norm_xy, real_norm_xy, real_distort_norm_xy;
-    RETURN_FALSE_IF(!virtual_camera_model_->LiftFromRawImagePlaneToUndistortedNormalizedPlane(virtual_distort_pixel_uv, virtual_norm_xy));
-    RETURN_FALSE_IF(!RotateNormalizedPoint(*virtual_camera_model_, *real_camera_model_, H_virtual_to_real_, virtual_norm_xy, real_norm_xy));
-    RETURN_FALSE_IF(!real_camera_model_->DistortOnNormalizedPlane(real_norm_xy, real_distort_norm_xy));
-    real_camera_model_->LiftFromNormalizedPlaneToImagePlane(real_distort_norm_xy, real_distort_pixel_uv);
-    return real_distort_pixel_uv.allFinite();
+    Vec3 virtual_bearing_xyz = Vec3::Zero();
+    Vec3 real_bearing_xyz = Vec3::Zero();
+    RETURN_FALSE_IF(!virtual_camera_model_->LiftFromRawImagePlaneToBearingVector(virtual_distort_pixel_uv, virtual_bearing_xyz));
+    RemapBearingVectorFromVirtualCameraToRealCamera(virtual_bearing_xyz, real_bearing_xyz);
+    return real_camera_model_->LiftFromBearingVectorToRawImagePlane(real_bearing_xyz, real_distort_pixel_uv);
 }
 
 bool VirtualCamera::RemapPixelUvFromRealCameraToVirtualCamera(const Vec2 &real_distort_pixel_uv, Vec2 &virtual_distort_pixel_uv) {
     RETURN_FALSE_IF(real_camera_model_ == nullptr || virtual_camera_model_ == nullptr);
 
-    Vec2 real_norm_xy, virtual_norm_xy, virtual_distort_norm_xy;
-    RETURN_FALSE_IF(!real_camera_model_->LiftFromRawImagePlaneToUndistortedNormalizedPlane(real_distort_pixel_uv, real_norm_xy));
-    RETURN_FALSE_IF(!RotateNormalizedPoint(*real_camera_model_, *virtual_camera_model_, H_real_to_virtual_, real_norm_xy, virtual_norm_xy));
-    RETURN_FALSE_IF(!virtual_camera_model_->DistortOnNormalizedPlane(virtual_norm_xy, virtual_distort_norm_xy));
-    virtual_camera_model_->LiftFromNormalizedPlaneToImagePlane(virtual_distort_norm_xy, virtual_distort_pixel_uv);
-    return virtual_distort_pixel_uv.allFinite();
+    Vec3 real_bearing_xyz = Vec3::Zero();
+    Vec3 virtual_bearing_xyz = Vec3::Zero();
+    RETURN_FALSE_IF(!real_camera_model_->LiftFromRawImagePlaneToBearingVector(real_distort_pixel_uv, real_bearing_xyz));
+    RemapBearingVectorFromRealCameraToVirtualCamera(real_bearing_xyz, virtual_bearing_xyz);
+    return virtual_camera_model_->LiftFromBearingVectorToRawImagePlane(virtual_bearing_xyz, virtual_distort_pixel_uv);
 }
 
-bool VirtualCamera::RemapUndistortedNormXyFromVirtualCameraToRealCamera(const Vec2 &virtual_undistorted_norm_xy, Vec2 &real_undistorted_norm_xy) {
-    RETURN_FALSE_IF(real_camera_model_ == nullptr || virtual_camera_model_ == nullptr);
-    return RotateNormalizedPoint(*virtual_camera_model_, *real_camera_model_, H_virtual_to_real_, virtual_undistorted_norm_xy, real_undistorted_norm_xy);
+void VirtualCamera::RemapBearingVectorFromVirtualCameraToRealCamera(const Vec3 &virtual_bearing_xyz, Vec3 &real_bearing_xyz) const {
+    real_bearing_xyz = H_virtual_to_real_ * virtual_bearing_xyz;
 }
 
-bool VirtualCamera::RemapUndistortedNormXyFromRealCameraToVirtualCamera(const Vec2 &real_undistorted_norm_xy, Vec2 &virtual_undistorted_norm_xy) {
-    RETURN_FALSE_IF(real_camera_model_ == nullptr || virtual_camera_model_ == nullptr);
-    return RotateNormalizedPoint(*real_camera_model_, *virtual_camera_model_, H_real_to_virtual_, real_undistorted_norm_xy, virtual_undistorted_norm_xy);
+void VirtualCamera::RemapBearingVectorFromRealCameraToVirtualCamera(const Vec3 &real_bearing_xyz, Vec3 &virtual_bearing_xyz) const {
+    virtual_bearing_xyz = H_real_to_virtual_ * real_bearing_xyz;
 }
 
 Vec2 VirtualCamera::GetVirtualCameraFov() const {
@@ -125,7 +104,8 @@ Vec2 VirtualCamera::GetVirtualCameraFov() const {
         return Vec2::Zero();
     }
 
-    Vec3 horizontal_ray, vertical_ray;
+    Vec3 horizontal_ray = Vec3::Zero();
+    Vec3 vertical_ray = Vec3::Zero();
     virtual_camera_model_->LiftFromImagePlaneToBearingVector(Vec2(0, virtual_camera_model_->cy()), horizontal_ray);
     virtual_camera_model_->LiftFromImagePlaneToBearingVector(Vec2(virtual_camera_model_->cx(), 0), vertical_ray);
     return kRadToDeg * 2.0f *

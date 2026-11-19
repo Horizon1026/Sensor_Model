@@ -23,6 +23,9 @@ public:
     virtual void LiftFromBearingVectorToImagePlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &pixel_uv) const override;
     virtual void LiftFromImagePlaneToBearingVector(const TVec2<Scalar> pixel_uv, TVec3<Scalar> &bearing_vector) const override;
 
+    virtual bool LiftFromRawImagePlaneToBearingVector(const TVec2<Scalar> pixel_uv, TVec3<Scalar> &bearing_vector) const override;
+    virtual bool LiftFromBearingVectorToRawImagePlane(const TVec3<Scalar> bearing_vector, TVec2<Scalar> &pixel_uv) const override;
+
     /*  Kannala-Brandt model.
         r(theta) = theta * (1 + k1*theta^2 + k2*theta^4 + ... + k6*theta^12). */
     virtual bool DistortOnNormalizedPlane(const TVec2<Scalar> undistort_xy, TVec2<Scalar> &distort_xy) const override;
