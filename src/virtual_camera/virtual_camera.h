@@ -5,7 +5,10 @@
 
 #include "basic_type.h"
 
+#include "array"
 #include "memory"
+#include "string"
+#include "vector"
 
 namespace sensor_model {
 
@@ -27,6 +30,8 @@ public:
     bool CreateDefaultVirtualCameraModel();
     bool GenerateMaphex();
     bool GenerateMaphex(const Quat &q_rv);
+    // Call after changing custom camera state not exposed by its intrinsic or distortion parameters.
+    void InvalidateBearingMap() { bearing_map_camera_ptr_ = nullptr; }
     bool RemapVirtualCameraImage(const GrayImage &raw_image);
     bool RemapPixelUvFromVirtualCameraToRealCamera(const Vec2 &virtual_pixel_uv, Vec2 &real_distort_pixel_uv);
     bool RemapPixelUvFromRealCameraToVirtualCamera(const Vec2 &real_distort_pixel_uv, Vec2 &virtual_pixel_uv);
@@ -52,6 +57,11 @@ public:
     const MatImg &virtual_camera_mask() const { return virtual_camera_mask_; }
 
 private:
+    void GenerateBearingMap();
+    void GenerateMaphexCpu();
+    void GenerateMaphexSimd();
+
+private:
     Options options_;
     std::unique_ptr<BasicCameraModel<float>> virtual_camera_model_ = nullptr;
     std::unique_ptr<BasicCameraModel<float>> real_camera_model_ = nullptr;
@@ -59,6 +69,12 @@ private:
     MatImg virtual_camera_mask_;
     Mat maphex_row_;
     Mat maphex_col_;
+    std::array<Mat, 3> bearing_map_xyz_ {};
+    TMat<uint8_t> bearing_map_valid_ {};
+    const BasicCameraModel<float> *bearing_map_camera_ptr_ = nullptr;
+    std::string bearing_map_camera_name_ = "";
+    std::array<int64_t, 4> bearing_map_integer_parameters_ {};
+    std::vector<float> bearing_map_parameters_ {};
     Mat3 H_virtual_to_real_ = Mat3::Identity();
     Mat3 H_real_to_virtual_ = Mat3::Identity();
 };

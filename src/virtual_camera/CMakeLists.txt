@@ -42,3 +42,13 @@ target_link_libraries( lib_virtual_camera_model
     lib_image
     lib_image_pyramid
 )
+
+# Use Highway when installed; otherwise keep the regular CPU implementation.
+find_package( hwy CONFIG QUIET )
+if( TARGET hwy::hwy )
+    target_compile_definitions( lib_virtual_camera_model PRIVATE SENSOR_MODEL_USE_HIGHWAY )
+    target_link_libraries( lib_virtual_camera_model hwy::hwy )
+    message( ">> Virtual camera map generation uses Google Highway." )
+else()
+    message( ">> Virtual camera map generation uses regular CPU." )
+endif()

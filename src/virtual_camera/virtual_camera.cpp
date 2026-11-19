@@ -30,23 +30,69 @@ bool VirtualCamera::GenerateMaphex(const Quat &q_rv) {
     options_.kQrv = rotation;
     H_virtual_to_real_ = rotation.toRotationMatrix();
     H_real_to_virtual_ = H_virtual_to_real_.transpose();
-    maphex_row_.setZero(virtual_camera_model_->image_rows(), virtual_camera_model_->image_cols());
-    maphex_col_.setZero(virtual_camera_model_->image_rows(), virtual_camera_model_->image_cols());
+    GenerateBearingMap();
+    maphex_row_.resize(virtual_camera_model_->image_rows(), virtual_camera_model_->image_cols());
+    maphex_col_.resize(virtual_camera_model_->image_rows(), virtual_camera_model_->image_cols());
+    GenerateMaphexSimd();
+    return true;
+}
+
+void VirtualCamera::GenerateBearingMap() {
+    const auto &camera = *virtual_camera_model_;
+    const auto &camera_options = camera.options();
+    const std::array<int64_t, 4> integer_parameters {
+        camera.image_rows(),
+        camera.image_cols(),
+        static_cast<int64_t>(camera_options.kUndistortMethod),
+        camera_options.kMaxIterationForUndistortion,
+    };
+    std::vector<float> parameters {
+        camera.fx(), camera.fy(), camera.cx(), camera.cy(), camera_options.kMaxIterateStepLengthForUndistortion,
+    };
+    const auto *omni_camera = dynamic_cast<const CameraOmni<float> *>(&camera);
+    if (omni_camera != nullptr) {
+        parameters.emplace_back(omni_camera->xi());
+    }
+    std::vector<float> distortion_parameters {};
+    camera.GetDistortionParameter(distortion_parameters);
+    parameters.insert(parameters.end(), distortion_parameters.begin(), distortion_parameters.end());
+    const std::string camera_name = camera.CameraModelName();
+    RETURN_IF(bearing_map_camera_ptr_ == &camera && bearing_map_camera_name_ == camera_name && bearing_map_integer_parameters_ == integer_parameters &&
+              bearing_map_parameters_ == parameters);
+
+    for (Mat &bearing_map: bearing_map_xyz_) {
+        bearing_map.resize(camera.image_rows(), camera.image_cols());
+    }
+    bearing_map_valid_.resize(camera.image_rows(), camera.image_cols());
+    for (int32_t row = 0; row < camera.image_rows(); ++row) {
+        for (int32_t col = 0; col < camera.image_cols(); ++col) {
+            Vec3 bearing_xyz = Vec3::Zero();
+            bearing_map_valid_(row, col) = camera.LiftFromRawImagePlaneToBearingVector(Vec2(col, row), bearing_xyz);
+            for (uint32_t axis = 0; axis < 3; ++axis) {
+                bearing_map_xyz_[axis](row, col) = bearing_xyz[axis];
+            }
+        }
+    }
+    bearing_map_camera_ptr_ = &camera;
+    bearing_map_camera_name_ = camera_name;
+    bearing_map_integer_parameters_ = integer_parameters;
+    bearing_map_parameters_ = std::move(parameters);
+}
+
+void VirtualCamera::GenerateMaphexCpu() {
     for (int32_t row = 0; row < virtual_camera_model_->image_rows(); ++row) {
         for (int32_t col = 0; col < virtual_camera_model_->image_cols(); ++col) {
-            const Vec2 virtual_distort_pixel_uv = Vec2(col, row);
+            maphex_col_(row, col) = -1;
+            maphex_row_(row, col) = -1;
+            CONTINUE_IF(!bearing_map_valid_(row, col));
+            const Vec3 virtual_bearing_xyz(bearing_map_xyz_[0](row, col), bearing_map_xyz_[1](row, col), bearing_map_xyz_[2](row, col));
+            const Vec3 real_bearing_xyz = H_virtual_to_real_ * virtual_bearing_xyz;
             Vec2 real_distort_pixel_uv = Vec2::Zero();
-            if (!RemapPixelUvFromVirtualCameraToRealCamera(virtual_distort_pixel_uv, real_distort_pixel_uv)) {
-                maphex_col_(row, col) = -1;
-                maphex_row_(row, col) = -1;
-                continue;
-            }
+            CONTINUE_IF(!real_camera_model_->LiftFromBearingVectorToRawImagePlane(real_bearing_xyz, real_distort_pixel_uv));
             maphex_col_(row, col) = real_distort_pixel_uv.x();
             maphex_row_(row, col) = real_distort_pixel_uv.y();
         }
     }
-
-    return true;
 }
 
 bool VirtualCamera::RemapVirtualCameraImage(const GrayImage &raw_image) {
