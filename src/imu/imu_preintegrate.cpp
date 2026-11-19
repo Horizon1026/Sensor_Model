@@ -84,7 +84,8 @@ bool ImuPreintegrateBlock<Scalar>::Propagate(const ImuMeasurement &measure_i, co
     const TQuat<Scalar> new_q_ij = (q_ij_ * dq).normalized();
 
     // Compute delta position and velocity.
-    const TVec3<Scalar> mid_accel = 0.5 * (q_ij_ * (measure_i.accel_mps2.cast<Scalar>() - bias_accel_) + new_q_ij * (measure_j.accel_mps2.cast<Scalar>() - bias_accel_));
+    const TVec3<Scalar> mid_accel =
+        0.5 * (q_ij_ * (measure_i.accel_mps2.cast<Scalar>() - bias_accel_) + new_q_ij * (measure_j.accel_mps2.cast<Scalar>() - bias_accel_));
     const TVec3<Scalar> new_p_ij = p_ij_ + v_ij_ * dt + 0.5 * mid_accel * dt2;
     const TVec3<Scalar> new_v_ij = v_ij_ + mid_accel * dt;
 

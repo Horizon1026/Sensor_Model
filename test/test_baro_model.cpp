@@ -22,8 +22,7 @@ int main(int argc, char **argv) {
         measure.temperature_degC = 25.0f;
         const float standard = barometer.ConvertBaroToAltitude(measure);
         const float compensated = barometer.ConvertBaroWithTemperatureToAltitude(measure);
-        ReportInfo("  - At sea level pressure, standard altitude = " << standard
-                   << " m, compensated altitude = " << compensated << " m.");
+        ReportInfo("  - At sea level pressure, standard altitude = " << standard << " m, compensated altitude = " << compensated << " m.");
         if (std::abs(standard) > 0.1f || std::abs(compensated) > 0.1f) {
             ReportError("    Failed: sea level pressure should map to ~0 m.");
             return -1;
@@ -38,8 +37,7 @@ int main(int argc, char **argv) {
         measure.temperature_degC = 15.0f;
         const float standard = barometer.ConvertBaroToAltitude(measure);
         const float compensated = barometer.ConvertBaroWithTemperatureToAltitude(measure);
-        ReportInfo("  - At 15 degC, standard altitude = " << standard
-                   << " m, compensated altitude = " << compensated << " m.");
+        ReportInfo("  - At 15 degC, standard altitude = " << standard << " m, compensated altitude = " << compensated << " m.");
         if (std::abs(standard - compensated) > 1.0f) {
             ReportError("    Failed: compensated altitude should match standard altitude at 15 degC.");
             return -1;
@@ -69,8 +67,7 @@ int main(int argc, char **argv) {
         measure.temperature_degC = 15.0f;
         const float altitude = barometer.ConvertBaroToAltitude(measure);
         const float compensated = barometer.ConvertBaroWithTemperatureToAltitude(measure);
-        ReportInfo("  - ISA pressure at 500 m maps back to " << altitude
-                   << " m (standard), " << compensated << " m (compensated).");
+        ReportInfo("  - ISA pressure at 500 m maps back to " << altitude << " m (standard), " << compensated << " m (compensated).");
         if (std::abs(altitude - 500.0f) > 2.0f) {
             ReportError("    Failed: ISA round-trip should recover ~500 m.");
             return -1;

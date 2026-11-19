@@ -77,8 +77,8 @@ float Lidar::ComputeRatioOfZeroIntensityPoints(const LidarMeasurement &measure) 
     return static_cast<float>(cnt) / static_cast<float>(measure.intensity_of_points.size());
 }
 
-void Lidar::DownsampleLidarScan(const std::vector<Vec3> &all_raw_p_l, const uint32_t max_num_of_downsampled_points,
-                              std::vector<Vec3> &all_downsampled_p_l, const float radius, const float voxel_step) {
+void Lidar::DownsampleLidarScan(const std::vector<Vec3> &all_raw_p_l, const uint32_t max_num_of_downsampled_points, std::vector<Vec3> &all_downsampled_p_l,
+                                const float radius, const float voxel_step) {
     if (&all_raw_p_l == &all_downsampled_p_l) {
         std::vector<Vec3> sampled_points;
         DownsampleLidarScan(all_raw_p_l, max_num_of_downsampled_points, sampled_points, radius, voxel_step);

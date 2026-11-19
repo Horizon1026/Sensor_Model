@@ -389,8 +389,7 @@ bool Lidar::ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3
                 if (pos + 8 > buffer.size()) {
                     // Only a trailing newline / whitespace is acceptable, nothing else.
                     size_t k = pos;
-                    for (; k < buffer.size() && std::isspace(buffer[k]); ++k) {
-                    }
+                    for (; k < buffer.size() && std::isspace(buffer[k]); ++k) {}
                     if (k < buffer.size()) {
                         ReportError("Truncated compressed data in pcd file: " << pcd_file);
                         return false;

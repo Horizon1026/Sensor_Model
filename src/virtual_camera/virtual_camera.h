@@ -51,6 +51,10 @@ public:
     const MatImg &virtual_camera_mask() const { return virtual_camera_mask_; }
 
 private:
+    static bool RotateNormalizedPoint(const BasicCameraModel<float> &source, const BasicCameraModel<float> &target, const Mat3 &rotation, const Vec2 &source_xy,
+                                      Vec2 &target_xy);
+
+private:
     Options options_;
     std::unique_ptr<BasicCameraModel<float>> virtual_camera_model_ = nullptr;
     std::unique_ptr<BasicCameraModel<float>> real_camera_model_ = nullptr;

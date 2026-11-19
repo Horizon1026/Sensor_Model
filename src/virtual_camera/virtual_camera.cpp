@@ -6,9 +6,8 @@
 
 namespace sensor_model {
 
-namespace {
-bool RotateNormalizedPoint(const BasicCameraModel<float> &source, const BasicCameraModel<float> &target,
-                           const Mat3 &rotation, const Vec2 &source_xy, Vec2 &target_xy) {
+bool VirtualCamera::RotateNormalizedPoint(const BasicCameraModel<float> &source, const BasicCameraModel<float> &target, const Mat3 &rotation,
+                                          const Vec2 &source_xy, Vec2 &target_xy) {
     Vec3 source_ray;
     source.LiftFromNormalizedPlaneToBearingVector(source_xy, source_ray);
     const Vec3 target_ray = rotation * source_ray;
@@ -24,14 +23,13 @@ bool RotateNormalizedPoint(const BasicCameraModel<float> &source, const BasicCam
     target.LiftFromNormalizedPlaneToBearingVector(target_xy, recovered_ray);
     return recovered_ray.allFinite() && recovered_ray.dot(target_ray) > 0.0f;
 }
-}  // namespace
-
 
 bool VirtualCamera::CreateDefaultVirtualCameraModel() {
     RETURN_FALSE_IF(options_.kDefaultVirtualCameraImageRows <= 0);
     RETURN_FALSE_IF(options_.kDefaultVirtualCameraImageCols <= 0);
-    virtual_camera_model_ = std::make_unique<CameraPinhole<float>>(options_.kDefaultVirtualCameraFocalLength, options_.kDefaultVirtualCameraFocalLength,
-                                                            options_.kDefaultVirtualCameraImageCols * 0.5f, options_.kDefaultVirtualCameraImageRows * 0.5f);
+    virtual_camera_model_ =
+        std::make_unique<CameraPinhole<float>>(options_.kDefaultVirtualCameraFocalLength, options_.kDefaultVirtualCameraFocalLength,
+                                               options_.kDefaultVirtualCameraImageCols * 0.5f, options_.kDefaultVirtualCameraImageRows * 0.5f);
     return true;
 }
 
@@ -130,8 +128,8 @@ Vec2 VirtualCamera::GetVirtualCameraFov() const {
     Vec3 horizontal_ray, vertical_ray;
     virtual_camera_model_->LiftFromImagePlaneToBearingVector(Vec2(0, virtual_camera_model_->cy()), horizontal_ray);
     virtual_camera_model_->LiftFromImagePlaneToBearingVector(Vec2(virtual_camera_model_->cx(), 0), vertical_ray);
-    return kRadToDeg * 2.0f * Vec2(std::atan2(horizontal_ray.head<2>().norm(), horizontal_ray.z()),
-                                  std::atan2(vertical_ray.head<2>().norm(), vertical_ray.z()));
+    return kRadToDeg * 2.0f *
+           Vec2(std::atan2(horizontal_ray.head<2>().norm(), horizontal_ray.z()), std::atan2(vertical_ray.head<2>().norm(), vertical_ray.z()));
 }
 
 int32_t VirtualCamera::GetVirtualCameraImageRows() const {

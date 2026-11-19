@@ -72,7 +72,9 @@ public:
 
     // Also differentiate with respect to the input camera-frame point, without unit-length normalization.
     virtual bool JacobiansForDistortedImagePlaneResidual(const TVec3<Scalar> prediction_undistorted_bearing_xyz, TMat<Scalar> &jacobian_dr_dprojection,
-                                                         TMat<Scalar> &jacobian_dr_ddistortion, TMat<Scalar> &jacobian_dr_dp_c) const { return false; }
+                                                         TMat<Scalar> &jacobian_dr_ddistortion, TMat<Scalar> &jacobian_dr_dp_c) const {
+        return false;
+    }
 
     // Set intrinsic and distortion parameters.
     void SetImageSize(int32_t image_rows, int32_t image_cols);
