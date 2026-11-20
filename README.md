@@ -9,7 +9,8 @@ The model of sensors for slam, for example, imu, camera, and so on.
         - [x] Kannala-Brandt
     - [x] Omni
         - [x] Radtan
-        - [ ] Equidistant
+        - [x] Equidistant
+        - [x] Kannala-Brandt
 - [x] Virtual camera model
 - [x] Imu model
 - [x] Wheel odom model
@@ -31,6 +32,7 @@ The model of sensors for slam, for example, imu, camera, and so on.
 - Eigen3 (>= 3.3.7)（`sudo apt install libeigen3-dev`）
 - dw (`sudo apt install libdw-dev`)
 - glfw (`sudo apt install libglfw3-dev`)
+- Google Highway / hwy（virtual camera 的可选 SIMD 加速依赖，非必要，`sudo apt install libhwy-dev`）
 
 # Compile and Run
 - 第三方仓库的话需要自行 apt-get install 安装
