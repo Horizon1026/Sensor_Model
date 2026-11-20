@@ -1,5 +1,7 @@
 #include "virtual_camera.h"
 
+#include "limits"
+
 #if defined(SENSOR_MODEL_USE_HIGHWAY)
 
 #undef HWY_TARGET_INCLUDE
@@ -39,8 +41,8 @@ namespace HWY_NAMESPACE {
             hn::StoreU(hn::Add(hn::Add(hn::Mul(r10, x), hn::Mul(r11, y)), hn::Mul(r12, z)), d, rotated_y.data());
             hn::StoreU(hn::Add(hn::Add(hn::Mul(r20, x), hn::Mul(r21, y)), hn::Mul(r22, z)), d, rotated_z.data());
             for (uint32_t lane = 0; lane < lanes; ++lane) {
-                map_col[index + lane] = -1;
-                map_row[index + lane] = -1;
+                map_col[index + lane] = std::numeric_limits<float>::quiet_NaN();
+                map_row[index + lane] = std::numeric_limits<float>::quiet_NaN();
                 if (!valid[index + lane]) {
                     continue;
                 }
@@ -56,8 +58,8 @@ namespace HWY_NAMESPACE {
         // Handle pixels that do not fill an entire SIMD batch.
         const Mat3 rotation_matrix = Eigen::Map<const Mat3>(rotation);
         for (; index < count; ++index) {
-            map_col[index] = -1;
-            map_row[index] = -1;
+            map_col[index] = std::numeric_limits<float>::quiet_NaN();
+            map_row[index] = std::numeric_limits<float>::quiet_NaN();
             if (!valid[index]) {
                 continue;
             }

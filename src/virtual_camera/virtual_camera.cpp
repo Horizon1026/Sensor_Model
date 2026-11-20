@@ -4,6 +4,9 @@
 #include "slam_log_reporter.h"
 #include "slam_operations.h"
 
+#include "algorithm"
+#include "limits"
+
 namespace sensor_model {
 
 bool VirtualCamera::CreateDefaultVirtualCameraModel() {
@@ -82,8 +85,8 @@ void VirtualCamera::GenerateBearingMap() {
 void VirtualCamera::GenerateMaphexCpu() {
     for (int32_t row = 0; row < virtual_camera_model_->image_rows(); ++row) {
         for (int32_t col = 0; col < virtual_camera_model_->image_cols(); ++col) {
-            maphex_col_(row, col) = -1;
-            maphex_row_(row, col) = -1;
+            maphex_col_(row, col) = std::numeric_limits<float>::quiet_NaN();
+            maphex_row_(row, col) = std::numeric_limits<float>::quiet_NaN();
             CONTINUE_IF(!bearing_map_valid_(row, col));
             const Vec3 virtual_bearing_xyz(bearing_map_xyz_[0](row, col), bearing_map_xyz_[1](row, col), bearing_map_xyz_[2](row, col));
             const Vec3 real_bearing_xyz = H_virtual_to_real_ * virtual_bearing_xyz;
@@ -107,10 +110,29 @@ bool VirtualCamera::RemapVirtualCameraImage(const GrayImage &raw_image) {
 
     for (int32_t row = 0; row < image_rows; ++row) {
         for (int32_t col = 0; col < image_cols; ++col) {
+            const float pixel_row = maphex_row_(row, col);
+            const float pixel_col = maphex_col_(row, col);
+            CONTINUE_IF(!std::isfinite(pixel_row) || !std::isfinite(pixel_col));
             float pixel_value = 0.0f;
-            CONTINUE_IF(!raw_image.GetPixelValue(maphex_row_(row, col), maphex_col_(row, col), &pixel_value));
+            const bool is_valid = raw_image.GetPixelValue(pixel_row, pixel_col, &pixel_value);
+            if (!is_valid) {
+                // Replicate source borders while preserving interpolation along the edge.
+                const float clamped_row = std::clamp(pixel_row, 0.0f, static_cast<float>(raw_image.rows() - 1));
+                const float clamped_col = std::clamp(pixel_col, 0.0f, static_cast<float>(raw_image.cols() - 1));
+                const int32_t row_0 = static_cast<int32_t>(clamped_row);
+                const int32_t col_0 = static_cast<int32_t>(clamped_col);
+                const int32_t row_1 = std::min(row_0 + 1, raw_image.rows() - 1);
+                const int32_t col_1 = std::min(col_0 + 1, raw_image.cols() - 1);
+                const float row_weight = clamped_row - row_0;
+                const float col_weight = clamped_col - col_0;
+                pixel_value =
+                    (1.0f - row_weight) *
+                        ((1.0f - col_weight) * raw_image.GetPixelValueNoCheck(row_0, col_0) + col_weight * raw_image.GetPixelValueNoCheck(row_0, col_1)) +
+                    row_weight *
+                        ((1.0f - col_weight) * raw_image.GetPixelValueNoCheck(row_1, col_0) + col_weight * raw_image.GetPixelValueNoCheck(row_1, col_1));
+            }
             virtual_camera_image_(row, col) = static_cast<uint8_t>(static_cast<int32_t>(pixel_value));
-            virtual_camera_mask_(row, col) = 255;
+            virtual_camera_mask_(row, col) = is_valid ? 255 : 0;
         }
     }
 
