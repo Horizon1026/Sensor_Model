@@ -116,7 +116,7 @@ bool ParseUnsigned(const std::string &text, uint32_t &value) {
 }
 
 /* Read one line (without the terminating '\n', and any trailing '\r') from a byte buffer. */
-bool ReadLine(const std::vector<uint8_t> &buffer, size_t &pos, std::string &line) {
+bool ReadLine(const std::vector<uint8_t> &buffer, uint32_t &pos, std::string &line) {
     line.clear();
     while (pos < buffer.size() && buffer[pos] != '\n') {
         line.push_back(static_cast<char>(buffer[pos]));
@@ -135,8 +135,8 @@ bool ReadLine(const std::vector<uint8_t> &buffer, size_t &pos, std::string &line
 }
 
 /* Parse the PCD header. On success `data_offset` points at the first byte after the DATA line. */
-bool ParsePcdHeader(const std::vector<uint8_t> &buffer, size_t &data_offset, PcdHeader &header) {
-    size_t pos = 0;
+bool ParsePcdHeader(const std::vector<uint8_t> &buffer, uint32_t &data_offset, PcdHeader &header) {
+    uint32_t pos = 0;
     while (pos < buffer.size()) {
         std::string line;
         if (!ReadLine(buffer, pos, line)) {
@@ -159,17 +159,17 @@ bool ParsePcdHeader(const std::vector<uint8_t> &buffer, size_t &data_offset, Pcd
             }
         } else if (key == "SIZE") {
             uint32_t value = 0;
-            for (size_t i = 0; i < header.fields.size() && iss >> value; ++i) {
+            for (uint32_t i = 0; i < header.fields.size() && iss >> value; ++i) {
                 header.fields[i].size = value;
             }
         } else if (key == "TYPE") {
             char type = 0;
-            for (size_t i = 0; i < header.fields.size() && iss >> type; ++i) {
+            for (uint32_t i = 0; i < header.fields.size() && iss >> type; ++i) {
                 header.fields[i].type = type;
             }
         } else if (key == "COUNT") {
             uint32_t value = 0;
-            for (size_t i = 0; i < header.fields.size() && iss >> value; ++i) {
+            for (uint32_t i = 0; i < header.fields.size() && iss >> value; ++i) {
                 header.fields[i].count = value;
             }
         } else if (key == "WIDTH") {
@@ -198,7 +198,7 @@ bool ParsePcdHeader(const std::vector<uint8_t> &buffer, size_t &data_offset, Pcd
 }
 
 /* Read one ascii token from a byte buffer, skipping any whitespace. */
-bool ReadAsciiToken(const std::vector<uint8_t> &buffer, size_t &pos, std::string &token) {
+bool ReadAsciiToken(const std::vector<uint8_t> &buffer, uint32_t &pos, std::string &token) {
     while (pos < buffer.size() && std::isspace(buffer[pos])) {
         ++pos;
     }
@@ -298,7 +298,7 @@ bool Lidar::ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3
     const std::streamoff file_size = file.tellg();
     file.seekg(0, std::ios::beg);
     if (file_size > 0) {
-        buffer.resize(static_cast<size_t>(file_size));
+        buffer.resize(static_cast<uint32_t>(file_size));
         file.read(reinterpret_cast<char *>(buffer.data()), file_size);
     }
     if (buffer.empty()) {
@@ -306,7 +306,7 @@ bool Lidar::ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3
         return false;
     }
 
-    size_t data_offset = 0;
+    uint32_t data_offset = 0;
     PcdHeader header;
     if (!ParsePcdHeader(buffer, data_offset, header)) {
         ReportError("Failed to parse pcd header of file: " << pcd_file);
@@ -327,7 +327,7 @@ bool Lidar::ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3
     int32_t x_index = -1;
     int32_t y_index = -1;
     int32_t z_index = -1;
-    for (size_t i = 0; i < header.fields.size(); ++i) {
+    for (uint32_t i = 0; i < header.fields.size(); ++i) {
         if (header.fields[i].name == "x") {
             x_index = static_cast<int32_t>(i);
         } else if (header.fields[i].name == "y") {
@@ -344,7 +344,7 @@ bool Lidar::ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3
     // Byte offset of every field inside one point record.
     std::vector<uint32_t> field_offsets(header.fields.size(), 0);
     uint32_t point_step = 0;
-    for (size_t i = 0; i < header.fields.size(); ++i) {
+    for (uint32_t i = 0; i < header.fields.size(); ++i) {
         field_offsets[i] = point_step;
         point_step += header.fields[i].size * header.fields[i].count;
     }
@@ -355,11 +355,11 @@ bool Lidar::ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3
         // Points are space separated text, one point per line in the standard
         // layout. Parse the remainder as a flat token stream instead so that
         // arbitrary whitespace / line breaks are tolerated.
-        size_t pos = data_offset;
+        uint32_t pos = data_offset;
         std::string token;
         std::vector<std::string> point_tokens(header.fields.size());
         for (uint32_t i = 0; i < header.points; ++i) {
-            for (size_t j = 0; j < header.fields.size(); ++j) {
+            for (uint32_t j = 0; j < header.fields.size(); ++j) {
                 if (!ReadAsciiToken(buffer, pos, token)) {
                     ReportError("Not enough ascii data in pcd file: " << pcd_file);
                     return false;
@@ -384,11 +384,11 @@ bool Lidar::ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3
         std::vector<uint8_t> uncompressed;
         if (header.data_type == "binary_compressed") {
             // Decompress every block in order and concatenate them into one field-major buffer.
-            size_t pos = data_offset;
+            uint32_t pos = data_offset;
             while (pos < buffer.size()) {
                 if (pos + 8 > buffer.size()) {
                     // Only a trailing newline / whitespace is acceptable, nothing else.
-                    size_t k = pos;
+                    uint32_t k = pos;
                     for (; k < buffer.size() && std::isspace(buffer[k]); ++k) {}
                     if (k < buffer.size()) {
                         ReportError("Truncated compressed data in pcd file: " << pcd_file);
@@ -404,7 +404,7 @@ bool Lidar::ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3
                     ReportError("Truncated compressed data in pcd file: " << pcd_file);
                     return false;
                 }
-                const size_t old_size = uncompressed.size();
+                const uint32_t old_size = uncompressed.size();
                 uncompressed.resize(old_size + uncompressed_size);
                 const uint32_t written = LzfDecompress(buffer.data() + pos + 8, compressed_size, uncompressed.data() + old_size, uncompressed_size);
                 if (written != uncompressed_size) {
@@ -429,7 +429,7 @@ bool Lidar::ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3
             // matching slot of their field blocks instead of one record.
             std::vector<uint64_t> field_major_offsets(header.fields.size(), 0);
             uint64_t field_block_bytes = 0;
-            for (size_t i = 0; i < header.fields.size(); ++i) {
+            for (uint32_t i = 0; i < header.fields.size(); ++i) {
                 field_major_offsets[i] = field_block_bytes;
                 field_block_bytes += static_cast<uint64_t>(header.points) * header.fields[i].count * header.fields[i].size;
             }
