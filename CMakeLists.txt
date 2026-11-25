@@ -58,6 +58,9 @@ endif()
 if( NOT TARGET lib_tof_model )
     add_subdirectory( ${SENSOR_MODEL_PATH}/src/tof ${PROJECT_SOURCE_DIR}/build/lib_tof_model )
 endif()
+if( NOT TARGET lib_visual_measure )
+    add_subdirectory( ${SENSOR_MODEL_PATH}/src/visual_measure ${PROJECT_SOURCE_DIR}/build/lib_visual_measure )
+endif()
 
 # Add image painter.
 set( IMAGE_PAINTER_PATH ${PROJECT_SOURCE_DIR}/../Image_Painter )

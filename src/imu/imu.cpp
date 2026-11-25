@@ -1,10 +1,32 @@
 #include "imu.h"
 
+#include "slam_operations.h"
+
 #include "slam_log_reporter.h"
 
-#include <cmath>
+#include "cmath"
+#include "cstdio"
+#include "fstream"
 
 namespace sensor_model {
+
+bool Imu::ParseMeasuresFromFile(const std::string &file_path, const double &time_stamp_offset_s, std::vector<ImuMeasurement> &measures) {
+    std::ifstream file(file_path);
+    std::string line;
+    RETURN_FALSE_IF(!file.is_open() || !std::getline(file, line));
+
+    measures.clear();
+    while (std::getline(file, line)) {
+        double data[7] = {};
+        CONTINUE_IF(std::sscanf(line.c_str(), "%lf,%lf,%lf,%lf,%lf,%lf,%lf", &data[0], &data[1], &data[2], &data[3], &data[4], &data[5], &data[6]) != 7);
+        ImuMeasurement measure;
+        measure.time_stamp_s = data[0] * 1e-9 - time_stamp_offset_s;
+        measure.gyro_rps = Vec3(data[1], data[2], data[3]);
+        measure.accel_mps2 = Vec3(data[4], data[5], data[6]);
+        measures.emplace_back(measure);
+    }
+    return !measures.empty();
+}
 
 void Imu::DiscretizeImuProcessFunction(const Mat &Fc, const Mat &Gc_sqrt_Qc, const float dt, Mat &Ft, Mat &sqrt_Qt_t) const {
     // Covariance integral reference: C. F. Van Loan, "Computing Integrals Involving the Matrix Exponential", IEEE TAC, 23(3):395-404, 1978,
@@ -32,9 +54,7 @@ void Imu::DiscretizeImuProcessFunction(const Mat &Fc, const Mat &Gc_sqrt_Qc, con
 }
 
 bool Imu::PropagateNominalState(const ImuMeasurement &meas_prev, const ImuMeasurement &meas_next, const ImuState &state_prev, ImuState &state_next) {
-    if (meas_prev.time_stamp_s > meas_next.time_stamp_s) {
-        return false;
-    }
+    RETURN_FALSE_IF(meas_prev.time_stamp_s > meas_next.time_stamp_s);
 
     // Propagate nominal state.
     Vec3 mid_accel_i = Vec3::Zero();
@@ -44,9 +64,7 @@ bool Imu::PropagateNominalState(const ImuMeasurement &meas_prev, const ImuMeasur
 
 bool Imu::PropagateNominalState(const ImuMeasurement &meas_prev, const ImuMeasurement &meas_next, const ImuState &state_prev, ImuState &state_next,
                                 Vec3 &mid_accel_i, Vec3 &mid_gyro_i) {
-    if (meas_prev.time_stamp_s > meas_next.time_stamp_s) {
-        return false;
-    }
+    RETURN_FALSE_IF(meas_prev.time_stamp_s > meas_next.time_stamp_s);
 
     const float dt = static_cast<float>(meas_next.time_stamp_s - meas_prev.time_stamp_s);
     const Vec3 &bias_a = state_prev.ba();
@@ -77,9 +95,7 @@ bool Imu::PropagateNominalStateCovariance(const ImuMeasurement &meas_prev, const
 bool Imu::PropagateResidualStateCovariance(const ImuMeasurement &meas_prev, const ImuMeasurement &meas_next, const Vec3 &mid_accel_i, const Vec3 &mid_gyro_i,
                                            const ImuState &state_prev, const Mat15 &cov_prev, Mat15 &cov_next) {
 
-    if (meas_next.time_stamp_s - meas_prev.time_stamp_s < 0) {
-        return false;
-    }
+    RETURN_FALSE_IF(meas_next.time_stamp_s - meas_prev.time_stamp_s < 0);
 
     const float dt = static_cast<float>(meas_next.time_stamp_s - meas_prev.time_stamp_s);
     const Mat3 dt_I3 = dt * Mat3::Identity();

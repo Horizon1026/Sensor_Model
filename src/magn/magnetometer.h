@@ -6,6 +6,9 @@
 #include "basic_type.h"
 #include "slam_basic_math.h"
 
+#include "string"
+#include "vector"
+
 namespace sensor_model {
 
 /* Class Magnetometer Model Declaration. */
@@ -20,6 +23,9 @@ public:
 public:
     Magnetometer() = default;
     virtual ~Magnetometer() = default;
+
+    // CSV: timestamp[ns], magn_x[mG], magn_y[mG], magn_z[mG].
+    static bool ParseMeasuresFromFile(const std::string &file_path, const double &time_stamp_offset_s, std::vector<MagnMeasurement> &measures);
 
     // Convert magnetometer measurement to yaw (heading) angle.
     float ConvertMagnToYaw(const MagnMeasurement &magn, const Quat &q_im = Quat::Identity(), const Quat &q_wi = Quat::Identity());

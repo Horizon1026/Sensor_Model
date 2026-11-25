@@ -6,6 +6,9 @@
 #include "basic_type.h"
 #include "slam_basic_math.h"
 
+#include "string"
+#include "vector"
+
 namespace sensor_model {
 
 /* Class Gnss Model Declaration. */
@@ -22,6 +25,9 @@ public:
 public:
     Gnss() = default;
     virtual ~Gnss() = default;
+
+    // CSV: timestamp[ns], fixed_type, velocity_e, velocity_n, velocity_u, longitude[deg], latitude[deg], altitude[m].
+    static bool ParseMeasuresFromFile(const std::string &file_path, const double &time_stamp_offset_s, std::vector<GnssMeasurement> &measures);
 
     // Process measurements to be state observations.
     TVec3<double> ConvertLlaToEnu(const GnssMeasurement &origin_lla, const GnssMeasurement &lla);

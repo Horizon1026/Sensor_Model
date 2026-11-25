@@ -8,6 +8,9 @@
 #include "basic_type.h"
 #include "slam_basic_math.h"
 
+#include "string"
+#include "vector"
+
 namespace sensor_model {
 
 /* Class IMU model Declaration. */
@@ -26,6 +29,9 @@ public:
 public:
     Imu() = default;
     virtual ~Imu() = default;
+
+    // CSV: timestamp[ns], gyro_x, gyro_y, gyro_z, accel_x, accel_y, accel_z.
+    static bool ParseMeasuresFromFile(const std::string &file_path, const double &time_stamp_offset_s, std::vector<ImuMeasurement> &measures);
 
     bool PropagateNominalState(const ImuMeasurement &meas_prev, const ImuMeasurement &meas_next, const ImuState &state_prev, ImuState &state_next);
 

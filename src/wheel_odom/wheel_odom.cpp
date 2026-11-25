@@ -1,9 +1,33 @@
 #include "wheel_odom.h"
 
+#include "slam_operations.h"
+
 #include "slam_basic_math.h"
 #include "slam_log_reporter.h"
 
+#include "cstdio"
+#include "fstream"
+
 namespace sensor_model {
+
+bool WheelOdom::ParseMeasuresFromFile(const std::string &file_path, const double &time_stamp_offset_s, std::vector<WheelOdomMeasurement> &measures) {
+    std::ifstream file(file_path);
+    std::string line;
+    RETURN_FALSE_IF(!file.is_open() || !std::getline(file, line));
+
+    measures.clear();
+    while (std::getline(file, line)) {
+        double data[4] = {};
+        CONTINUE_IF(std::sscanf(line.c_str(), "%lf,%lf,%lf,%lf", &data[0], &data[1], &data[2], &data[3]) != 4);
+        WheelOdomMeasurement measure;
+        measure.time_stamp_s = data[0] * 1e-9 - time_stamp_offset_s;
+        measure.is_wheel_velocity_valid = data[1] == 1;
+        measure.encoder_left_cnt = static_cast<float>(data[2]);
+        measure.encoder_right_cnt = static_cast<float>(data[3]);
+        measures.emplace_back(measure);
+    }
+    return !measures.empty();
+}
 
 Vec3 WheelOdom::ConvertEncoderCountToVelocity(const WheelOdomMeasurement &measure) {
     if (!measure.is_wheel_velocity_valid) {

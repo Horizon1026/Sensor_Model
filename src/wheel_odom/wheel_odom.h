@@ -6,6 +6,9 @@
 #include "basic_type.h"
 #include "slam_basic_math.h"
 
+#include "string"
+#include "vector"
+
 namespace sensor_model {
 
 /* Class Wheel Odom Model Declaration. */
@@ -23,6 +26,9 @@ public:
 public:
     WheelOdom() = default;
     virtual ~WheelOdom() = default;
+
+    // CSV: timestamp[ns], is_wheel_velocity_valid, encoder_left[count/s], encoder_right[count/s].
+    static bool ParseMeasuresFromFile(const std::string &file_path, const double &time_stamp_offset_s, std::vector<WheelOdomMeasurement> &measures);
 
     // Process measurements to be state observations.
     Vec3 ConvertEncoderCountToVelocity(const WheelOdomMeasurement &measure);

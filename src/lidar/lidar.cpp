@@ -4,15 +4,41 @@
 
 #include "algorithm"
 #include "cmath"
+#include "cstdio"
+#include "fstream"
+#include "limits"
 #include "utility"
 
 namespace sensor_model {
 
+bool Lidar::ParseOneMeasureFromFile(const std::string &file_path, const double &time_stamp_offset_s, LidarMeasurement &measure) {
+    std::ifstream file(file_path);
+    std::string line;
+    RETURN_FALSE_IF(!file.is_open() || !std::getline(file, line));
+
+    measure.raw_points.clear();
+    measure.time_stamp_s_of_points.clear();
+    measure.intensity_of_points.clear();
+    measure.undistorted_points.clear();
+    measure.time_stamp_s = -std::numeric_limits<double>::max();
+    while (std::getline(file, line)) {
+        double time_stamp_ns = 0.0;
+        double x = 0.0, y = 0.0, z = 0.0, intensity = 0.0;
+        CONTINUE_IF(std::sscanf(line.c_str(), "%lf,%lf,%lf,%lf,%lf", &time_stamp_ns, &x, &y, &z, &intensity) != 5);
+        const Vec3 point(x, y, z);
+        CONTINUE_IF(point.squaredNorm() < 0.25f);
+        const double time_stamp_s = time_stamp_ns * 1e-9 - time_stamp_offset_s;
+        measure.time_stamp_s = std::max(measure.time_stamp_s, time_stamp_s);
+        measure.raw_points.emplace_back(point);
+        measure.time_stamp_s_of_points.emplace_back(time_stamp_s);
+        measure.intensity_of_points.emplace_back(static_cast<float>(intensity));
+    }
+    return !measure.raw_points.empty();
+}
+
 void Lidar::RemoveLowIntensityPoints(LidarMeasurement &measure) {
     const uint32_t point_num = measure.intensity_of_points.size();
-    if (point_num == 0) {
-        return;
-    }
+    RETURN_IF(point_num == 0);
     // Build status vector. 1 = keep, 0 = remove.
     std::vector<uint8_t> status(point_num, 1);
 

@@ -6,6 +6,9 @@
 #include "basic_type.h"
 #include "slam_basic_math.h"
 
+#include "string"
+#include "vector"
+
 namespace sensor_model {
 
 /* Class Barometer Model Declaration. */
@@ -20,6 +23,9 @@ public:
 public:
     Barometer() = default;
     virtual ~Barometer() = default;
+
+    // CSV: timestamp[ns], pressure[Kpa], temperature[degC].
+    static bool ParseMeasuresFromFile(const std::string &file_path, const double &time_stamp_offset_s, std::vector<BaroMeasurement> &measures);
 
     // Convert measure of baro to altitude.
     float ConvertBaroToAltitude(const BaroMeasurement &measure);

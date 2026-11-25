@@ -22,6 +22,9 @@ public:
     Lidar() = default;
     virtual ~Lidar() = default;
 
+    // CSV: timestamp[ns], x[m], y[m], z[m], intensity. Frame time is the latest retained point time.
+    static bool ParseOneMeasureFromFile(const std::string &file_path, const double &time_stamp_offset_s, LidarMeasurement &measure);
+
     void RemoveLowIntensityPoints(LidarMeasurement &measure);
     bool ConvertPcdFileToPoints(const std::string &pcd_file, std::vector<Vec3> &points);
     float ComputeRatioOfZeroIntensityPoints(const LidarMeasurement &measure);
